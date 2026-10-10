@@ -39,7 +39,8 @@ healthcare attorney and an independent security review).
 ## Stack (default choices, change only with a reason)
 - Next.js (TypeScript) web app, mobile-friendly, installable to the home screen
 - Supabase: Postgres + Auth (email login with two-step verification)
-- Stripe Connect (Express accounts) + Stripe Checkout, tested in test mode first
+- Stripe Connect + Stripe Checkout, tested in test mode first (account style is an
+  open decision, see Payments)
 - Wallet passes: Apple PassKit (signed .pkpass + update web service) and Google Wallet API
 - Transactional email service (no health details in email bodies)
 - Hosting: decide before pilot; must offer a BAA on the chosen plan (verify, don't assume)
@@ -104,7 +105,25 @@ default), plus a privilege check in `provider_setup_test.sql`.
 -> 9 dashboard -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
 -> 14 store app.
 
+## Payments (build step 4: 4a Connect onboarding done; checkout comes in step 6)
+- Settings in `src/config/payments.ts`: `connectAccountStyle` ("full" = provider's own
+  full Stripe account, Stripe liable for losses; "express" = lighter, WE are liable) and
+  `platformFeePercent` (1%). Stripe client: `getStripe()` in `src/lib/stripe.ts`
+  (refuses live keys unless `ALLOW_LIVE_PAYMENTS=true`).
+- `src/lib/payments/connect.ts`: creates the connected account with **Accounts v2**
+  (`stripe.v2.core.accounts`; Stripe refuses v1 account creation for new platforms),
+  idempotent per provider, merchant configuration for direct charges; v2 onboarding
+  links; syncs `stripe_charges_enabled` from `configuration.merchant.capabilities.
+  card_payments.status`. Owner-only: guard with `requireOwner(providerId)`.
+- Development uses a Stripe **sandbox** (Connect setup in plain test mode required
+  live-mode steps). `STRIPE_SECRET_KEY` is the sandbox's `sk_test_` key.
+- Routes: dashboard "Connect Stripe" (server action), `/dashboard/stripe/return`,
+  `/dashboard/stripe/refresh`, `/dashboard/stripe/problem`. Status syncs on return;
+  an `account.updated` webhook comes with the payment webhooks in step 6.
+
 ## Open decisions
+- Stripe account style (who is liable for chargebacks/negative balances): testing with
+  "full"; decide with the attorney before pilot. One setting in `src/config/payments.ts`.
 - Lost authenticator phone: no self-service recovery yet. For now, delete the user's
   factor in the Supabase dashboard (Authentication > Users). Decide before pilot.
 - Shared front-desk devices for scan_only staff: two-step may need a different approach.
@@ -117,3 +136,5 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Make small, testable steps. After each step, say what to run to check it works.
 - Ask before adding dependencies or services that cost money.
 - Keep the data model and this file in sync.
+- After each commit, push to GitHub (`git push`; private repo
+  github.com/Millerlite35/prepaid-visits-app, branch `main`).

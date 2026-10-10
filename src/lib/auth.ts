@@ -31,6 +31,25 @@ export async function requireUser(): Promise<StaffUser> {
   return toUser(claims);
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// The signed-in, two-step-verified OWNER of this provider; anyone else is sent to the
+// dashboard. Use for money and account settings (Stripe, refunds, packages later).
+export async function requireOwner(providerId: string): Promise<StaffUser> {
+  const user = await requireUser();
+  if (!UUID.test(providerId)) redirect("/dashboard");
+  // read as the user, so row-level security only shows their own memberships
+  const supabase = await createSessionClient();
+  const { data } = await supabase
+    .from("provider_members")
+    .select("role")
+    .eq("provider_id", providerId)
+    .eq("user_id", user.id)
+    .maybeSingle<{ role: string }>();
+  if (data?.role !== "owner") redirect("/dashboard");
+  return user;
+}
+
 // Password-only check. ONLY for the two-step setup and verify pages themselves.
 export async function requireSignedIn(): Promise<StaffUser> {
   const { claims } = await readSession();

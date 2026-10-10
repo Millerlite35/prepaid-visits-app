@@ -5,6 +5,7 @@ import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { signOut } from "../(auth)/actions";
+import { connectStripe } from "./stripe/actions";
 
 export const metadata: Metadata = { title: `Dashboard · ${brand.name}` };
 
@@ -19,7 +20,15 @@ export default function DashboardPage() {
   );
 }
 
-type Membership = { role: string; providers: { display_name: string } | null };
+type Membership = {
+  role: string;
+  providers: {
+    id: string;
+    display_name: string;
+    stripe_account_id: string | null;
+    stripe_charges_enabled: boolean;
+  } | null;
+};
 
 async function DashboardContent() {
   const user = await requireUser();
@@ -28,7 +37,7 @@ async function DashboardContent() {
   const supabase = await createSessionClient();
   const { data, error } = await supabase
     .from("provider_members")
-    .select("role, providers(display_name)")
+    .select("role, providers(id, display_name, stripe_account_id, stripe_charges_enabled)")
     .returns<Membership[]>();
 
   return (
@@ -53,11 +62,12 @@ async function DashboardContent() {
           </>
         ) : (
           <>
-            <ul className="mt-2 space-y-1 text-sm">
+            <ul className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
               {data.map((m, i) => (
-                <li key={i}>
-                  {m.providers?.display_name ?? "A business"}{" "}
+                <li key={m.providers?.id ?? i} className="py-3">
+                  <span className="font-medium">{m.providers?.display_name ?? "A business"}</span>{" "}
                   <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
+                  {m.providers && <PaymentsStatus provider={m.providers} isOwner={m.role === "owner"} />}
                 </li>
               ))}
             </ul>
@@ -72,5 +82,29 @@ async function DashboardContent() {
         <button className="text-sm underline">Sign out</button>
       </form>
     </>
+  );
+}
+
+function PaymentsStatus({ provider, isOwner }: { provider: NonNullable<Membership["providers"]>; isOwner: boolean }) {
+  if (provider.stripe_charges_enabled) {
+    return <p className="mt-1 text-green-700 dark:text-green-500">✓ Ready to accept payments</p>;
+  }
+  const started = provider.stripe_account_id !== null;
+  return (
+    <div className="mt-1">
+      <p className="text-zinc-600 dark:text-zinc-400">
+        {started ? "Stripe setup isn't finished yet." : "Connect Stripe to get paid for packages."}
+      </p>
+      {isOwner ? (
+        <form action={connectStripe} className="mt-2">
+          <input type="hidden" name="providerId" value={provider.id} />
+          <button className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white">
+            {started ? "Continue Stripe setup" : "Connect Stripe"}
+          </button>
+        </form>
+      ) : (
+        <p className="text-xs text-zinc-500">The business owner can connect Stripe.</p>
+      )}
+    </div>
   );
 }
