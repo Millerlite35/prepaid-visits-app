@@ -54,9 +54,15 @@ Files in `supabase/migrations/`, run in order:
 3. `0003_access_rules.sql`: row-level security
 4. `0004_require_two_step.sql`: restrictive RLS policies, so signed-in users see provider
    data only after two-step verification (`aal2` in their login token)
+5. `0005_create_provider.sql`: `create_provider` (business + owner + audit row, atomic),
+   and locks all business functions to the server (revoke from public/anon/authenticated)
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
-`supabase/tests/visit_logic_test.sql` and `supabase/tests/access_rules_test.sql`.
-Re-run both after any schema change.
+`visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql` in
+`supabase/tests/`. Re-run all after any schema change.
+
+**Every new business function** needs `revoke execute ... from public, anon, authenticated`
+and `grant execute ... to service_role` (Supabase makes functions browser-callable by
+default), plus a privilege check in `provider_setup_test.sql`.
 
 `record_visit` result codes the scanner must handle:
 `ok | unknown_code | unassigned | revoked | no_visits | expired | duplicate_recent`
@@ -74,7 +80,7 @@ Re-run both after any schema change.
   browser key cannot read providers). Replace it when the real home page exists.
 - Check: `npm run lint` and `npm run build` must both pass.
 
-## Provider login (build step 3: 3a + 3b done; 3c onboarding next)
+## Provider login (build step 3: 3a login, 3b two-step, 3c onboarding)
 - Supabase Auth, email + password (min 12 chars), email confirmation on.
   Supabase dashboard > Authentication > URL Configuration must allow `SITE_URL/**`.
 - Two-step verification (authenticator app, TOTP) is required for ALL staff.
@@ -87,10 +93,13 @@ Re-run both after any schema change.
   `/mfa/*` pages alone. Read staff data with `createSessionClient()` from
   `src/lib/supabase/server.ts`, which acts as the signed-in user so RLS applies.
 - Routes: `/signup`, `/login` (forms + actions in `src/app/(auth)/`), `/auth/callback`
-  (email link, fixed redirect to /dashboard), `/auth/error`, `/dashboard`.
+  (email link, fixed redirect to /dashboard), `/auth/error`, `/dashboard`,
+  `/dashboard/new-business` (onboarding; calls `create_provider` with the verified user id).
+- Provider purchase pages will live at `/{slug}`. `src/lib/slug.ts` has the slug rules
+  (must match the DB check) and a RESERVED list: **add every new top-level route to it.**
 
 ## Roadmap pointers (matches plan Section "Build steps")
-1 data model (done) -> 2 project (done) + hosting (open) -> 3 provider login/security -> 4 Stripe Connect
+1 data model (done) -> 2 project (done) + hosting (open) -> 3 provider login/security (done) -> 4 Stripe Connect
 -> 5 provider page builder -> 6 purchase flow + email -> 7 wallet passes -> 8 scanner web app
 -> 9 dashboard -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
 -> 14 store app.

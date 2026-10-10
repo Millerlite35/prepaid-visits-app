@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
@@ -39,18 +40,31 @@ async function DashboardContent() {
         {error ? (
           <p className="mt-2 text-sm text-red-600">Couldn&apos;t load your businesses. Try refreshing.</p>
         ) : data.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            You&apos;re not part of a business yet.
-          </p>
+          <>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              You&apos;re not part of a business yet.
+            </p>
+            <Link
+              href="/dashboard/new-business"
+              className="mt-4 inline-block rounded-md bg-brand px-4 py-2 text-sm font-medium text-white"
+            >
+              Create your business
+            </Link>
+          </>
         ) : (
-          <ul className="mt-2 space-y-1 text-sm">
-            {data.map((m, i) => (
-              <li key={i}>
-                {m.providers?.display_name ?? "A business"}{" "}
-                <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="mt-2 space-y-1 text-sm">
+              {data.map((m, i) => (
+                <li key={i}>
+                  {m.providers?.display_name ?? "A business"}{" "}
+                  <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/dashboard/new-business" className="mt-4 inline-block text-sm underline">
+              Add another business
+            </Link>
+          </>
         )}
       </section>
 
