@@ -1,0 +1,51 @@
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { brand } from "@/config/brand";
+import { requireStaff } from "@/lib/auth";
+import { getAdminClient } from "@/lib/supabase/admin";
+import { checkIn, undoCheckIn } from "./actions";
+import { Scanner } from "./scanner";
+
+export const metadata: Metadata = { title: `Scan · ${brand.name}` };
+
+export default function ScanPage({ params }: PageProps<"/dashboard/business/[providerId]/scan">) {
+  return (
+    <main className="mx-auto w-full max-w-md flex-1 px-4 py-6">
+      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+        <ScanContent params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function ScanContent({ params }: { params: Promise<{ providerId: string }> }) {
+  const { providerId } = await params;
+  await requireStaff(providerId);
+
+  // scan-only staff can't read the providers table directly, so the server reads the
+  // name after the staff check above
+  const { data: provider } = await getAdminClient()
+    .from("providers")
+    .select("display_name, vocab_singular, vocab_plural")
+    .eq("id", providerId)
+    .single<{ display_name: string; vocab_singular: string; vocab_plural: string }>();
+
+  return (
+    <>
+      <div className="mb-4 flex items-baseline justify-between gap-3">
+        <h1 className="text-xl font-semibold text-brand">Check in</h1>
+        <Link href="/dashboard" className="text-sm underline">
+          Dashboard
+        </Link>
+      </div>
+      <p className="mb-4 text-sm text-zinc-500">{provider?.display_name}</p>
+      <Scanner
+        checkIn={checkIn.bind(null, providerId)}
+        undo={undoCheckIn.bind(null, providerId)}
+        singular={provider?.vocab_singular ?? "visit"}
+        plural={provider?.vocab_plural ?? "visits"}
+      />
+    </>
+  );
+}

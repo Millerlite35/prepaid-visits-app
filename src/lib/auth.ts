@@ -35,9 +35,12 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type StaffRole = "owner" | "manager" | "scan_only";
 
-// The signed-in, two-step-verified user, if they hold one of these roles for the provider.
-// Anyone else is sent to the dashboard.
-export async function requireProviderRole(providerId: string, roles: StaffRole[]): Promise<StaffUser> {
+// The signed-in, two-step-verified user (and their role), if they hold one of these roles
+// for the provider. Anyone else is sent to the dashboard.
+export async function requireProviderRole(
+  providerId: string,
+  roles: StaffRole[],
+): Promise<StaffUser & { role: StaffRole }> {
   const user = await requireUser();
   if (!UUID.test(providerId)) redirect("/dashboard");
   // read as the user, so row-level security only shows their own memberships
@@ -49,7 +52,12 @@ export async function requireProviderRole(providerId: string, roles: StaffRole[]
     .eq("user_id", user.id)
     .maybeSingle<{ role: StaffRole }>();
   if (!data || !roles.includes(data.role)) redirect("/dashboard");
-  return user;
+  return { ...user, role: data.role };
+}
+
+// Any staff member: checking clients in with the scanner.
+export function requireStaff(providerId: string) {
+  return requireProviderRole(providerId, ["owner", "manager", "scan_only"]);
 }
 
 // Owner only: money, page settings and terms (Stripe, refunds). The database's

@@ -111,8 +111,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
 
 ## Roadmap pointers (matches plan Section "Build steps")
 1 data model (done) -> 2 project (done) + hosting (open) -> 3 provider login/security (done) -> 4 Stripe Connect
-(done) -> 5 provider page builder (done) -> 6 purchase flow + email (done) -> 7 wallet passes -> 8 scanner web app
--> 9 dashboard -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
+(done) -> 5 provider page builder (done) -> 6 purchase flow + email (done) -> 7 wallet passes
+(deferred: needs the $99 Apple Developer account and the final name) -> 8 scanner web app
+(done) -> 9 dashboard -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
 -> 14 store app.
 
 ## Payments (build step 4: 4a Connect onboarding done; checkout comes in step 6)
@@ -177,6 +178,20 @@ default), plus a privilege check in `provider_setup_test.sql`.
   their own snapshot, so edits never change past sales.
 - UI uses the provider's `vocab_singular` / `vocab_plural` ("visit"/"class"), never a
   hardcoded word.
+
+## Scanner (build step 8)
+- `/dashboard/business/[providerId]/scan`, ALL staff incl. scan_only (`requireStaff`).
+  Camera (native `BarcodeDetector` where available, else the `barcode-detector` ponyfill
+  with its zxing `.wasm` self-hosted at `/vendor/zxing_reader-<version>.wasm`, copied by
+  `scripts/copy-scanner-wasm.mjs` on predev/prebuild; `public/vendor` is git-ignored),
+  USB scanner / typed code (a pasted pass link also works).
+- Server actions call `record_visit` / `undo_visit` with the admin client after the staff
+  check; every result code has its own screen. scan_only can undo within 15 minutes;
+  owners/managers any time. Beep + vibration feedback.
+- Camera needs a secure origin: works on `localhost`, NOT on `http://<LAN-ip>` from a
+  phone. Phone camera testing needs https (hosting, or a tunnel).
+- Dashboard shows scan-only staff the business name via a server-side lookup (RLS hides
+  provider rows from them), and has "View purchase page" links.
 
 ## Open decisions
 - Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the

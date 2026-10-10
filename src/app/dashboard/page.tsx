@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
+import { getAdminClient } from "@/lib/supabase/admin";
 import { createSessionClient } from "@/lib/supabase/server";
 import { signOut } from "../(auth)/actions";
 import { connectStripe } from "./stripe/actions";
@@ -21,10 +22,15 @@ export default function DashboardPage() {
 }
 
 type Membership = {
+  provider_id: string;
   role: string;
+  // null for scan-only staff: row-level security doesn't let them read business details
   providers: {
     id: string;
     display_name: string;
+    slug: string;
+    page_access: "public" | "private";
+    private_access_key: string;
     stripe_account_id: string | null;
     stripe_charges_enabled: boolean;
   } | null;
@@ -37,8 +43,23 @@ async function DashboardContent() {
   const supabase = await createSessionClient();
   const { data, error } = await supabase
     .from("provider_members")
-    .select("role, providers(id, display_name, stripe_account_id, stripe_charges_enabled)")
+    .select(
+      "provider_id, role, providers(id, display_name, slug, page_access, private_access_key, stripe_account_id, stripe_charges_enabled)",
+    )
     .returns<Membership[]>();
+
+  // Scan-only staff still need to see which business they're scanning for: look up just
+  // the names, server-side, for memberships the user really has (read above).
+  const hidden = (data ?? []).filter((m) => !m.providers).map((m) => m.provider_id);
+  const names = new Map<string, string>();
+  if (hidden.length) {
+    const { data: rows } = await getAdminClient()
+      .from("providers")
+      .select("id, display_name")
+      .in("id", hidden)
+      .returns<{ id: string; display_name: string }[]>();
+    rows?.forEach((r) => names.set(r.id, r.display_name));
+  }
 
   return (
     <>
@@ -63,23 +84,42 @@ async function DashboardContent() {
         ) : (
           <>
             <ul className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
-              {data.map((m, i) => (
-                <li key={m.providers?.id ?? i} className="py-3">
-                  <span className="font-medium">{m.providers?.display_name ?? "A business"}</span>{" "}
-                  <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
-                  {m.providers && (m.role === "owner" || m.role === "manager") && (
-                    <Link href={`/dashboard/business/${m.providers.id}/packages`} className="ml-3 underline">
-                      Packages
-                    </Link>
-                  )}
-                  {m.providers && m.role === "owner" && (
-                    <Link href={`/dashboard/business/${m.providers.id}/settings`} className="ml-3 underline">
-                      Page settings
-                    </Link>
-                  )}
-                  {m.providers && <PaymentsStatus provider={m.providers} isOwner={m.role === "owner"} />}
-                </li>
-              ))}
+              {data.map((m) => {
+                const p = m.providers;
+                const base = `/dashboard/business/${m.provider_id}`;
+                return (
+                  <li key={m.provider_id} className="py-3">
+                    <span className="font-medium">{p?.display_name ?? names.get(m.provider_id) ?? "A business"}</span>{" "}
+                    <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                      <Link href={`${base}/scan`} className="font-medium underline">
+                        Scan
+                      </Link>
+                      {p && (m.role === "owner" || m.role === "manager") && (
+                        <Link href={`${base}/packages`} className="underline">
+                          Packages
+                        </Link>
+                      )}
+                      {p && m.role === "owner" && (
+                        <Link href={`${base}/settings`} className="underline">
+                          Page settings
+                        </Link>
+                      )}
+                      {p && (
+                        <a
+                          href={p.page_access === "private" ? `/${p.slug}?key=${p.private_access_key}` : `/${p.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          View purchase page ↗
+                        </a>
+                      )}
+                    </div>
+                    {p && <PaymentsStatus provider={p} isOwner={m.role === "owner"} />}
+                  </li>
+                );
+              })}
             </ul>
             <Link href="/dashboard/new-business" className="mt-4 inline-block text-sm underline">
               Add another business
