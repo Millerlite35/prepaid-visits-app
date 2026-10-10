@@ -63,6 +63,8 @@ Files in `supabase/migrations/`, run in order:
 7. `0007_checkout.sql`: `complete_checkout` records a paid Checkout session atomically
    (client + account created on first purchase, purchase, `mark_purchase_paid`, wallet
    credential, audit row); idempotent per session id
+8. `0008_logos.sql`: public-read Storage bucket `provider-logos` (PNG/JPG/WebP, 1 MB, no
+   write policies: only the server uploads, after `requireOwner`)
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql` in `supabase/tests/`. Re-run all after any
@@ -137,6 +139,11 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (`/{slug}?key=...`, regenerable), terms (starter template, not legal advice; each save
   is a new version). Rules in `src/lib/page-settings.ts`.
 - Clients can't buy while `terms_text` is empty or Stripe isn't ready (`notSellingReason`).
+- Logos: upload in Page settings (`src/lib/logos.ts` checks the real file bytes; SVG is
+  refused because it can carry scripts; new random file name each upload; old file
+  deleted). `logoUrl()` in `src/lib/branding.ts`; shown via `<ProviderHeader>`
+  (`src/components/provider-header.tsx`) on the purchase, thank-you and pass pages, and
+  in the pass email. Server Action body limit raised to 2 MB in `next.config.ts`.
 
 ## Purchase flow (build step 6: 6a checkout, 6b pass email)
 - Public purchase page `/{slug}` (`?key=` for private pages; wrong key = not found).

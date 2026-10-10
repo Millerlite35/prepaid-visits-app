@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
+import { ProviderHeader } from "@/components/provider-header";
 import { brand } from "@/config/brand";
 import { loadActivePackages, loadPublicProvider, notSellingReason } from "@/lib/payments/checkout";
 import { startCheckout } from "./actions";
@@ -32,14 +33,14 @@ async function PurchaseContent({ params, searchParams }: PageProps<"/[slug]">) {
   if (!provider) notFound(); // also for a private page without the right key
 
   const header = (
-    <header className="mb-8">
-      <h1 className="text-2xl font-semibold" style={{ color: provider.brand_color }}>
-        {provider.display_name}
-      </h1>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        Prepaid {provider.vocab_singular} packages: pay once, then check in with your pass.
-      </p>
-    </header>
+    <div className="mb-8">
+      <ProviderHeader
+        name={provider.display_name}
+        color={provider.brand_color}
+        logoPath={provider.logo_path}
+        subtitle={`Prepaid ${provider.vocab_singular} packages: pay once, then check in with your pass.`}
+      />
+    </div>
   );
 
   const reason = notSellingReason(provider);

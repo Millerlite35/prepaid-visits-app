@@ -31,6 +31,7 @@ export type PassView = {
   status: "active" | "revoked" | "unassigned";
   providerName: string;
   brandColor: string;
+  logoPath: string | null;
   passLabel: string;
   singular: string;
   plural: string;
@@ -44,12 +45,19 @@ export async function loadPass(token: string): Promise<PassView | null> {
   const db = getAdminClient();
   const { data: cred } = await db
     .from("credentials")
-    .select("status, visit_account_id, providers(display_name, brand_color, pass_label, vocab_singular, vocab_plural)")
+    .select("status, visit_account_id, providers(display_name, brand_color, logo_path, pass_label, vocab_singular, vocab_plural)")
     .eq("token", token)
     .maybeSingle<{
       status: PassView["status"];
       visit_account_id: string | null;
-      providers: { display_name: string; brand_color: string; pass_label: string; vocab_singular: string; vocab_plural: string };
+      providers: {
+        display_name: string;
+        brand_color: string;
+        logo_path: string | null;
+        pass_label: string;
+        vocab_singular: string;
+        vocab_plural: string;
+      };
     }>();
   if (!cred) return null;
 
@@ -69,6 +77,7 @@ export async function loadPass(token: string): Promise<PassView | null> {
     status: cred.status,
     providerName: cred.providers.display_name,
     brandColor: cred.providers.brand_color,
+    logoPath: cred.providers.logo_path,
     passLabel: cred.providers.pass_label,
     singular: cred.providers.vocab_singular,
     plural: cred.providers.vocab_plural,

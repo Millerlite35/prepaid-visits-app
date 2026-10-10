@@ -1,5 +1,6 @@
 import "server-only";
 import { brand } from "@/config/brand";
+import { logoUrl } from "@/lib/branding";
 import { emailConfigured, escapeHtml, fromAddress, sendEmail } from "@/lib/email";
 import { formatDate, passUrl, qrPng } from "@/lib/passes";
 import { getAdminClient } from "@/lib/supabase/admin";
@@ -17,7 +18,7 @@ export async function sendPassEmail(purchaseId: string, credentialId: string): P
     const { data: p } = await db
       .from("purchases")
       .select(
-        "provider_id, package_name, visits_purchased, expires_at, visit_account_id, visit_accounts(clients(full_name, email)), providers(display_name, brand_color, pass_label, vocab_singular, vocab_plural)",
+        "provider_id, package_name, visits_purchased, expires_at, visit_account_id, visit_accounts(clients(full_name, email)), providers(display_name, brand_color, logo_path, pass_label, vocab_singular, vocab_plural)",
       )
       .eq("id", purchaseId)
       .single<{
@@ -27,7 +28,14 @@ export async function sendPassEmail(purchaseId: string, credentialId: string): P
         expires_at: string | null;
         visit_account_id: string;
         visit_accounts: { clients: { full_name: string; email: string } };
-        providers: { display_name: string; brand_color: string; pass_label: string; vocab_singular: string; vocab_plural: string };
+        providers: {
+          display_name: string;
+          brand_color: string;
+          logo_path: string | null;
+          pass_label: string;
+          vocab_singular: string;
+          vocab_plural: string;
+        };
       }>();
     const { data: cred } = await db.from("credentials").select("token").eq("id", credentialId).single<{ token: string }>();
     if (!p || !cred) throw new Error("purchase or pass not found");
@@ -45,10 +53,15 @@ export async function sendPassEmail(purchaseId: string, credentialId: string): P
     const expiry = p.expires_at ? `Expires ${formatDate(p.expires_at)}` : "Never expires";
     const available = bal?.usable_visits ?? p.visits_purchased;
     const e = escapeHtml;
+    const logo = logoUrl(prov.logo_path);
+    const logoHtml = logo
+      ? `<img src="${e(logo)}" alt="${e(prov.display_name)} logo" height="56" style="display:block;max-height:56px;max-width:220px;height:auto;margin:0 0 12px">`
+      : "";
 
     const html = `<!doctype html>
 <html><body style="margin:0;padding:24px;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;color:#18181b">
   <div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:12px;padding:28px">
+    ${logoHtml}
     <p style="margin:0 0 4px;font-size:20px;font-weight:bold;color:${e(prov.brand_color)}">${e(prov.display_name)}</p>
     <p style="margin:0 0 20px;font-size:14px;color:#52525b">${e(prov.pass_label)}</p>
     <p style="margin:0 0 12px">Hi ${e(firstName)}, thanks for your purchase!</p>

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
+import { ProviderHeader } from "@/components/provider-header";
 import { brand } from "@/config/brand";
 import { formatDate, loadPass, qrSvg } from "@/lib/passes";
 
@@ -27,12 +28,7 @@ async function PassContent({ params }: PageProps<"/pass/[token]">) {
   if (!pass) notFound();
 
   const header = (
-    <div className="text-center">
-      <p className="text-xl font-semibold" style={{ color: pass.brandColor }}>
-        {pass.providerName}
-      </p>
-      <p className="text-sm text-zinc-500">{pass.passLabel}</p>
-    </div>
+    <ProviderHeader name={pass.providerName} color={pass.brandColor} logoPath={pass.logoPath} subtitle={pass.passLabel} center />
   );
 
   if (pass.status !== "active") {

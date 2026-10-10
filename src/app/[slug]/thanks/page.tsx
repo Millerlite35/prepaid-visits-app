@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
+import { ProviderHeader } from "@/components/provider-header";
 import { brand } from "@/config/brand";
 import { describeExpiry } from "@/lib/packages";
 import { getStripe } from "@/lib/stripe";
@@ -23,7 +24,15 @@ export default function ThanksPage(props: PageProps<"/[slug]/thanks">) {
   );
 }
 
-type ProviderRow = { id: string; display_name: string; brand_color: string; vocab_singular: string; vocab_plural: string; stripe_account_id: string | null };
+type ProviderRow = {
+  id: string;
+  display_name: string;
+  brand_color: string;
+  logo_path: string | null;
+  vocab_singular: string;
+  vocab_plural: string;
+  stripe_account_id: string | null;
+};
 type PurchaseRow = { package_name: string; visits_purchased: number; expires_days: number | null; visit_account_id: string };
 
 async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks">) {
@@ -36,7 +45,7 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
   const db = getAdminClient();
   const { data: provider } = await db
     .from("providers")
-    .select("id, display_name, brand_color, vocab_singular, vocab_plural, stripe_account_id")
+    .select("id, display_name, brand_color, logo_path, vocab_singular, vocab_plural, stripe_account_id")
     .eq("slug", slug.toLowerCase())
     .maybeSingle<ProviderRow>();
   if (!provider?.stripe_account_id) notFound();
@@ -50,11 +59,7 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
     notFound();
   }
 
-  const heading = (
-    <h1 className="text-2xl font-semibold" style={{ color: provider.brand_color }}>
-      {provider.display_name}
-    </h1>
-  );
+  const heading = <ProviderHeader name={provider.display_name} color={provider.brand_color} logoPath={provider.logo_path} />;
 
   if (!paid) {
     return (

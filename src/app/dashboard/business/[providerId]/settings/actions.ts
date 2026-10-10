@@ -11,6 +11,7 @@ import {
   isHexColor,
   passLabelProblem,
 } from "@/lib/page-settings";
+import { removeLogoFile, uploadLogo } from "@/lib/logos";
 import { checkSlug } from "@/lib/slug";
 import { createSessionClient } from "@/lib/supabase/server";
 
@@ -79,6 +80,27 @@ export async function newPrivateLink(providerId: string): Promise<void> {
   await requireOwner(providerId);
   const result = await saveProvider(providerId, { private_access_key: randomBytes(16).toString("hex") });
   if (result.error) console.error("new private link failed");
+}
+
+async function currentLogoPath(providerId: string): Promise<string | null> {
+  const db = await createSessionClient();
+  const { data } = await db.from("providers").select("logo_path").eq("id", providerId).single<{ logo_path: string | null }>();
+  return data?.logo_path ?? null;
+}
+
+export async function saveLogo(providerId: string, _prev: SettingsState, formData: FormData): Promise<SettingsState> {
+  await requireOwner(providerId);
+  const file = formData.get("logo");
+  const uploaded = await uploadLogo(providerId, file instanceof File ? file : null, await currentLogoPath(providerId));
+  if ("error" in uploaded) return { error: uploaded.error };
+  return saveProvider(providerId, { logo_path: uploaded.path });
+}
+
+export async function removeLogo(providerId: string): Promise<void> {
+  await requireOwner(providerId);
+  const path = await currentLogoPath(providerId);
+  const result = await saveProvider(providerId, { logo_path: null });
+  if (!result.error && path) await removeLogoFile(path);
 }
 
 export async function saveTerms(providerId: string, _prev: SettingsState, formData: FormData): Promise<SettingsState> {

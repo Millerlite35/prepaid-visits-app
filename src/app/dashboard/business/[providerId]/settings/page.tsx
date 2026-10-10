@@ -5,7 +5,9 @@ import { brand } from "@/config/brand";
 import { requireOwner } from "@/lib/auth";
 import { requireEnv } from "@/lib/env";
 import { createSessionClient } from "@/lib/supabase/server";
-import { newPrivateLink, saveAddressAndAccess, savePageDetails, saveTerms } from "./actions";
+import { logoUrl } from "@/lib/branding";
+import { newPrivateLink, removeLogo, saveAddressAndAccess, saveLogo, savePageDetails, saveTerms } from "./actions";
+import { LogoForm } from "./logo-form";
 import { AddressForm, PageDetailsForm, PrivateLink, TermsForm, type PageDetails } from "./settings-forms";
 
 export const metadata: Metadata = { title: `Page settings · ${brand.name}` };
@@ -20,12 +22,17 @@ export default function SettingsPage({ params }: PageProps<"/dashboard/business/
   );
 }
 
+function privateUrlOrPublic(site: string, p: { slug: string; page_access: string; private_access_key: string }) {
+  return p.page_access === "private" ? `${site}/${p.slug}?key=${p.private_access_key}` : `${site}/${p.slug}`;
+}
+
 type ProviderSettings = PageDetails & {
   slug: string;
   page_access: "public" | "private";
   private_access_key: string;
   terms_text: string;
   terms_version: number;
+  logo_path: string | null;
 };
 
 async function SettingsContent({ params }: { params: Promise<{ providerId: string }> }) {
@@ -37,7 +44,7 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
   const { data: p, error } = await db
     .from("providers")
     .select(
-      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version",
+      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version, logo_path",
     )
     .eq("id", providerId)
     .single<ProviderSettings>();
@@ -54,9 +61,20 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
       </Link>
       <h1 className="mt-4 text-2xl font-semibold text-brand">Page settings</h1>
       <p className="mt-1 text-sm text-zinc-500">
-        What clients see on {p.display_name}&apos;s purchase page and passes. The purchase page
-        itself arrives in the next build step.
+        What clients see on {p.display_name}&apos;s purchase page, passes and emails.{" "}
+        <a href={privateUrlOrPublic(site, p)} target="_blank" rel="noopener noreferrer" className="underline">
+          View your purchase page ↗
+        </a>
       </p>
+
+      <section className={card}>
+        <h2 className="mb-4 font-medium">Logo</h2>
+        <LogoForm
+          action={saveLogo.bind(null, providerId)}
+          removeAction={removeLogo.bind(null, providerId)}
+          currentUrl={logoUrl(p.logo_path)}
+        />
+      </section>
 
       <section className={card}>
         <h2 className="mb-4 font-medium">Page details</h2>

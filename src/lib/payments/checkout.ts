@@ -15,6 +15,7 @@ export type PublicProvider = {
   slug: string;
   display_name: string;
   brand_color: string;
+  logo_path: string | null;
   vocab_singular: string;
   vocab_plural: string;
   pass_label: string;
@@ -47,7 +48,7 @@ export async function loadPublicProvider(slug: string, key: string | undefined):
   const { data } = await getAdminClient()
     .from("providers")
     .select(
-      "id, slug, display_name, brand_color, vocab_singular, vocab_plural, pass_label, page_access, private_access_key, stripe_account_id, stripe_charges_enabled, terms_text, terms_version",
+      "id, slug, display_name, brand_color, logo_path, vocab_singular, vocab_plural, pass_label, page_access, private_access_key, stripe_account_id, stripe_charges_enabled, terms_text, terms_version",
     )
     .eq("slug", slug.toLowerCase())
     .maybeSingle<PublicProvider>();
