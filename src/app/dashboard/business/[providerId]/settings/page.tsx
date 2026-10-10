@@ -1,0 +1,105 @@
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { brand } from "@/config/brand";
+import { requireOwner } from "@/lib/auth";
+import { requireEnv } from "@/lib/env";
+import { createSessionClient } from "@/lib/supabase/server";
+import { newPrivateLink, saveAddressAndAccess, savePageDetails, saveTerms } from "./actions";
+import { AddressForm, PageDetailsForm, PrivateLink, TermsForm, type PageDetails } from "./settings-forms";
+
+export const metadata: Metadata = { title: `Page settings · ${brand.name}` };
+
+export default function SettingsPage({ params }: PageProps<"/dashboard/business/[providerId]/settings">) {
+  return (
+    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12">
+      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+        <SettingsContent params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+type ProviderSettings = PageDetails & {
+  slug: string;
+  page_access: "public" | "private";
+  private_access_key: string;
+  terms_text: string;
+  terms_version: number;
+};
+
+async function SettingsContent({ params }: { params: Promise<{ providerId: string }> }) {
+  const { providerId } = await params;
+  await requireOwner(providerId);
+
+  // read as the signed-in owner (row-level security)
+  const db = await createSessionClient();
+  const { data: p, error } = await db
+    .from("providers")
+    .select(
+      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version",
+    )
+    .eq("id", providerId)
+    .single<ProviderSettings>();
+  if (error) return <p className="text-sm text-red-600">Couldn&apos;t load settings. Try refreshing.</p>;
+
+  const site = requireEnv("SITE_URL");
+  const privateUrl = `${site}/${p.slug}?key=${p.private_access_key}`;
+  const card = "mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800";
+
+  return (
+    <>
+      <Link href="/dashboard" className="text-sm underline">
+        ← Dashboard
+      </Link>
+      <h1 className="mt-4 text-2xl font-semibold text-brand">Page settings</h1>
+      <p className="mt-1 text-sm text-zinc-500">
+        What clients see on {p.display_name}&apos;s purchase page and passes. The purchase page
+        itself arrives in the next build step.
+      </p>
+
+      <section className={card}>
+        <h2 className="mb-4 font-medium">Page details</h2>
+        <PageDetailsForm
+          action={savePageDetails.bind(null, providerId)}
+          initial={{
+            display_name: p.display_name,
+            brand_color: p.brand_color,
+            vocab_singular: p.vocab_singular,
+            vocab_plural: p.vocab_plural,
+            pass_label: p.pass_label,
+            profession_template: p.profession_template,
+            timezone: p.timezone,
+          }}
+        />
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-4 font-medium">Web address and access</h2>
+        <AddressForm
+          action={saveAddressAndAccess.bind(null, providerId)}
+          initialSlug={p.slug}
+          initialAccess={p.page_access}
+          siteHost={new URL(site).host}
+        />
+        {p.page_access === "private" && (
+          <div className="mt-6 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+            <PrivateLink url={privateUrl} renewAction={newPrivateLink.bind(null, providerId)} />
+          </div>
+        )}
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-2 font-medium">Terms clients accept before buying</h2>
+        <TermsForm
+          action={saveTerms.bind(null, providerId)}
+          initialTerms={p.terms_text}
+          version={p.terms_version}
+          businessName={p.display_name}
+          singular={p.vocab_singular}
+          plural={p.vocab_plural}
+        />
+      </section>
+    </>
+  );
+}

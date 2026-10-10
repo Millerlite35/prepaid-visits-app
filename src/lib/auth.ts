@@ -52,12 +52,13 @@ export async function requireProviderRole(providerId: string, roles: StaffRole[]
   return user;
 }
 
-// Owner only: money and account settings (Stripe, refunds).
+// Owner only: money, page settings and terms (Stripe, refunds). The database's
+// providers_update policy is owner-only too.
 export function requireOwner(providerId: string): Promise<StaffUser> {
   return requireProviderRole(providerId, ["owner"]);
 }
 
-// Owner or manager: running the business (packages, page settings). Not scan-only staff.
+// Owner or manager: running the business day to day (packages). Not scan-only staff.
 export function requireManager(providerId: string): Promise<StaffUser> {
   return requireProviderRole(providerId, ["owner", "manager"]);
 }

@@ -72,6 +72,11 @@ async function DashboardContent() {
                       Packages
                     </Link>
                   )}
+                  {m.providers && m.role === "owner" && (
+                    <Link href={`/dashboard/business/${m.providers.id}/settings`} className="ml-3 underline">
+                      Page settings
+                    </Link>
+                  )}
                   {m.providers && <PaymentsStatus provider={m.providers} isOwner={m.role === "owner"} />}
                 </li>
               ))}

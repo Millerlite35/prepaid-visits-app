@@ -57,9 +57,13 @@ Files in `supabase/migrations/`, run in order:
    data only after two-step verification (`aal2` in their login token)
 5. `0005_create_provider.sql`: `create_provider` (business + owner + audit row, atomic),
    and locks all business functions to the server (revoke from public/anon/authenticated)
+6. `0006_page_settings.sql`: `provider_terms` history (triggers bump `terms_version` and
+   save each version; read-only to owners), and column-level grants so signed-in owners
+   may update only settings columns on `providers` (never Stripe fields or versions)
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
-`visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql` in
-`supabase/tests/`. Re-run all after any schema change.
+`visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
+`page_settings_test.sql` in `supabase/tests/`. Re-run all after any schema change.
+**New settings columns on providers** must be added to the `grant update (...)` list.
 
 **Every new business function** needs `revoke execute ... from public, anon, authenticated`
 and `grant execute ... to service_role` (Supabase makes functions browser-callable by
@@ -121,7 +125,14 @@ default), plus a privilege check in `provider_setup_test.sql`.
   `/dashboard/stripe/refresh`, `/dashboard/stripe/problem`. Status syncs on return;
   an `account.updated` webhook comes with the payment webhooks in step 6.
 
-## Provider setup (build step 5: 5a packages done; page settings + terms next)
+## Provider setup (build step 5: 5a packages, 5b page settings + terms)
+- `/dashboard/business/[providerId]/settings`, OWNER only (`requireOwner`; the DB's
+  `providers_update` policy is owner-only too): name, profession preset (fills wording +
+  pass label), vocab, neutral pass label (`passLabelProblem` keyword check, hard rule 8),
+  brand colour (contrast warning), time zone, slug, public/private, private link
+  (`/{slug}?key=...`, regenerable), terms (starter template, not legal advice; each save
+  is a new version). Rules in `src/lib/page-settings.ts`.
+- Clients must not be able to buy while `terms_text` is empty (enforce in step 6).
 - `/dashboard/business/[providerId]/packages` (+ `/[packageId]` to edit), owners and
   managers only (`requireManager`). Writes go through `createSessionClient()` so RLS
   (`templates_all` + two-step) also enforces access; no admin client needed.
