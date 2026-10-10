@@ -60,9 +60,13 @@ Files in `supabase/migrations/`, run in order:
 6. `0006_page_settings.sql`: `provider_terms` history (triggers bump `terms_version` and
    save each version; read-only to owners), and column-level grants so signed-in owners
    may update only settings columns on `providers` (never Stripe fields or versions)
+7. `0007_checkout.sql`: `complete_checkout` records a paid Checkout session atomically
+   (client + account created on first purchase, purchase, `mark_purchase_paid`, wallet
+   credential, audit row); idempotent per session id
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
-`page_settings_test.sql` in `supabase/tests/`. Re-run all after any schema change.
+`page_settings_test.sql`, `checkout_test.sql` in `supabase/tests/`. Re-run all after any
+schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
 **Every new business function** needs `revoke execute ... from public, anon, authenticated`
@@ -105,7 +109,7 @@ default), plus a privilege check in `provider_setup_test.sql`.
 
 ## Roadmap pointers (matches plan Section "Build steps")
 1 data model (done) -> 2 project (done) + hosting (open) -> 3 provider login/security (done) -> 4 Stripe Connect
--> 5 provider page builder -> 6 purchase flow + email -> 7 wallet passes -> 8 scanner web app
+(done) -> 5 provider page builder (done) -> 6 purchase flow + email (done) -> 7 wallet passes -> 8 scanner web app
 -> 9 dashboard -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
 -> 14 store app.
 
@@ -132,7 +136,29 @@ default), plus a privilege check in `provider_setup_test.sql`.
   brand colour (contrast warning), time zone, slug, public/private, private link
   (`/{slug}?key=...`, regenerable), terms (starter template, not legal advice; each save
   is a new version). Rules in `src/lib/page-settings.ts`.
-- Clients must not be able to buy while `terms_text` is empty (enforce in step 6).
+- Clients can't buy while `terms_text` is empty or Stripe isn't ready (`notSellingReason`).
+
+## Purchase flow (build step 6: 6a checkout, 6b pass email)
+- Public purchase page `/{slug}` (`?key=` for private pages; wrong key = not found).
+  Server reads with the admin client after its own checks (`src/lib/payments/checkout.ts`).
+  Client gives full name + email only and accepts the current terms version.
+- Stripe Checkout as a **direct charge on the provider's connected account** with
+  `application_fee_amount` = `platformFeePercent`. Name/email/package snapshot travel in
+  the session metadata; **nothing about the client is stored until paid**.
+- Visits are granted ONLY by the webhook `/api/stripe/webhook` (signature-verified,
+  de-duplicated via `stripe_events`, `checkout.session.completed` on a connected account
+  that must match the provider) calling `complete_checkout`.
+- `/{slug}/thanks?session_id=` confirms with Stripe, waits for the webhook, links the pass.
+- Pass page `/pass/{token}`: QR (token only, hard rule 2) + visits left; no client name or
+  email. Helpers in `src/lib/passes.ts`.
+- Pass email via Resend (`src/lib/email.ts`, `src/lib/pass-email.ts`): sent once per new
+  purchase (idempotency key), QR inline (`cid:`), no health details; failures are logged
+  to `audit_log` and never undo the purchase. Test sender `onboarding@resend.dev` only
+  delivers to the Resend account's own email until a domain is verified.
+- Local webhooks: `npm.cmd run stripe:listen` (script `scripts/stripe-listen.ps1` uses the
+  sandbox key from `.env.local`, saves `STRIPE_WEBHOOK_SECRET`, forwards Connect events).
+  The Stripe CLI login is NOT used (it was linked to a provider account by mistake).
+- In PowerShell, `npm` is blocked by the execution policy on this machine: use `npm.cmd`.
 - `/dashboard/business/[providerId]/packages` (+ `/[packageId]` to edit), owners and
   managers only (`requireManager`). Writes go through `createSessionClient()` so RLS
   (`templates_all` + two-step) also enforces access; no admin client needed.
@@ -146,6 +172,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   hardcoded word.
 
 ## Open decisions
+- Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the
+  hosting/BAA decision; a verified sending domain is needed either way.
+- Resending a pass email / rate limits on repeat purchases: not built yet (steps 9, 11).
 - Stripe account style (who is liable for chargebacks/negative balances): testing with
   "full"; decide with the attorney before pilot. One setting in `src/config/payments.ts`.
 - Lost authenticator phone: no self-service recovery yet. For now, delete the user's
