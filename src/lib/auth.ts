@@ -33,9 +33,11 @@ export async function requireUser(): Promise<StaffUser> {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// The signed-in, two-step-verified OWNER of this provider; anyone else is sent to the
-// dashboard. Use for money and account settings (Stripe, refunds, packages later).
-export async function requireOwner(providerId: string): Promise<StaffUser> {
+export type StaffRole = "owner" | "manager" | "scan_only";
+
+// The signed-in, two-step-verified user, if they hold one of these roles for the provider.
+// Anyone else is sent to the dashboard.
+export async function requireProviderRole(providerId: string, roles: StaffRole[]): Promise<StaffUser> {
   const user = await requireUser();
   if (!UUID.test(providerId)) redirect("/dashboard");
   // read as the user, so row-level security only shows their own memberships
@@ -45,9 +47,19 @@ export async function requireOwner(providerId: string): Promise<StaffUser> {
     .select("role")
     .eq("provider_id", providerId)
     .eq("user_id", user.id)
-    .maybeSingle<{ role: string }>();
-  if (data?.role !== "owner") redirect("/dashboard");
+    .maybeSingle<{ role: StaffRole }>();
+  if (!data || !roles.includes(data.role)) redirect("/dashboard");
   return user;
+}
+
+// Owner only: money and account settings (Stripe, refunds).
+export function requireOwner(providerId: string): Promise<StaffUser> {
+  return requireProviderRole(providerId, ["owner"]);
+}
+
+// Owner or manager: running the business (packages, page settings). Not scan-only staff.
+export function requireManager(providerId: string): Promise<StaffUser> {
+  return requireProviderRole(providerId, ["owner", "manager"]);
 }
 
 // Password-only check. ONLY for the two-step setup and verify pages themselves.

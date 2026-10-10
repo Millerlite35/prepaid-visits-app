@@ -67,6 +67,11 @@ async function DashboardContent() {
                 <li key={m.providers?.id ?? i} className="py-3">
                   <span className="font-medium">{m.providers?.display_name ?? "A business"}</span>{" "}
                   <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
+                  {m.providers && (m.role === "owner" || m.role === "manager") && (
+                    <Link href={`/dashboard/business/${m.providers.id}/packages`} className="ml-3 underline">
+                      Packages
+                    </Link>
+                  )}
                   {m.providers && <PaymentsStatus provider={m.providers} isOwner={m.role === "owner"} />}
                 </li>
               ))}

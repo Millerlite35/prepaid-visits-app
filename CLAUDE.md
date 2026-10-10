@@ -121,6 +121,19 @@ default), plus a privilege check in `provider_setup_test.sql`.
   `/dashboard/stripe/refresh`, `/dashboard/stripe/problem`. Status syncs on return;
   an `account.updated` webhook comes with the payment webhooks in step 6.
 
+## Provider setup (build step 5: 5a packages done; page settings + terms next)
+- `/dashboard/business/[providerId]/packages` (+ `/[packageId]` to edit), owners and
+  managers only (`requireManager`). Writes go through `createSessionClient()` so RLS
+  (`templates_all` + two-step) also enforces access; no admin client needed.
+- Quick start presets live in `src/config/package-presets.ts` (priced from the
+  provider's usual per-visit price minus a discount). Shared rules, money parsing and
+  formatting in `src/lib/packages.ts` (limits: 1-100 visits, $1-$10,000, expiry 1-3650
+  days or never).
+- Packages with sales can't be deleted, only paused (`active = false`). Purchases keep
+  their own snapshot, so edits never change past sales.
+- UI uses the provider's `vocab_singular` / `vocab_plural` ("visit"/"class"), never a
+  hardcoded word.
+
 ## Open decisions
 - Stripe account style (who is liable for chargebacks/negative balances): testing with
   "full"; decide with the attorney before pilot. One setting in `src/config/payments.ts`.
