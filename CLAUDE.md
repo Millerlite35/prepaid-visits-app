@@ -52,8 +52,11 @@ Files in `supabase/migrations/`, run in order:
 2. `0002_visit_functions.sql`: `mark_purchase_paid`, `record_visit`, `undo_visit`,
    `create_card_batch`, `link_card`, `revoke_credential`, `expire_purchases`
 3. `0003_access_rules.sql`: row-level security
-Then `supabase/seed.sql` (fake demo provider) and `supabase/tests/visit_logic_test.sql`
-(must print ALL VISIT LOGIC TESTS PASSED). Re-run tests after any schema change.
+4. `0004_require_two_step.sql`: restrictive RLS policies, so signed-in users see provider
+   data only after two-step verification (`aal2` in their login token)
+Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
+`supabase/tests/visit_logic_test.sql` and `supabase/tests/access_rules_test.sql`.
+Re-run both after any schema change.
 
 `record_visit` result codes the scanner must handle:
 `ok | unknown_code | unassigned | revoked | no_visits | expired | duplicate_recent`
@@ -71,13 +74,17 @@ Then `supabase/seed.sql` (fake demo provider) and `supabase/tests/visit_logic_te
   browser key cannot read providers). Replace it when the real home page exists.
 - Check: `npm run lint` and `npm run build` must both pass.
 
-## Provider login (build step 3: 3a done; 3b two-step verification and 3c onboarding next)
+## Provider login (build step 3: 3a + 3b done; 3c onboarding next)
 - Supabase Auth, email + password (min 12 chars), email confirmation on.
   Supabase dashboard > Authentication > URL Configuration must allow `SITE_URL/**`.
+- Two-step verification (authenticator app, TOTP) is required for ALL staff.
+  Enforced twice: `requireUser()` redirects to `/mfa/setup` or `/mfa/verify`, and
+  migration 0004 makes the database hide provider data from password-only sessions.
 - `src/proxy.ts` (Next 16's name for middleware) only refreshes the session cookie.
   It does NOT protect pages.
 - Protect every page, server action and route handler with `requireUser()` from
-  `src/lib/auth.ts`. Read staff data with `createSessionClient()` from
+  `src/lib/auth.ts` (requires two-step). `requireSignedIn()` (password only) is for the
+  `/mfa/*` pages alone. Read staff data with `createSessionClient()` from
   `src/lib/supabase/server.ts`, which acts as the signed-in user so RLS applies.
 - Routes: `/signup`, `/login` (forms + actions in `src/app/(auth)/`), `/auth/callback`
   (email link, fixed redirect to /dashboard), `/auth/error`, `/dashboard`.
@@ -89,6 +96,9 @@ Then `supabase/seed.sql` (fake demo provider) and `supabase/tests/visit_logic_te
 -> 14 store app.
 
 ## Open decisions
+- Lost authenticator phone: no self-service recovery yet. For now, delete the user's
+  factor in the Supabase dashboard (Authentication > Users). Decide before pilot.
+- Shared front-desk devices for scan_only staff: two-step may need a different approach.
 - Final product name (placeholder: Visit Pack). Needed before Apple pass setup and the
   Stripe platform name.
 - Hosting provider with BAA.

@@ -16,10 +16,13 @@ Do not buy a domain, Apple Developer account, or paid hosting yet.
 ## B. Load the database (Supabase dashboard)
 1. Open your project, then **SQL Editor** > **New query**.
 2. Paste the contents of `supabase/migrations/0001_core_schema.sql`. Click **Run**.
-3. Repeat for `0002_visit_functions.sql`, then `0003_access_rules.sql`, then `supabase/seed.sql`.
+3. Repeat for `0002_visit_functions.sql`, `0003_access_rules.sql`,
+   `0004_require_two_step.sql`, then `supabase/seed.sql`.
 4. Paste and run `supabase/tests/visit_logic_test.sql`. The Results panel should show one
    row: **ALL VISIT LOGIC TESTS PASSED**. A red error means a check failed. (It rolls
    back, so no test data remains.)
+5. Do the same with `supabase/tests/access_rules_test.sql`. Expect one row:
+   **ALL ACCESS RULE TESTS PASSED**.
 
 ## C. Start a Claude Code session in this folder
 Open the `visit-pack-build` folder in Claude Code. Claude reads `CLAUDE.md`
