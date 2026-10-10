@@ -71,6 +71,17 @@ Then `supabase/seed.sql` (fake demo provider) and `supabase/tests/visit_logic_te
   browser key cannot read providers). Replace it when the real home page exists.
 - Check: `npm run lint` and `npm run build` must both pass.
 
+## Provider login (build step 3: 3a done; 3b two-step verification and 3c onboarding next)
+- Supabase Auth, email + password (min 12 chars), email confirmation on.
+  Supabase dashboard > Authentication > URL Configuration must allow `SITE_URL/**`.
+- `src/proxy.ts` (Next 16's name for middleware) only refreshes the session cookie.
+  It does NOT protect pages.
+- Protect every page, server action and route handler with `requireUser()` from
+  `src/lib/auth.ts`. Read staff data with `createSessionClient()` from
+  `src/lib/supabase/server.ts`, which acts as the signed-in user so RLS applies.
+- Routes: `/signup`, `/login` (forms + actions in `src/app/(auth)/`), `/auth/callback`
+  (email link, fixed redirect to /dashboard), `/auth/error`, `/dashboard`.
+
 ## Roadmap pointers (matches plan Section "Build steps")
 1 data model (done) -> 2 project (done) + hosting (open) -> 3 provider login/security -> 4 Stripe Connect
 -> 5 provider page builder -> 6 purchase flow + email -> 7 wallet passes -> 8 scanner web app

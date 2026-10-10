@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { connection } from "next/server";
 import { brand } from "@/config/brand";
 import { getAdminClient, getPublicClient } from "@/lib/supabase/admin";
@@ -19,6 +20,12 @@ export default function Home() {
           <SystemCheck />
         </Suspense>
       </section>
+
+      <p className="mt-6 text-sm">
+        <Link href="/login" className="underline">
+          Provider sign in
+        </Link>
+      </p>
     </main>
   );
 }
