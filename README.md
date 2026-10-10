@@ -1,6 +1,7 @@
-# Visit Pack (placeholder name)
+# Prepaid visit packages app
 
-Prepaid visit packages for independent providers. Project brief and rules: [CLAUDE.md](CLAUDE.md).
+For independent providers. The product name is not final; it lives in
+[src/config/brand.ts](src/config/brand.ts). Project brief and rules: [CLAUDE.md](CLAUDE.md).
 First-time account and database setup: [docs/SETUP.md](docs/SETUP.md).
 
 ## Run it on your computer

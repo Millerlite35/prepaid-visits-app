@@ -3,7 +3,8 @@
 Use FAKE data only until the legal and hosting steps in the plan are done.
 
 ## A. Accounts to create (all have free tiers for testing)
-1. **GitHub** (github.com): holds the code. Create a private repository called `visit-pack`.
+1. **GitHub** (github.com): holds the code. Create a private repository with a generic name such as
+   `prepaid-visits-app` (not the placeholder product name).
 2. **Supabase** (supabase.com): the database and login. Create a project named
    `visit-pack-dev`. Save the database password somewhere safe.
 3. **Stripe** (stripe.com): sign up and stay in **Test mode**. Later, enable Connect.

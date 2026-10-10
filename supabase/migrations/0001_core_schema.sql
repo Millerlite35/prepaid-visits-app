@@ -1,4 +1,4 @@
--- Visit Pack (placeholder name) :: core schema
+-- Core schema
 -- Design rules:
 --   * Collect as little personal data as possible (name + email only for clients).
 --   * QR codes carry only a random token, never a name or health detail.

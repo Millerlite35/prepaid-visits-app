@@ -31,6 +31,10 @@ healthcare attorney and an independent security review).
 8. Neutral pass labels (e.g. "Wellness visit card"). Nothing about diagnosis or specialty.
 9. Secrets (Stripe keys, service role key, Apple certificates) live in environment
    variables only. Never commit them.
+10. **The product name is a placeholder.** Name, tagline and brand colors live only in
+    `src/config/brand.ts`. Import `brand` everywhere (page text, titles, emails, passes).
+    Never hardcode the name in code, the database or seed data. Name folders, files,
+    tables and variables generically ("app", "provider", "package"), not after the product.
 
 ## Stack (default choices, change only with a reason)
 - Next.js (TypeScript) web app, mobile-friendly, installable to the home screen

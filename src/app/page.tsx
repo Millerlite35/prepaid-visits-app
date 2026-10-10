@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { brand } from "@/config/brand";
 import { getAdminClient, getPublicClient } from "@/lib/supabase/admin";
 
 // Temporary home page for build step 2: proves the app can reach the database
@@ -7,7 +8,7 @@ import { getAdminClient, getPublicClient } from "@/lib/supabase/admin";
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold">Visit Pack</h1>
+      <h1 className="text-2xl font-semibold text-brand">{brand.name}</h1>
       <p className="mt-1 text-sm text-zinc-500">
         Development build · test mode · fake data only
       </p>

@@ -1,4 +1,4 @@
--- Visit Pack :: row-level security (Supabase).
+-- Row-level security (Supabase).
 -- Principle: a signed-in user can only see data for providers they belong to.
 -- Clients and the public purchase page never touch these tables directly;
 -- the server reads and writes them with the service role after its own checks.

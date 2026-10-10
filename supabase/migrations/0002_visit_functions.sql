@@ -1,4 +1,4 @@
--- Visit Pack :: business logic that must be atomic and correct.
+-- Business logic that must be atomic and correct.
 -- These are called from the server (service role), never directly from a browser.
 
 -- ------------------------------------------------------------------

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { brand } from "@/config/brand";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Visit Pack",
-  description: "Prepaid visit packages",
+  title: brand.name,
+  description: brand.tagline,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -22,6 +23,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // brand colors as CSS variables, used through the bg-brand / text-brand classes
+      style={
+        {
+          "--brand-primary": brand.colors.primary,
+          "--brand-accent": brand.colors.accent,
+        } as React.CSSProperties
+      }
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
