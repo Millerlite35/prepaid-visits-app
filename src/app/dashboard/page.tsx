@@ -96,9 +96,14 @@ async function DashboardContent() {
                         Scan
                       </Link>
                       {p && (m.role === "owner" || m.role === "manager") && (
-                        <Link href={`${base}/packages`} className="underline">
-                          Packages
-                        </Link>
+                        <>
+                          <Link href={`${base}/clients`} className="underline">
+                            Clients
+                          </Link>
+                          <Link href={`${base}/packages`} className="underline">
+                            Packages
+                          </Link>
+                        </>
                       )}
                       {p && m.role === "owner" && (
                         <Link href={`${base}/settings`} className="underline">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { LOGO_MAX_BYTES, LOGO_TYPES } from "@/lib/branding";
 import type { SettingsState } from "./actions";
 
@@ -61,13 +62,8 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
       </form>
 
       {currentUrl && (
-        <form
-          action={removeAction}
-          onSubmit={(e) => {
-            if (!confirm("Remove your logo?")) e.preventDefault();
-          }}
-        >
-          <button className="text-sm text-red-600 underline">Remove logo</button>
+        <form action={removeAction}>
+          <ConfirmSubmit label="Remove logo" question="Remove your logo?" confirmLabel="Yes, remove" className="text-sm text-red-600 underline" />
         </form>
       )}
     </div>

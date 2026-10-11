@@ -18,7 +18,8 @@ Do not buy a domain, Apple Developer account, or paid hosting yet.
 2. Paste the contents of `supabase/migrations/0001_core_schema.sql`. Click **Run**.
 3. Repeat for `0002_visit_functions.sql`, `0003_access_rules.sql`,
    `0004_require_two_step.sql`, `0005_create_provider.sql`, `0006_page_settings.sql`,
-   `0007_checkout.sql`, then `supabase/seed.sql`.
+   `0007_checkout.sql`, `0008_logos.sql`, `0009_view_security_and_pass_reissue.sql`,
+   then `supabase/seed.sql`.
 4. Paste and run `supabase/tests/visit_logic_test.sql`. The Results panel should show one
    row: **ALL VISIT LOGIC TESTS PASSED**. A red error means a check failed. (It rolls
    back, so no test data remains.)
@@ -27,6 +28,7 @@ Do not buy a domain, Apple Developer account, or paid hosting yet.
 6. And `supabase/tests/provider_setup_test.sql`. Expect **ALL PROVIDER SETUP TESTS PASSED**.
 7. And `supabase/tests/page_settings_test.sql`. Expect **ALL PAGE SETTINGS TESTS PASSED**.
 8. And `supabase/tests/checkout_test.sql`. Expect **ALL CHECKOUT TESTS PASSED**.
+9. And `supabase/tests/clients_test.sql`. Expect **ALL CLIENTS TESTS PASSED**.
 
 ## E. Payments and email for local testing
 1. **Stripe sandbox**: in Stripe, create a sandbox and set up Connect inside it (Platform,

@@ -11,6 +11,7 @@ import {
   passLabelProblem,
   starterTerms,
 } from "@/lib/page-settings";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { checkSlug } from "@/lib/slug";
 import type { SettingsState } from "./actions";
 
@@ -243,13 +244,13 @@ export function PrivateLink({ url, renewAction }: { url: string; renewAction: ()
         <button type="button" onClick={copy} className="underline">
           {copied ? "Copied ✓" : "Copy link"}
         </button>
-        <form
-          action={renewAction}
-          onSubmit={(e) => {
-            if (!confirm("Make a new private link? The current link will stop working.")) e.preventDefault();
-          }}
-        >
-          <button className="underline">Make a new link</button>
+        <form action={renewAction}>
+          <ConfirmSubmit
+            label="Make a new link"
+            question="The current link will stop working. Continue?"
+            confirmLabel="Yes, new link"
+            className="underline"
+          />
         </form>
       </div>
       <p className="text-xs text-zinc-500">
@@ -277,10 +278,11 @@ export function TermsForm({
 }) {
   const [state, formAction, pending] = useActionState(action, {});
   const [terms, setTerms] = useState(initialTerms);
+  const [askReplace, setAskReplace] = useState(false);
 
   function applyTemplate() {
-    if (terms.trim() && !confirm("Replace your current terms with the starter template?")) return;
     setTerms(starterTerms(businessName, singular, plural));
+    setAskReplace(false);
   }
 
   return (
@@ -290,9 +292,21 @@ export function TermsForm({
           Version {version}. Each saved change becomes a new version, and every sale records
           which version the client accepted.
         </p>
-        <button type="button" onClick={applyTemplate} className="text-sm underline">
-          Use starter template
-        </button>
+        {askReplace ? (
+          <span className="inline-flex flex-wrap items-center gap-3 rounded-md bg-amber-50 p-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+            Replace your current terms?
+            <button type="button" onClick={applyTemplate} className="rounded-md bg-amber-600 px-3 py-1 font-medium text-white">
+              Yes, replace
+            </button>
+            <button type="button" onClick={() => setAskReplace(false)} className="underline">
+              Keep mine
+            </button>
+          </span>
+        ) : (
+          <button type="button" onClick={() => (terms.trim() ? setAskReplace(true) : applyTemplate())} className="text-sm underline">
+            Use starter template
+          </button>
+        )}
       </div>
       <textarea
         name="terms"

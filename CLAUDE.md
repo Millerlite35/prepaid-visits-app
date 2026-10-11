@@ -65,10 +65,16 @@ Files in `supabase/migrations/`, run in order:
    credential, audit row); idempotent per session id
 8. `0008_logos.sql`: public-read Storage bucket `provider-logos` (PNG/JPG/WebP, 1 MB, no
    write policies: only the server uploads, after `requireOwner`)
+9. `0009_view_security_and_pass_reissue.sql`: **security fix**, balance views set to
+   `security_invoker` (they were readable with the public key, bypassing RLS); and
+   `reissue_wallet_pass` (cancel the active pass + issue a new one, atomic)
+
+**Every new view** must be created `with (security_invoker = true)` (or altered so), and
+covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
-`page_settings_test.sql`, `checkout_test.sql` in `supabase/tests/`. Re-run all after any
-schema change.
+`page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql` in `supabase/tests/`.
+Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
 **Every new business function** needs `revoke execute ... from public, anon, authenticated`
@@ -192,6 +198,15 @@ default), plus a privilege check in `provider_setup_test.sql`.
   phone. Phone camera testing needs https (hosting, or a tunnel).
 - Dashboard shows scan-only staff the business name via a server-side lookup (RLS hides
   provider rows from them), and has "View purchase page" links.
+
+## Provider dashboard (build step 9: 9a clients done; 9b refunds/adjust, 9c staff, 9d overview)
+- `/dashboard/business/[providerId]/clients` (search by name/email, visits left, next
+  expiry, last check-in) and `/clients/[clientId]` (balance, purchases with accepted
+  terms version, full ledger history, pass actions). Owners + managers (`requireManager`).
+  Reads use `createSessionClient()` (RLS); pass actions use the admin client after checks.
+- Resend pass email (same pass; at most once a minute) and "Cancel pass and send a new
+  one" (`reissue_wallet_pass`, then a "reissue" email). `sendPassEmail(purchaseId,
+  credentialId, kind, actorId)` with kind `purchase | resend | reissue`.
 
 ## Open decisions
 - Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the

@@ -1,0 +1,206 @@
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { brand } from "@/config/brand";
+import { requireManager } from "@/lib/auth";
+import { formatCents } from "@/lib/packages";
+import { createSessionClient } from "@/lib/supabase/server";
+import { reissuePass, resendPass } from "../actions";
+import { PassButtons } from "./pass-buttons";
+
+export const metadata: Metadata = { title: `Client · ${brand.name}` };
+
+export default function ClientPage(props: PageProps<"/dashboard/business/[providerId]/clients/[clientId]">) {
+  return (
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
+      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+        <ClientContent {...props} />
+      </Suspense>
+    </main>
+  );
+}
+
+type Purchase = {
+  id: string;
+  package_name: string;
+  visits_purchased: number;
+  price_cents: number;
+  status: string;
+  paid_at: string | null;
+  expires_at: string | null;
+  terms_version: number;
+};
+type LedgerRow = { id: number; kind: string; delta: number; note: string | null; created_at: string; purchase_id: string | null };
+
+const KIND_LABEL: Record<string, string> = {
+  grant: "Package purchased",
+  deduct: "Check-in",
+  undo: "Check-in undone",
+  adjust: "Adjustment",
+  expire: "Expired",
+  refund: "Refund",
+};
+
+function fmt(iso: string | null, withTime = false) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    ...(withTime ? { hour: "numeric", minute: "2-digit" } : {}),
+  });
+}
+
+async function ClientContent({ params }: PageProps<"/dashboard/business/[providerId]/clients/[clientId]">) {
+  const { providerId, clientId } = await params;
+  await requireManager(providerId);
+
+  // read as the signed-in user: row-level security limits everything to this business
+  const db = await createSessionClient();
+  const { data: client } = await db
+    .from("clients")
+    .select("id, full_name, email, created_at, visit_accounts(id)")
+    .eq("id", clientId)
+    .eq("provider_id", providerId)
+    .maybeSingle<{ id: string; full_name: string; email: string; created_at: string; visit_accounts: { id: string } | null }>();
+  if (!client) notFound();
+  const accountId = client.visit_accounts?.id;
+
+  const [providerRes, balanceRes, purchasesRes, ledgerRes, passRes] = await Promise.all([
+    db.from("providers").select("vocab_singular, vocab_plural").eq("id", providerId).single<{ vocab_singular: string; vocab_plural: string }>(),
+    accountId
+      ? db.from("account_balances").select("usable_visits, next_expiry").eq("visit_account_id", accountId).maybeSingle<{ usable_visits: number; next_expiry: string | null }>()
+      : Promise.resolve({ data: null }),
+    accountId
+      ? db
+          .from("purchases")
+          .select("id, package_name, visits_purchased, price_cents, status, paid_at, expires_at, terms_version")
+          .eq("visit_account_id", accountId)
+          .neq("status", "pending")
+          .order("created_at", { ascending: false })
+          .returns<Purchase[]>()
+      : Promise.resolve({ data: [] as Purchase[] }),
+    accountId
+      ? db
+          .from("visit_ledger")
+          .select("id, kind, delta, note, created_at, purchase_id")
+          .eq("visit_account_id", accountId)
+          .order("created_at", { ascending: false })
+          .limit(200)
+          .returns<LedgerRow[]>()
+      : Promise.resolve({ data: [] as LedgerRow[] }),
+    accountId
+      ? db
+          .from("credentials")
+          .select("token, issued_at")
+          .eq("visit_account_id", accountId)
+          .eq("kind", "wallet")
+          .eq("status", "active")
+          .order("issued_at", { ascending: false })
+          .limit(1)
+          .maybeSingle<{ token: string; issued_at: string }>()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const one = providerRes.data?.vocab_singular ?? "visit";
+  const many = providerRes.data?.vocab_plural ?? "visits";
+  const balance = balanceRes.data;
+  const purchases = purchasesRes.data ?? [];
+  const ledger = ledgerRes.data ?? [];
+  const pass = passRes.data;
+  const card = "mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800";
+
+  return (
+    <>
+      <Link href={`/dashboard/business/${providerId}/clients`} className="text-sm underline">
+        ← Clients
+      </Link>
+      <h1 className="mt-4 text-2xl font-semibold text-brand">{client.full_name}</h1>
+      <p className="mt-1 text-sm text-zinc-500">
+        {client.email} · client since {fmt(client.created_at)}
+      </p>
+
+      <section className={`${card} flex flex-wrap items-center gap-6`}>
+        <div>
+          <p className="text-sm text-zinc-500">{many.charAt(0).toUpperCase() + many.slice(1)} left</p>
+          <p className="text-4xl font-semibold text-brand">{balance?.usable_visits ?? 0}</p>
+        </div>
+        {balance?.next_expiry && (
+          <div>
+            <p className="text-sm text-zinc-500">Next expiry</p>
+            <p className="font-medium">{fmt(balance.next_expiry)}</p>
+          </div>
+        )}
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-1 font-medium">Pass</h2>
+        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+          {pass ? (
+            <>
+              Active since {fmt(pass.issued_at)}.{" "}
+              <a href={`/pass/${pass.token}`} target="_blank" rel="noopener noreferrer" className="underline">
+                View pass ↗
+              </a>
+            </>
+          ) : (
+            "No active pass."
+          )}
+        </p>
+        <PassButtons
+          resend={resendPass.bind(null, providerId, clientId)}
+          reissue={reissuePass.bind(null, providerId, clientId)}
+          hasPass={!!pass}
+        />
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-3 font-medium">Purchases</h2>
+        {purchases.length === 0 ? (
+          <p className="text-sm text-zinc-500">No purchases.</p>
+        ) : (
+          <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+            {purchases.map((p) => (
+              <li key={p.id} className="flex flex-wrap justify-between gap-2 py-2">
+                <span>
+                  <span className="font-medium">{p.package_name}</span>: {p.visits_purchased}{" "}
+                  {p.visits_purchased === 1 ? one : many} · {formatCents(p.price_cents)}
+                  <span className="block text-xs text-zinc-500">
+                    Bought {fmt(p.paid_at)}
+                    {p.expires_at ? ` · expires ${fmt(p.expires_at)}` : " · never expires"} · accepted terms v{p.terms_version}
+                  </span>
+                </span>
+                {p.status !== "paid" && <span className="text-xs font-medium uppercase text-amber-700">{p.status.replace("_", " ")}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-3 font-medium">History</h2>
+        {ledger.length === 0 ? (
+          <p className="text-sm text-zinc-500">Nothing yet.</p>
+        ) : (
+          <table className="w-full text-left text-sm">
+            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+              {ledger.map((l) => (
+                <tr key={l.id}>
+                  <td className="py-2 pr-3 text-zinc-500">{fmt(l.created_at, true)}</td>
+                  <td className="py-2 pr-3">
+                    {KIND_LABEL[l.kind] ?? l.kind}
+                    {l.note && l.kind === "adjust" && <span className="block text-xs text-zinc-500">{l.note}</span>}
+                  </td>
+                  <td className={`py-2 text-right font-mono ${l.delta > 0 ? "text-green-700 dark:text-green-500" : "text-red-700 dark:text-red-400"}`}>
+                    {l.delta > 0 ? `+${l.delta}` : l.delta}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+    </>
+  );
+}

@@ -5,9 +5,26 @@ import { emailConfigured, escapeHtml, fromAddress, sendEmail } from "@/lib/email
 import { formatDate, passUrl, qrPng } from "@/lib/passes";
 import { getAdminClient } from "@/lib/supabase/admin";
 
-// After a paid checkout: email the client their pass (QR code + link) and a summary.
+// Why the email is being sent:
+//   "purchase": right after a paid checkout (sent once per purchase)
+//   "resend":   staff resent it from the client's page
+//   "reissue":  the old pass was cancelled and this is the replacement
+export type PassEmailKind = "purchase" | "resend" | "reissue";
+
+const INTRO: Record<PassEmailKind, string> = {
+  purchase: "thanks for your purchase!",
+  resend: "here's your pass again.",
+  reissue: "here's your new pass. Your old pass no longer works.",
+};
+
+// Email the client their pass (QR code + link) and a summary of their latest purchase.
 // Never throws for email problems (the purchase is already recorded); returns what happened.
-export async function sendPassEmail(purchaseId: string, credentialId: string): Promise<"sent" | "skipped" | "failed"> {
+export async function sendPassEmail(
+  purchaseId: string,
+  credentialId: string,
+  kind: PassEmailKind = "purchase",
+  actorId: string | null = null,
+): Promise<"sent" | "skipped" | "failed"> {
   const db = getAdminClient();
   if (!emailConfigured()) {
     console.warn("pass email skipped: RESEND_API_KEY / EMAIL_FROM_ADDRESS not set");
@@ -64,7 +81,7 @@ export async function sendPassEmail(purchaseId: string, credentialId: string): P
     ${logoHtml}
     <p style="margin:0 0 4px;font-size:20px;font-weight:bold;color:${e(prov.brand_color)}">${e(prov.display_name)}</p>
     <p style="margin:0 0 20px;font-size:14px;color:#52525b">${e(prov.pass_label)}</p>
-    <p style="margin:0 0 12px">Hi ${e(firstName)}, thanks for your purchase!</p>
+    <p style="margin:0 0 12px">Hi ${e(firstName)}, ${e(INTRO[kind])}</p>
     <p style="margin:0 0 4px"><strong>${e(p.package_name)}</strong>: ${p.visits_purchased} ${e(unit)}</p>
     <p style="margin:0 0 4px;font-size:14px;color:#52525b">${e(expiry)}</p>
     <p style="margin:0 0 20px;font-size:14px">Available now: <strong>${available}</strong></p>
@@ -81,7 +98,7 @@ export async function sendPassEmail(purchaseId: string, credentialId: string): P
     const text = [
       `${prov.display_name}: ${prov.pass_label}`,
       "",
-      `Hi ${firstName}, thanks for your purchase!`,
+      `Hi ${firstName}, ${INTRO[kind]}`,
       `${p.package_name}: ${p.visits_purchased} ${unit}. ${expiry}.`,
       `Available now: ${available}`,
       "",
@@ -93,18 +110,31 @@ export async function sendPassEmail(purchaseId: string, credentialId: string): P
     await sendEmail({
       to: client.email,
       from: fromAddress(prov.display_name),
-      subject: `Your ${prov.pass_label} from ${prov.display_name}`,
+      subject: `Your ${kind === "reissue" ? "new " : ""}${prov.pass_label} from ${prov.display_name}`,
       html,
       text,
       attachments: [{ filename: "pass-qr.png", content: await qrPng(cred.token), contentId: "pass-qr" }],
-      idempotencyKey: `pass-email-${purchaseId}`, // never send the same purchase twice
+      // the purchase email is sent once ever; a resend at most once a minute; a reissue once per new pass
+      idempotencyKey:
+        kind === "purchase"
+          ? `pass-email-${purchaseId}`
+          : kind === "resend"
+            ? `pass-resend-${credentialId}-${Math.floor(Date.now() / 60000)}`
+            : `pass-reissue-${credentialId}`,
     });
 
-    await db.from("audit_log").insert({ provider_id: p.provider_id, action: "pass.email_sent", entity: "purchase", entity_id: purchaseId });
+    await db.from("audit_log").insert({
+      provider_id: p.provider_id,
+      actor_id: actorId,
+      action: "pass.email_sent",
+      entity: "purchase",
+      entity_id: purchaseId,
+      metadata: { kind },
+    });
     return "sent";
   } catch (e) {
-    console.error(`pass email for purchase ${purchaseId} failed:`, e instanceof Error ? e.message : e);
-    await db.from("audit_log").insert({ action: "pass.email_failed", entity: "purchase", entity_id: purchaseId });
+    console.error(`pass email (${kind}) for purchase ${purchaseId} failed:`, e instanceof Error ? e.message : e);
+    await db.from("audit_log").insert({ actor_id: actorId, action: "pass.email_failed", entity: "purchase", entity_id: purchaseId, metadata: { kind } });
     return "failed";
   }
 }
