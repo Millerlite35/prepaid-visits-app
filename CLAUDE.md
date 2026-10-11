@@ -132,7 +132,7 @@ default), plus a privilege check in `provider_setup_test.sql`.
 1 data model (done) -> 2 project (done) + hosting (open) -> 3 provider login/security (done) -> 4 Stripe Connect
 (done) -> 5 provider page builder (done) -> 6 purchase flow + email (done) -> 7 wallet passes
 (deferred: needs the $99 Apple Developer account and the final name) -> 8 scanner web app
-(done) -> 9 dashboard -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
+(done) -> 9 dashboard (done) -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
 -> 14 store app.
 
 ## Payments (build step 4: 4a Connect onboarding done; checkout comes in step 6)
@@ -212,7 +212,13 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Dashboard shows scan-only staff the business name via a server-side lookup (RLS hides
   provider rows from them), and has "View purchase page" links.
 
-## Provider dashboard (build step 9: 9a clients, 9b refunds/adjust, 9c staff done; 9d overview)
+## Provider dashboard (build step 9: done: 9a clients, 9b refunds/adjust, 9c staff, 9d overview)
+- Overview `/dashboard/business/[providerId]` (owners + managers; money figures owner
+  only): net sales this month (sales minus succeeded refunds) as the one hero figure,
+  tiles for packages sold, check-ins (deducts minus undos) and prepaid visits not yet used
+  (+ approx value), each vs last month with ▲/▼ + words (never colour alone); expiring
+  in 30 days; last 10 ledger events. Months use the provider's time zone
+  (`monthStart` in `src/lib/dates.ts`). $0 "Complimentary" entries don't count as sales.
 - Roles: owner = everything; manager = clients, packages, scan (no refunds, Stripe,
   settings, staff); scan_only = scan. Staff page `/dashboard/business/[id]/staff` (owner):
   members (emails via `auth.admin.getUserById`), change role, remove, open invites,

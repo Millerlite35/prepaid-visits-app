@@ -122,7 +122,13 @@ async function DashboardContent() {
                 const base = `/dashboard/business/${m.provider_id}`;
                 return (
                   <li key={m.provider_id} className="py-3">
-                    <span className="font-medium">{p?.display_name ?? names.get(m.provider_id) ?? "A business"}</span>{" "}
+                    {p && (m.role === "owner" || m.role === "manager") ? (
+                      <Link href={base} className="font-medium underline">
+                        {p.display_name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{p?.display_name ?? names.get(m.provider_id) ?? "A business"}</span>
+                    )}{" "}
                     <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
                       <Link href={`${base}/scan`} className="font-medium underline">
