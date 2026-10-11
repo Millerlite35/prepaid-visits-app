@@ -6,6 +6,8 @@ import { requireUser } from "@/lib/auth";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { createSessionClient } from "@/lib/supabase/server";
 import { signOut } from "../(auth)/actions";
+import { ROLE_LABELS } from "@/lib/staff";
+import { acceptInvite } from "./invite-actions";
 import { connectStripe } from "./stripe/actions";
 
 export const metadata: Metadata = { title: `Dashboard · ${brand.name}` };
@@ -50,6 +52,16 @@ async function DashboardContent() {
 
   // Scan-only staff still need to see which business they're scanning for: look up just
   // the names, server-side, for memberships the user really has (read above).
+  // open invitations for this user's email
+  const { data: invites } = await getAdminClient()
+    .from("staff_invites")
+    .select("id, role, providers(display_name)")
+    .eq("email", user.email.toLowerCase())
+    .is("accepted_at", null)
+    .is("cancelled_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .returns<{ id: string; role: string; providers: { display_name: string } | null }[]>();
+
   const hidden = (data ?? []).filter((m) => !m.providers).map((m) => m.provider_id);
   const names = new Map<string, string>();
   if (hidden.length) {
@@ -64,6 +76,27 @@ async function DashboardContent() {
   return (
     <>
       <p className="mt-1 text-sm text-zinc-500">Signed in as {user.email}</p>
+
+      {invites && invites.length > 0 && (
+        <section className="mt-8 rounded-lg border-2 border-brand p-4">
+          <h2 className="font-medium">Invitations</h2>
+          <ul className="mt-2 space-y-3 text-sm">
+            {invites.map((i) => (
+              <li key={i.id} className="flex flex-wrap items-center justify-between gap-3">
+                <span>
+                  <span className="font-medium">{i.providers?.display_name ?? "A business"}</span> invited you as{" "}
+                  {ROLE_LABELS[i.role] ?? i.role}.
+                </span>
+                <form action={acceptInvite.bind(null, i.id)}>
+                  <button className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white">
+                    Join {i.providers?.display_name ?? "business"}
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-8 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
         <h2 className="font-medium">Your businesses</h2>
@@ -106,9 +139,14 @@ async function DashboardContent() {
                         </>
                       )}
                       {p && m.role === "owner" && (
-                        <Link href={`${base}/settings`} className="underline">
-                          Page settings
-                        </Link>
+                        <>
+                          <Link href={`${base}/settings`} className="underline">
+                            Page settings
+                          </Link>
+                          <Link href={`${base}/staff`} className="underline">
+                            Staff
+                          </Link>
+                        </>
                       )}
                       {p && (
                         <a

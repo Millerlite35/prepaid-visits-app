@@ -76,12 +76,17 @@ Files in `supabase/migrations/`, run in order:
     `adjust_visits` (note required; removes soonest-expiring first; adding with no usable
     package creates a $0 "Complimentary" purchase so balances still come from the ledger)
 
+11. `0011_staff.sql`: `staff_invites` (keyed by email, one open invite per email per
+    business, 14-day expiry; RLS read for admins) and server-only `create_staff_invite`,
+    `cancel_staff_invite`, `accept_staff_invite` (email must match the signed-in user's
+    confirmed email), `change_member_role`, `remove_member` (owner can't be changed/removed)
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
-`page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql` in
-`supabase/tests/`.
+`page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
+`staff_test.sql` in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -207,7 +212,14 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Dashboard shows scan-only staff the business name via a server-side lookup (RLS hides
   provider rows from them), and has "View purchase page" links.
 
-## Provider dashboard (build step 9: 9a clients, 9b refunds/adjust done; 9c staff, 9d overview)
+## Provider dashboard (build step 9: 9a clients, 9b refunds/adjust, 9c staff done; 9d overview)
+- Roles: owner = everything; manager = clients, packages, scan (no refunds, Stripe,
+  settings, staff); scan_only = scan. Staff page `/dashboard/business/[id]/staff` (owner):
+  members (emails via `auth.admin.getUserById`), change role, remove, open invites,
+  invite form. Invite = email-based (no secret link): the invitee signs up/in with that
+  email, passes two-step, and clicks "Join" on their dashboard (`invite-actions.ts`).
+  The owner also gets copyable joining instructions (`inviteText` in `src/lib/staff.ts`),
+  since Resend's test sender can only email the account owner.
 - Refunds + adjustments: OWNER only, on the client page (`money-actions.ts`,
   `src/lib/payments/refunds.ts`). Stripe refund on the connected account with
   `refund_application_fee: true` (decision: our platform fee is refunded proportionally),
