@@ -69,11 +69,19 @@ Files in `supabase/migrations/`, run in order:
    `security_invoker` (they were readable with the public key, bypassing RLS); and
    `reissue_wallet_pass` (cancel the active pass + issue a new one, atomic)
 
+10. `0010_refunds_and_adjustments.sql`: `refunds` table (RLS read for admins), two-step
+    refunds `begin_refund` (locks, checks unused visits + un-refunded money, ledger
+    'refund' row, pending; idempotent per `request_id`) then `finish_refund` /
+    `fail_refund` (restores visits with an 'adjust' row that `reverses_id` the refund);
+    `adjust_visits` (note required; removes soonest-expiring first; adding with no usable
+    package creates a $0 "Complimentary" purchase so balances still come from the ledger)
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
-`page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql` in `supabase/tests/`.
+`page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql` in
+`supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -199,7 +207,15 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Dashboard shows scan-only staff the business name via a server-side lookup (RLS hides
   provider rows from them), and has "View purchase page" links.
 
-## Provider dashboard (build step 9: 9a clients done; 9b refunds/adjust, 9c staff, 9d overview)
+## Provider dashboard (build step 9: 9a clients, 9b refunds/adjust done; 9c staff, 9d overview)
+- Refunds + adjustments: OWNER only, on the client page (`money-actions.ts`,
+  `src/lib/payments/refunds.ts`). Stripe refund on the connected account with
+  `refund_application_fee: true` (decision: our platform fee is refunded proportionally),
+  idempotency key `refund-<refund id>`. Form sends a `requestId` (new per attempt) so a
+  double click is the same refund. If Stripe succeeds but `finish_refund` fails, it's logged
+  loudly ("PAID BY STRIPE BUT NOT MARKED FINISHED") and the row stays pending.
+- Not yet: refunds/disputes started from the Stripe dashboard (charge.refunded,
+  charge.dispute.* webhooks) don't update our ledger. Handle in step 11.
 - `/dashboard/business/[providerId]/clients` (search by name/email, visits left, next
   expiry, last check-in) and `/clients/[clientId]` (balance, purchases with accepted
   terms version, full ledger history, pass actions). Owners + managers (`requireManager`).

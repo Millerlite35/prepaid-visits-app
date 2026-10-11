@@ -62,12 +62,12 @@ export function requireStaff(providerId: string) {
 
 // Owner only: money, page settings and terms (Stripe, refunds). The database's
 // providers_update policy is owner-only too.
-export function requireOwner(providerId: string): Promise<StaffUser> {
+export function requireOwner(providerId: string): Promise<StaffUser & { role: StaffRole }> {
   return requireProviderRole(providerId, ["owner"]);
 }
 
 // Owner or manager: running the business day to day (packages). Not scan-only staff.
-export function requireManager(providerId: string): Promise<StaffUser> {
+export function requireManager(providerId: string): Promise<StaffUser & { role: StaffRole }> {
   return requireProviderRole(providerId, ["owner", "manager"]);
 }
 
