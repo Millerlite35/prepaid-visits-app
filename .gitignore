@@ -20,6 +20,12 @@
 # production
 /build
 
+# page screenshots with test names/emails; kept locally, not on GitHub
+/screenshots/
+
+# written by scripts/keep-supabase-awake.mjs
+/keep-awake.log
+
 # copied from node_modules by scripts/copy-scanner-wasm.mjs
 /public/vendor/
 

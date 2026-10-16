@@ -186,6 +186,11 @@ default), plus a privilege check in `provider_setup_test.sql`.
   sandbox key from `.env.local`, saves `STRIPE_WEBHOOK_SECRET`, forwards Connect events).
   The Stripe CLI login is NOT used (it was linked to a provider account by mistake).
 - In PowerShell, `npm` is blocked by the execution policy on this machine: use `npm.cmd`.
+- Free Supabase projects pause after ~7 days without activity. Windows Task Scheduler task
+  "Keep Supabase awake" (Sundays 12:00, runs late if the PC was off, hidden via
+  `conhost --headless`) runs `scripts/keep-supabase-awake.mjs`: read-only counts, one line
+  appended to `keep-awake.log` (git-ignored). Remove the task once on a paid plan:
+  `Unregister-ScheduledTask -TaskName "Keep Supabase awake"`.
 - `/dashboard/business/[providerId]/packages` (+ `/[packageId]` to edit), owners and
   managers only (`requireManager`). Writes go through `createSessionClient()` so RLS
   (`templates_all` + two-step) also enforces access; no admin client needed.
