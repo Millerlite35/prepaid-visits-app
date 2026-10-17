@@ -81,12 +81,17 @@ Files in `supabase/migrations/`, run in order:
     `cancel_staff_invite`, `accept_staff_invite` (email must match the signed-in user's
     confirmed email), `change_member_role`, `remove_member` (owner can't be changed/removed)
 
+12. `0012_external_refunds.sql`: `record_external_refund` for refunds made in the
+    provider's Stripe dashboard and lost disputes: full refund removes all unused visits,
+    partial removes visits in proportion (rounded down, capped at unused); writes a
+    `refunds` row (status succeeded) so app refund limits see it; idempotent per request id
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
-`staff_test.sql` in `supabase/tests/`.
+`staff_test.sql`, `external_refunds_test.sql` in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -237,8 +242,17 @@ default), plus a privilege check in `provider_setup_test.sql`.
   idempotency key `refund-<refund id>`. Form sends a `requestId` (new per attempt) so a
   double click is the same refund. If Stripe succeeds but `finish_refund` fails, it's logged
   loudly ("PAID BY STRIPE BUT NOT MARKED FINISHED") and the row stays pending.
-- Not yet: refunds/disputes started from the Stripe dashboard (charge.refunded,
-  charge.dispute.* webhooks) don't update our ledger. Handle in step 11.
+- Webhook also handles (step 11a, `src/lib/payments/stripe-events.ts`): `refund.created/
+  updated/failed` (ours = `metadata.refund_id` -> finish/fail_refund; otherwise a refund
+  made in the Stripe dashboard -> `record_external_refund`), `charge.dispute.created`
+  (audit `dispute.opened`; overview shows "Needs attention"; balance untouched) and
+  `charge.dispute.closed` (audit; if lost -> `record_external_refund` for the dispute
+  amount), `account.updated` (re-sync payments status). `stripe-listen.ps1` forwards these.
+  An external refund that later FAILS is only flagged (audit + loud log), not auto-reversed.
+  **Stripe events can arrive in any order** (a dispute often lands before
+  `checkout.session.completed` is recorded). Dispute audit rows store `payment_intent` and
+  the overview matches purchases by it; anything that must change balances throws if its
+  purchase isn't recorded yet, so Stripe retries. The local CLI listener does NOT retry.
 - `/dashboard/business/[providerId]/clients` (search by name/email, visits left, next
   expiry, last check-in) and `/clients/[clientId]` (balance, purchases with accepted
   terms version, full ledger history, pass actions). Owners + managers (`requireManager`).

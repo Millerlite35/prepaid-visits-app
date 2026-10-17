@@ -33,4 +33,5 @@ if (-not $found) {
 Write-Host "Saved STRIPE_WEBHOOK_SECRET to .env.local. Forwarding Stripe events to the app. Leave this window open." -ForegroundColor Green
 
 # Purchases happen on providers' own (connected) accounts, so forward Connect events.
-stripe listen --api-key $key --forward-connect-to localhost:3000/api/stripe/webhook --events checkout.session.completed
+$events = "checkout.session.completed,refund.created,refund.updated,refund.failed,charge.dispute.created,charge.dispute.closed,account.updated"
+stripe listen --api-key $key --forward-connect-to localhost:3000/api/stripe/webhook --events $events

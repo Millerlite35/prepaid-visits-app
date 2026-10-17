@@ -19,7 +19,8 @@ Do not buy a domain, Apple Developer account, or paid hosting yet.
 3. Repeat for `0002_visit_functions.sql`, `0003_access_rules.sql`,
    `0004_require_two_step.sql`, `0005_create_provider.sql`, `0006_page_settings.sql`,
    `0007_checkout.sql`, `0008_logos.sql`, `0009_view_security_and_pass_reissue.sql`,
-   `0010_refunds_and_adjustments.sql`, `0011_staff.sql`, then `supabase/seed.sql`.
+   `0010_refunds_and_adjustments.sql`, `0011_staff.sql`, `0012_external_refunds.sql`,
+   then `supabase/seed.sql`.
 4. Paste and run `supabase/tests/visit_logic_test.sql`. The Results panel should show one
    row: **ALL VISIT LOGIC TESTS PASSED**. A red error means a check failed. (It rolls
    back, so no test data remains.)
@@ -31,6 +32,7 @@ Do not buy a domain, Apple Developer account, or paid hosting yet.
 9. And `supabase/tests/clients_test.sql`. Expect **ALL CLIENTS TESTS PASSED**.
 10. And `supabase/tests/refunds_test.sql`. Expect **ALL REFUND TESTS PASSED**.
 11. And `supabase/tests/staff_test.sql`. Expect **ALL STAFF TESTS PASSED**.
+12. And `supabase/tests/external_refunds_test.sql`. Expect **ALL EXTERNAL REFUND TESTS PASSED**.
 
 ## E. Payments and email for local testing
 1. **Stripe sandbox**: in Stripe, create a sandbox and set up Connect inside it (Platform,

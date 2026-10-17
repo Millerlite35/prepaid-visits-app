@@ -143,6 +143,33 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
         .returns<Activity[]>(),
     ]);
 
+  // Card disputes (chargebacks) that are still open: opened, and not yet closed.
+  const { data: disputeLog } = await db
+    .from("audit_log")
+    .select("action, entity_id, metadata, created_at")
+    .eq("provider_id", providerId)
+    .in("action", ["dispute.opened", "dispute.closed"])
+    .order("created_at", { ascending: false })
+    .limit(200)
+    .returns<{
+      action: string;
+      entity_id: string;
+      metadata: { purchase_id?: string | null; payment_intent?: string; amount_cents?: number };
+      created_at: string;
+    }[]>();
+  const closedDisputes = new Set((disputeLog ?? []).filter((d) => d.action === "dispute.closed").map((d) => d.entity_id));
+  const openDisputes = (disputeLog ?? []).filter((d) => d.action === "dispute.opened" && !closedDisputes.has(d.entity_id));
+  // a dispute can arrive before its purchase is recorded, so match by Stripe payment id too
+  const disputePayments = openDisputes.map((d) => d.metadata.payment_intent).filter((id): id is string => !!id);
+  const { data: disputedPurchases } = disputePayments.length
+    ? await db
+        .from("purchases")
+        .select("visit_account_id, stripe_payment_intent_id")
+        .in("stripe_payment_intent_id", disputePayments)
+        .returns<{ visit_account_id: string; stripe_payment_intent_id: string }[]>()
+    : { data: [] as { visit_account_id: string; stripe_payment_intent_id: string }[] };
+  const accountOfPayment = new Map((disputedPurchases ?? []).map((p) => [p.stripe_payment_intent_id, p.visit_account_id]));
+
   const sales = salesRes.data ?? [];
   const refunds = refundsRes.data ?? [];
   const inThis = (iso: string) => iso >= thisMonth;
@@ -171,7 +198,13 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
     .sort((a, b) => (a.expires_at! < b.expires_at! ? -1 : 1));
 
   // client names for the lists below
-  const accountIds = [...new Set([...expiring.map((e) => e.visit_account_id), ...(activityRes.data ?? []).map((a) => a.visit_account_id)])];
+  const accountIds = [
+    ...new Set([
+      ...expiring.map((e) => e.visit_account_id),
+      ...(activityRes.data ?? []).map((a) => a.visit_account_id),
+      ...accountOfPayment.values(),
+    ]),
+  ];
   const names = new Map<string, { name: string; clientId: string }>();
   if (accountIds.length) {
     const { data } = await db
@@ -204,6 +237,29 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
       </Link>
       <h1 className="mt-4 text-2xl font-semibold text-brand">{provider.display_name}</h1>
       <p className="mt-1 text-sm text-zinc-500">{monthName(tz, now)} so far</p>
+
+      {openDisputes.length > 0 && (
+        <section className="mt-6 rounded-lg border-2 border-amber-500 p-4" role="alert">
+          <h2 className="font-medium">⚠ Needs attention</h2>
+          <ul className="mt-2 space-y-2 text-sm">
+            {openDisputes.map((d) => {
+              const account = d.metadata.payment_intent ? accountOfPayment.get(d.metadata.payment_intent) : undefined;
+              return (
+                <li key={d.entity_id}>
+                  <span className="font-medium">Card dispute</span>
+                  {account ? <> from {clientLink(account)}</> : null}
+                  {isOwner && d.metadata.amount_cents ? <> for {formatCents(d.metadata.amount_cents)}</> : null} · opened{" "}
+                  {fmtDate(d.created_at, tz)}
+                  <span className="block text-xs text-zinc-600 dark:text-zinc-400">
+                    The client asked their bank to reverse the payment. Respond in your Stripe dashboard (Payments, then
+                    Disputes). If the dispute is lost, their unused {many} are removed automatically.
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {isOwner && (
         <section className="mt-6">

@@ -2,6 +2,7 @@ import type Stripe from "stripe";
 import { requireEnv } from "@/lib/env";
 import { sendPassEmail } from "@/lib/pass-email";
 import { recordPaidCheckout } from "@/lib/payments/checkout";
+import { handleAccountEvent, handleDisputeEvent, handleRefundEvent } from "@/lib/payments/stripe-events";
 import { getStripe } from "@/lib/stripe";
 import { getAdminClient } from "@/lib/supabase/admin";
 
@@ -56,6 +57,21 @@ async function handleEvent(event: Stripe.Event): Promise<void> {
       }
       return;
     }
+    case "refund.created":
+    case "refund.updated":
+    case "refund.failed":
+      if (!event.account) return;
+      await handleRefundEvent(event.data.object, event.account);
+      return;
+    case "charge.dispute.created":
+    case "charge.dispute.closed":
+      if (!event.account) return;
+      await handleDisputeEvent(event.data.object, event.account, event.type);
+      return;
+    case "account.updated":
+      if (!event.account) return;
+      await handleAccountEvent(event.account);
+      return;
     default:
       return; // not needed yet
   }
