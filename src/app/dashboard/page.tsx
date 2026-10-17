@@ -149,6 +149,9 @@ async function DashboardContent() {
                           <Link href={`${base}/marketing`} className="underline">
                             Flyers and signs
                           </Link>
+                          <Link href={`${base}/cards`} className="underline">
+                            QR cards
+                          </Link>
                         </>
                       )}
                       {p && m.role === "owner" && (

@@ -83,3 +83,28 @@ export function starterTerms(businessName: string, singular: string, plural: str
 
 7. Questions. Contact ${businessName} directly about your package or a refund.`;
 }
+
+// The practice's own contact details, printed on QR cards and flyers (all optional).
+export const CONTACT_LIMITS = { address: 200, phone: 40, website: 100 };
+
+export type OfficeContact = { address: string | null; phone: string | null; website: string | null };
+
+// Up to two printed lines: the address, then "phone · website"
+export function contactLines(c: OfficeContact): string[] {
+  return [c.address, [c.phone, c.website].filter(Boolean).join(" · ")].filter((l): l is string => !!l);
+}
+
+export function cleanContact(raw: { address: string; phone: string; website: string }): { value: OfficeContact } | { error: string } {
+  const address = raw.address.replace(/\s+/g, " ").trim();
+  const phone = raw.phone.trim();
+  // shown without "https://" or a trailing slash: shorter, and it's what people type
+  const website = raw.website.trim().replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+  if (address.length > CONTACT_LIMITS.address) return { error: `Keep the address under ${CONTACT_LIMITS.address} characters.` };
+  if (phone && (phone.length > CONTACT_LIMITS.phone || !/^[0-9+()\-.\s]+(\s*(x|ext\.?)\s*\d+)?$/i.test(phone))) {
+    return { error: "Enter the phone number with digits, spaces, +, ( ), - or . only." };
+  }
+  if (website && (website.length > CONTACT_LIMITS.website || !/^[a-z0-9.-]+\.[a-z]{2,}(\/[\w\-./]*)?$/i.test(website))) {
+    return { error: "Enter a website like yourpractice.com." };
+  }
+  return { value: { address: address || null, phone: phone || null, website: website || null } };
+}

@@ -62,6 +62,7 @@ async function MarketingContent({ params }: { params: Promise<{ providerId: stri
         logo={data.logo}
         qrDataUrl={data.qrDataUrl}
         shortUrl={data.shortUrl}
+        contact={data.contact}
         singular={data.singular}
         plural={data.plural}
         packages={data.packages}

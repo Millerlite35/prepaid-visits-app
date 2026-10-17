@@ -331,3 +331,33 @@ export function TermsForm({
     </form>
   );
 }
+
+// ---------------------------------------------------------------- office contact
+export function ContactForm({
+  action,
+  initial,
+}: {
+  action: Action;
+  initial: { address: string | null; phone: string | null; website: string | null };
+}) {
+  const [state, formAction, pending] = useActionState(action, {});
+  return (
+    <form action={formAction} className="space-y-4">
+      <label className="block">
+        <span className="text-sm font-medium">Office address</span>
+        <input name="address" defaultValue={initial.address ?? ""} maxLength={200} autoComplete="street-address" placeholder="12 Main St, Springfield, IL 62701" className={inputClass} />
+      </label>
+      <label className="block">
+        <span className="text-sm font-medium">Phone</span>
+        <input name="phone" defaultValue={initial.phone ?? ""} maxLength={40} inputMode="tel" autoComplete="tel" placeholder="(555) 010-0000" className={inputClass} />
+      </label>
+      <label className="block">
+        <span className="text-sm font-medium">Website</span>
+        <input name="website" defaultValue={initial.website ?? ""} maxLength={100} autoCapitalize="none" spellCheck={false} placeholder="yourpractice.com" className={inputClass} />
+      </label>
+      <p className="text-xs text-zinc-500">All optional. Leave a box empty to leave it off.</p>
+      <Result state={state} pending={pending} />
+      <SaveButton pending={pending} />
+    </form>
+  );
+}

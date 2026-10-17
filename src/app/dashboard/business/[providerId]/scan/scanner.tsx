@@ -2,13 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { cameraErrorMessage, makeDetector } from "@/lib/qr-detector";
-import type { ScanResult, UndoResult } from "./actions";
+import type { LinkResult } from "@/lib/cards";
+import type { CardClient, ScanResult, UndoResult } from "./actions";
 
 type Props = {
   checkIn: (code: string, force: boolean) => Promise<ScanResult>;
   undo: (ledgerId: number) => Promise<UndoResult>;
   singular: string;
   plural: string;
+  // linking a new card to a client (owners and managers only; null for scan-only staff)
+  cardLinking: {
+    find: (query: string) => Promise<CardClient[]>;
+    link: (code: string, clientId: string) => Promise<LinkResult>;
+  } | null;
 };
 
 // Short beep + buzz so staff know the result without looking closely.
@@ -32,7 +38,7 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-export function Scanner({ checkIn, undo, singular, plural }: Props) {
+export function Scanner({ checkIn, undo, singular, plural, cardLinking }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<AudioContext | null>(null);
@@ -49,10 +55,11 @@ export function Scanner({ checkIn, undo, singular, plural }: Props) {
   const unit = (n: number) => (n === 1 ? singular : plural);
 
   const handle = useCallback(
-    async (code: string, force = false) => {
+    async (code: string, force = false, again = false) => {
       if (busyRef.current) return;
       const now = Date.now();
-      if (!force && lastRef.current.code === code && now - lastRef.current.at < 5000) return; // same code still in view
+      // same code still in view (unless staff asked to check this code again)
+      if (!force && !again && lastRef.current.code === code && now - lastRef.current.at < 5000) return;
       busyRef.current = true;
       pausedRef.current = true;
       lastRef.current = { code, at: now };
@@ -147,7 +154,18 @@ export function Scanner({ checkIn, undo, singular, plural }: Props) {
         {cameraOn && !result && (
           <div className="pointer-events-none absolute inset-10 rounded-xl border-4 border-white/70" aria-hidden />
         )}
-        {result && <ResultCard result={result} unit={unit} undoState={undoState} onUndo={doUndo} onForce={() => handle(result.code, true)} onNext={next} />}
+        {result && (
+          <ResultCard
+            result={result}
+            unit={unit}
+            undoState={undoState}
+            onUndo={doUndo}
+            onForce={() => handle(result.code, true)}
+            onNext={next}
+            cardLinking={cardLinking}
+            onCheckInLinked={() => handle(result.code, false, true)}
+          />
+        )}
       </div>
 
       {cameraOn && (
@@ -190,6 +208,8 @@ function ResultCard({
   onUndo,
   onForce,
   onNext,
+  cardLinking,
+  onCheckInLinked,
 }: {
   result: { scan: ScanResult; code: string };
   unit: (n: number) => string;
@@ -197,6 +217,8 @@ function ResultCard({
   onUndo: (ledgerId: number) => void;
   onForce: () => void;
   onNext: () => void;
+  cardLinking: Props["cardLinking"];
+  onCheckInLinked: () => void;
 }) {
   const s = result.scan;
   const tone =
@@ -239,7 +261,11 @@ function ResultCard({
       break;
     case "unassigned":
       title = "New card";
-      detail = <p>This card isn&apos;t linked to a client yet.</p>;
+      detail = cardLinking ? (
+        <LinkCardPanel code={result.code} linking={cardLinking} onCheckIn={onCheckInLinked} />
+      ) : (
+        <p>This card isn&apos;t linked to a client yet. Ask the owner or a manager to scan it and link it.</p>
+      );
       break;
     case "unknown_code":
       title = "✗ Code not recognised";
@@ -251,7 +277,7 @@ function ResultCard({
   }
 
   return (
-    <div className={`absolute inset-0 flex flex-col justify-between p-6 text-white ${tone}`} role="status" aria-live="assertive">
+    <div className={`absolute inset-0 flex flex-col justify-between overflow-y-auto p-6 text-white ${tone}`} role="status" aria-live="assertive">
       <div>
         <p className="text-3xl font-bold">{title}</p>
         <div className="mt-4">{detail}</div>
@@ -282,6 +308,73 @@ function ResultCard({
           Scan next
         </button>
       </div>
+    </div>
+  );
+}
+
+// "New card": find the client it's for, link it, then check them in.
+function LinkCardPanel({
+  code,
+  linking,
+  onCheckIn,
+}: {
+  code: string;
+  linking: NonNullable<Props["cardLinking"]>;
+  onCheckIn: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [matches, setMatches] = useState<CardClient[] | null>(null);
+  const [state, setState] = useState<LinkResult | "working" | null>(null);
+
+  useEffect(() => {
+    if (query.trim().length < 2) return;
+    const t = setTimeout(async () => setMatches(await linking.find(query)), 300);
+    return () => clearTimeout(t);
+  }, [query, linking]);
+
+  if (state && state !== "working" && state.ok) {
+    return (
+      <div className="space-y-3">
+        <p className="text-xl font-semibold">✓ Card linked to {state.clientName}</p>
+        <button onClick={onCheckIn} className="rounded-lg bg-white px-4 py-2 font-semibold text-black">
+          Check {state.clientName.split(" ")[0]} in now
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <p>Who is this card for? Search by name or email.</p>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        autoFocus
+        placeholder="Client name or email"
+        className="w-full rounded-md bg-white px-3 py-2 text-black"
+      />
+      {query.trim().length >= 2 && matches && matches.length === 0 && (
+        <p className="text-sm">No matching clients. They need to buy a package first, then link the card.</p>
+      )}
+      <ul className="space-y-1">
+        {query.trim().length >= 2 &&
+          matches?.map((c) => (
+            <li key={c.id}>
+              <button
+                disabled={state === "working"}
+                onClick={async () => {
+                  setState("working");
+                  setState(await linking.link(code, c.id));
+                }}
+                className="w-full rounded-md bg-white/90 px-3 py-2 text-left text-black disabled:opacity-60"
+              >
+                <span className="font-medium">{c.name}</span> <span className="text-sm text-zinc-600">{c.email}</span>
+              </button>
+            </li>
+          ))}
+      </ul>
+      {state === "working" && <p>Linking…</p>}
+      {state && state !== "working" && !state.ok && <p className="font-medium">{state.error}</p>}
     </div>
   );
 }

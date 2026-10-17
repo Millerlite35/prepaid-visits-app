@@ -96,13 +96,16 @@ Files in `supabase/migrations/`, run in order:
     `replace_backup_codes(user, hashes[])` (new set replaces all old codes), `use_backup_code(
     user, hash)` (one use; audits used/rejected)
 
+16. `0016_provider_contact.sql`: `providers.office_address / office_phone / office_website`
+    (the practice's own contact, optional, length checks; added to the column grant list)
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
 `staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`,
-`backup_codes_test.sql` in `supabase/tests/`.
+`backup_codes_test.sql`, `provider_contact_test.sql` in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -161,8 +164,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
 1 data model (done) -> 2 project (done) + hosting (open) -> 3 provider login/security (done) -> 4 Stripe Connect
 (done) -> 5 provider page builder (done) -> 6 purchase flow + email (done) -> 7 wallet passes
 (deferred: needs the $99 Apple Developer account and the final name) -> 8 scanner web app
-(done) -> 9 dashboard (done) -> 10 flyer generator -> 11 testing/security -> 12 pilot -> 13 physical cards
--> 14 store app.
+(done) -> 9 dashboard (done) -> 10 flyer generator (done) -> 11 testing/security -> 12 pilot -> 13 physical cards
+(provider-printed batches done; print-partner ordering later) -> 14 store app.
 
 ## Payments (build step 4: 4a Connect onboarding done; checkout comes in step 6)
 - Settings in `src/config/payments.ts`: `connectAccountStyle` ("full" = provider's own
@@ -308,6 +311,29 @@ default), plus a privilege check in `provider_setup_test.sql`.
   when built), Face ID/fingerprint in the store app (step 14), and "remember this device
   for 30 days". Remember-device must not weaken migration 0004 (the DB requires `aal2`),
   so design it carefully, not as a cookie that skips the code.
+
+## Flyers, signs and QR cards (steps 10 and 13a)
+- Design styles shared by both (`src/lib/design-styles.ts`): professional, warm, minimal,
+  classic, bordered, all built on the provider's brand colour; heading fonts (`DESIGN_FONTS`,
+  Google fonts self-hosted via next/font in `src/lib/design-fonts.ts`, variables on <html>,
+  preload off). Choices remembered per browser (localStorage), never on the server.
+- Flyers `/dashboard/business/[id]/marketing` (requireManager): flyer, 5x7 counter sign,
+  table tent, social post (`marketing/social` route, next/og; no WebP logos there). Content
+  from the provider's own ACTIVE packages (`src/lib/marketing.ts`, `src/lib/flyer-content.ts`).
+  QR = purchase page URL (includes `?key=` for private pages; the page warns). Printing is
+  the browser's Save as PDF at real size (`@page` + print CSS inside the component).
+- QR cards `/dashboard/business/[id]/cards` (requireManager): `create_card_batch` (audited),
+  print on Avery 28371 (2x5, 0.75in sides, 0.5in top, start-position picker, 1/16in nudges
+  saved per browser) or one per page for a card printer; print area is a portal on <body>.
+  Reprint = unassigned cards only. Card QR = the bare token (hard rule 2). Printed: logo/name,
+  office contact, neutral pass label. NOT printed: client name, package, punch boxes.
+- Linking: scanning an unassigned card shows "New card"; owners/managers search clients
+  (`findClientsForCard`, same safe search rule) and `linkScannedCard` -> `link_card` (audited),
+  then "Check in now". scan_only staff are told to ask a manager. Client page lists linked
+  cards with "Cancel card" (`revoke_credential`, audited). Kiosk treats new cards as "see desk".
+- Office contact (Page settings > Office contact, `cleanContact`/`contactLines` in
+  `src/lib/page-settings.ts`) prints on cards, flyers, signs, tents and social posts.
+- Later: "Request printed cards" through a print partner (quotes needed; see business plan).
 
 ## Installable app ("Add to Home Screen")
 - Manifest `/app.webmanifest` (route handler `src/app/app.webmanifest/route.ts`; name,

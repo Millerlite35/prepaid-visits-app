@@ -2,6 +2,7 @@ import "server-only";
 import QRCode from "qrcode";
 import { requireEnv } from "@/lib/env";
 import { logoUrl } from "@/lib/branding";
+import { contactLines } from "@/lib/page-settings";
 import type { FlyerPackage } from "@/lib/flyer-content";
 import { createSessionClient } from "@/lib/supabase/server";
 
@@ -18,6 +19,7 @@ export type MarketingData = {
   sellingProblem: string | null;
   purchaseUrl: string;
   shortUrl: string;
+  contact: string[];
   qrDataUrl: string;
   packages: FlyerPackage[];
 };
@@ -33,6 +35,9 @@ type ProviderRow = {
   private_access_key: string;
   stripe_charges_enabled: boolean;
   terms_text: string;
+  office_address: string | null;
+  office_phone: string | null;
+  office_website: string | null;
 };
 
 export async function loadMarketingData(providerId: string): Promise<MarketingData | null> {
@@ -41,7 +46,7 @@ export async function loadMarketingData(providerId: string): Promise<MarketingDa
     db
       .from("providers")
       .select(
-        "display_name, brand_color, logo_path, vocab_singular, vocab_plural, slug, page_access, private_access_key, stripe_charges_enabled, terms_text",
+        "display_name, brand_color, logo_path, vocab_singular, vocab_plural, slug, page_access, private_access_key, stripe_charges_enabled, terms_text, office_address, office_phone, office_website",
       )
       .eq("id", providerId)
       .maybeSingle<ProviderRow>(),
@@ -80,6 +85,7 @@ export async function loadMarketingData(providerId: string): Promise<MarketingDa
     sellingProblem,
     purchaseUrl,
     shortUrl: `${new URL(site).host}/${p.slug}`,
+    contact: contactLines({ address: p.office_address, phone: p.office_phone, website: p.office_website }),
     qrDataUrl: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
     packages: (pkgs ?? []).map((k) => ({ id: k.id, name: k.name, visits: k.visits, priceCents: k.price_cents })),
   };

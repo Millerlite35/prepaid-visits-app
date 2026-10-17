@@ -74,3 +74,35 @@ export async function reissuePass(providerId: string, clientId: string): Promise
     ? { message: `Old pass cancelled. New pass sent to ${info.email}.` }
     : { error: "Old pass cancelled and a new one issued, but the email didn't send. Use \"Resend pass\"." };
 }
+
+// Lost card: cancel it so it stops working straight away. Their balance and other
+// passes are untouched. A replacement is any new card, linked with its first scan.
+export async function cancelCard(providerId: string, clientId: string, credentialId: string): Promise<PassActionState> {
+  const user = await requireManager(providerId);
+  const db = getAdminClient();
+  const { data: card } = await db
+    .from("credentials")
+    .select("id, kind, status, visit_accounts!inner(client_id)")
+    .eq("id", credentialId)
+    .eq("provider_id", providerId)
+    .eq("visit_accounts.client_id", clientId)
+    .maybeSingle<{ id: string; kind: string; status: string }>();
+  if (!card || (card.kind !== "card" && card.kind !== "key_tag")) return { error: "Card not found." };
+  if (card.status !== "active") return { error: "That card is already cancelled." };
+
+  const { error } = await db.rpc("revoke_credential", { p_credential_id: credentialId, p_provider_id: providerId });
+  if (error) {
+    console.error("revoke card failed:", error.message);
+    return { error: "Couldn't cancel the card. Please try again." };
+  }
+  await db.from("audit_log").insert({
+    provider_id: providerId,
+    actor_id: user.id,
+    action: "card.revoked",
+    entity: "credential",
+    entity_id: credentialId,
+    metadata: { client_id: clientId },
+  });
+  refresh();
+  return { message: "Card cancelled. It won't work any more." };
+}

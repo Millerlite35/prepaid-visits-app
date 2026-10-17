@@ -6,9 +6,9 @@ import { requireOwner } from "@/lib/auth";
 import { requireEnv } from "@/lib/env";
 import { createSessionClient } from "@/lib/supabase/server";
 import { logoUrl } from "@/lib/branding";
-import { newPrivateLink, removeLogo, saveAddressAndAccess, saveLogo, savePageDetails, saveTerms } from "./actions";
+import { newPrivateLink, removeLogo, saveAddressAndAccess, saveContact, saveLogo, savePageDetails, saveTerms } from "./actions";
 import { LogoForm } from "./logo-form";
-import { AddressForm, PageDetailsForm, PrivateLink, TermsForm, type PageDetails } from "./settings-forms";
+import { AddressForm, ContactForm, PageDetailsForm, PrivateLink, TermsForm, type PageDetails } from "./settings-forms";
 
 export const metadata: Metadata = { title: `Page settings · ${brand.name}` };
 
@@ -33,6 +33,9 @@ type ProviderSettings = PageDetails & {
   terms_text: string;
   terms_version: number;
   logo_path: string | null;
+  office_address: string | null;
+  office_phone: string | null;
+  office_website: string | null;
 };
 
 async function SettingsContent({ params }: { params: Promise<{ providerId: string }> }) {
@@ -44,7 +47,7 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
   const { data: p, error } = await db
     .from("providers")
     .select(
-      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version, logo_path",
+      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version, logo_path, office_address, office_phone, office_website",
     )
     .eq("id", providerId)
     .single<ProviderSettings>();
@@ -89,6 +92,15 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
             profession_template: p.profession_template,
             timezone: p.timezone,
           }}
+        />
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-1 font-medium">Office contact</h2>
+        <p className="mb-4 text-sm text-zinc-500">Printed on your QR cards and flyers.</p>
+        <ContactForm
+          action={saveContact.bind(null, providerId)}
+          initial={{ address: p.office_address, phone: p.office_phone, website: p.office_website }}
         />
       </section>
 

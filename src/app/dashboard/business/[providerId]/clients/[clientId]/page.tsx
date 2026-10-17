@@ -6,9 +6,10 @@ import { brand } from "@/config/brand";
 import { requireManager } from "@/lib/auth";
 import { formatCents } from "@/lib/packages";
 import { createSessionClient } from "@/lib/supabase/server";
-import { reissuePass, resendPass } from "../actions";
+import { cancelCard, reissuePass, resendPass } from "../actions";
 import { adjustAction, refundAction } from "./money-actions";
 import { AdjustForm, RefundForm } from "./money-forms";
+import { CardList } from "./card-list";
 import { PassButtons } from "./pass-buttons";
 
 export const metadata: Metadata = { title: `Client · ${brand.name}` };
@@ -125,6 +126,17 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
   const refundedByPurchase = new Map<string, number>();
   for (const r of refundsRes.data ?? []) refundedByPurchase.set(r.purchase_id, (refundedByPurchase.get(r.purchase_id) ?? 0) + r.amount_cents);
 
+  const { data: cardRows } = accountId
+    ? await db
+        .from("credentials")
+        .select("id, linked_at")
+        .eq("visit_account_id", accountId)
+        .in("kind", ["card", "key_tag"])
+        .eq("status", "active")
+        .order("linked_at", { ascending: false })
+        .returns<{ id: string; linked_at: string | null }[]>()
+    : { data: [] as { id: string; linked_at: string | null }[] };
+
   const one = providerRes.data?.vocab_singular ?? "visit";
   const many = providerRes.data?.vocab_plural ?? "visits";
   const balance = balanceRes.data;
@@ -174,6 +186,17 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
           resend={resendPass.bind(null, providerId, clientId)}
           reissue={reissuePass.bind(null, providerId, clientId)}
           hasPass={!!pass}
+        />
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-3 font-medium">QR cards</h2>
+        <CardList
+          cards={(cardRows ?? []).map((c) => ({
+            id: c.id,
+            linkedAt: c.linked_at ? fmt(c.linked_at) : "",
+            cancel: cancelCard.bind(null, providerId, clientId, c.id),
+          }))}
         />
       </section>
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireStaff } from "@/lib/auth";
 import { getAdminClient } from "@/lib/supabase/admin";
-import { checkIn, undoCheckIn } from "./actions";
+import { checkIn, findClientsForCard, linkScannedCard, undoCheckIn } from "./actions";
 import { Scanner } from "./scanner";
 
 export const metadata: Metadata = { title: `Scan · ${brand.name}` };
@@ -21,7 +21,7 @@ export default function ScanPage({ params }: PageProps<"/dashboard/business/[pro
 
 async function ScanContent({ params }: { params: Promise<{ providerId: string }> }) {
   const { providerId } = await params;
-  await requireStaff(providerId);
+  const { role } = await requireStaff(providerId);
 
   // scan-only staff can't read the providers table directly, so the server reads the
   // name after the staff check above
@@ -45,6 +45,11 @@ async function ScanContent({ params }: { params: Promise<{ providerId: string }>
         undo={undoCheckIn.bind(null, providerId)}
         singular={provider?.vocab_singular ?? "visit"}
         plural={provider?.vocab_plural ?? "visits"}
+        cardLinking={
+          role === "scan_only"
+            ? null
+            : { find: findClientsForCard.bind(null, providerId), link: linkScannedCard.bind(null, providerId) }
+        }
       />
       <p className="mt-8 text-sm text-zinc-600 dark:text-zinc-400">
         Have a USB QR scanner on the front desk?{" "}

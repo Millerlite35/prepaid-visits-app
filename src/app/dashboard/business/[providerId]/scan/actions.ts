@@ -1,6 +1,8 @@
 "use server";
 
-import { requireStaff } from "@/lib/auth";
+import { requireManager, requireStaff } from "@/lib/auth";
+import { cleanSearch, linkCard, type LinkResult } from "@/lib/cards";
+import { createSessionClient } from "@/lib/supabase/server";
 import { allow, LIMITS } from "@/lib/rate-limit";
 import { getAdminClient } from "@/lib/supabase/admin";
 
@@ -88,4 +90,31 @@ export async function undoCheckIn(providerId: string, ledgerId: number): Promise
     return { ok: false, error: "Couldn't undo. Please try again." };
   }
   return { ok: true, remaining: Number(data) };
+}
+
+// New card (status "unassigned"): owners and managers pick the client it belongs to.
+export type CardClient = { id: string; name: string; email: string };
+
+export async function findClientsForCard(providerId: string, query: string): Promise<CardClient[]> {
+  await requireManager(providerId);
+  const q = cleanSearch(query);
+  if (q.length < 2) return [];
+  // read as the signed-in user: row-level security limits this to their own business
+  const db = await createSessionClient();
+  const { data } = await db
+    .from("clients")
+    .select("id, full_name, email")
+    .eq("provider_id", providerId)
+    .or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
+    .order("full_name")
+    .limit(8)
+    .returns<{ id: string; full_name: string; email: string }[]>();
+  return (data ?? []).map((c) => ({ id: c.id, name: c.full_name, email: c.email }));
+}
+
+export async function linkScannedCard(providerId: string, code: string, clientId: string): Promise<LinkResult> {
+  const user = await requireManager(providerId);
+  const token = readToken(code);
+  if (!token) return { ok: false, error: "That isn't a card code." };
+  return linkCard(providerId, token, clientId, user.id);
 }

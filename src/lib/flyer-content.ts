@@ -9,6 +9,7 @@ export type FlyerContent = {
   logo: string | null;
   qrDataUrl: string;
   shortUrl: string; // shown under the QR code, without any private key
+  contact: string[]; // the practice's address / phone / website lines (may be empty)
   singular: string;
   plural: string;
   headline: string;

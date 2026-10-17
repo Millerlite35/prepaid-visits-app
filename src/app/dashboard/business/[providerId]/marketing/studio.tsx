@@ -9,6 +9,7 @@ import {
   type FlyerContent,
   type FlyerPackage,
 } from "@/lib/flyer-content";
+import { FontPicker, StylePicker, useRememberedFont, useRememberedStyle } from "@/components/style-picker";
 import { Artwork, TEMPLATES, type PrintTemplate } from "./artwork";
 
 type Template = PrintTemplate | "social";
@@ -20,6 +21,7 @@ type Props = {
   logo: string | null;
   qrDataUrl: string;
   shortUrl: string;
+  contact: string[];
   singular: string;
   plural: string;
   packages: FlyerPackage[];
@@ -57,6 +59,8 @@ const MIN_LOGO_WIDTH_PX = 500; // smaller logos look soft when printed
 
 export function Studio(props: Props) {
   const [template, setTemplate] = useState<Template>("flyer");
+  const [styleId, setStyleId] = useRememberedStyle("flyer-style");
+  const [fontId, setFontId] = useRememberedFont("flyer-font");
   const [selected, setSelected] = useState<string[]>(props.packages.slice(0, MAX_FLYER_PACKAGES).map((p) => p.id));
   const [headline, setHeadline] = useState(defaultHeadline(props.plural));
   const [message, setMessage] = useState(defaultMessage(props.plural));
@@ -78,6 +82,7 @@ export function Studio(props: Props) {
     logo: props.logo,
     qrDataUrl: props.qrDataUrl,
     shortUrl: props.shortUrl,
+    contact: props.contact,
     singular: props.singular,
     plural: props.plural,
     headline: headline.trim() || defaultHeadline(props.plural),
@@ -88,10 +93,10 @@ export function Studio(props: Props) {
 
   // the social image is drawn on the server; debounce so typing doesn't fire a request per key
   const socialUrl = useMemo(() => {
-    const q = new URLSearchParams({ h: content.headline, m: content.message, p: selected.join(",") });
+    const q = new URLSearchParams({ h: content.headline, m: content.message, p: selected.join(","), s: styleId });
     if (usualCents) q.set("u", String(usualCents));
     return `${props.socialBase}?${q.toString()}`;
-  }, [content.headline, content.message, selected, usualCents, props.socialBase]);
+  }, [content.headline, content.message, selected, usualCents, props.socialBase, styleId]);
   const [socialSrc, setSocialSrc] = useState(socialUrl);
   useEffect(() => {
     const t = setTimeout(() => setSocialSrc(socialUrl), 500);
@@ -125,6 +130,9 @@ export function Studio(props: Props) {
             ))}
           </div>
         </fieldset>
+
+        <StylePicker value={styleId} onChange={setStyleId} color={props.color} />
+        <FontPicker value={fontId} onChange={setFontId} />
 
         <fieldset>
           <legend className="text-sm font-medium">Packages to show (up to {MAX_FLYER_PACKAGES})</legend>
@@ -226,7 +234,7 @@ ${PRINT_CSS}`}</style>
               style={{ width: PREVIEW_WIDTH_PX, height: print!.heightIn * 96 * scale }}
             >
               <div id="print-area" className="artwork-scale" style={{ ["--s" as string]: scale }}>
-                <Artwork template={template} c={content} />
+                <Artwork template={template} styleId={styleId} fontId={fontId} c={content} />
               </div>
             </div>
           </>

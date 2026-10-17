@@ -7,6 +7,7 @@ import {
   PROFESSION_PRESETS,
   SETTINGS_LIMITS,
   US_TIMEZONES,
+  cleanContact,
   cleanVocab,
   isHexColor,
   passLabelProblem,
@@ -111,4 +112,19 @@ export async function saveTerms(providerId: string, _prev: SettingsState, formDa
   }
   // the database saves the old wording and bumps the version automatically
   return saveProvider(providerId, { terms_text: terms });
+}
+
+export async function saveContact(providerId: string, _prev: SettingsState, formData: FormData): Promise<SettingsState> {
+  await requireOwner(providerId);
+  const cleaned = cleanContact({
+    address: String(formData.get("address") ?? ""),
+    phone: String(formData.get("phone") ?? ""),
+    website: String(formData.get("website") ?? ""),
+  });
+  if ("error" in cleaned) return { error: cleaned.error };
+  return saveProvider(providerId, {
+    office_address: cleaned.value.address,
+    office_phone: cleaned.value.phone,
+    office_website: cleaned.value.website,
+  });
 }
