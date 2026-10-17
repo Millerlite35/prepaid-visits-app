@@ -353,7 +353,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Shared front-desk devices for scan_only staff: two-step may need a different approach.
 - Final product name (placeholder: Visit Pack). Needed before Apple pass setup and the
   Stripe platform name.
-- Hosting provider with BAA.
+- Hosting provider with BAA: options, prices (Oct 2026) and attorney questions in
+  `docs/hosting-options.md`. Recommended: free Vercel Hobby + current Supabase now (fake data
+  only, gives real https links); BAA setup chosen after the attorney answers.
 - Which profession to market to first.
 
 ## Working style
