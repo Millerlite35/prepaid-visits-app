@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: `Flyers and signs · ${brand.name}` }
 // opens the provider's purchase page.
 export default function MarketingPage({ params }: PageProps<"/dashboard/business/[providerId]/marketing">) {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+    <main className="w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <MarketingContent params={params} />
       </Suspense>

@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: `Scan · ${brand.name}` };
 
 export default function ScanPage({ params }: PageProps<"/dashboard/business/[providerId]/scan">) {
   return (
-    <main className="mx-auto w-full max-w-md flex-1 px-4 py-6">
+    <main className="w-full max-w-md flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <ScanContent params={params} />
       </Suspense>

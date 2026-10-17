@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
-import { ProviderHeader } from "@/components/provider-header";
-import { brand } from "@/config/brand";
+import type { ReactNode } from "react";
+import { ClientCard, ClientHeader, ClientShell } from "@/components/client-shell";
+import { contactLines } from "@/lib/page-settings";
 import { describeExpiry } from "@/lib/packages";
 import { getStripe } from "@/lib/stripe";
 import { getAdminClient } from "@/lib/supabase/admin";
@@ -15,12 +16,15 @@ export const metadata: Metadata = { title: "Thank you", robots: { index: false, 
 // long and unguessable; we only show it to confirm the purchase, never the client's details.
 export default function ThanksPage(props: PageProps<"/[slug]/thanks">) {
   return (
-    <main className="mx-auto w-full max-w-lg flex-1 px-4 py-10">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
-        <ThanksContent {...props} />
-      </Suspense>
-      <p className="mt-12 text-center text-xs text-zinc-400">Powered by {brand.name}</p>
-    </main>
+    <Suspense
+      fallback={
+        <ClientShell>
+          <p className="text-center text-sm text-ink-muted">Loading…</p>
+        </ClientShell>
+      }
+    >
+      <ThanksContent {...props} />
+    </Suspense>
   );
 }
 
@@ -32,6 +36,9 @@ type ProviderRow = {
   vocab_singular: string;
   vocab_plural: string;
   stripe_account_id: string | null;
+  office_address: string | null;
+  office_phone: string | null;
+  office_website: string | null;
 };
 type PurchaseRow = { package_name: string; visits_purchased: number; expires_days: number | null; visit_account_id: string };
 
@@ -45,7 +52,7 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
   const db = getAdminClient();
   const { data: provider } = await db
     .from("providers")
-    .select("id, display_name, brand_color, logo_path, vocab_singular, vocab_plural, stripe_account_id")
+    .select("id, display_name, brand_color, logo_path, vocab_singular, vocab_plural, stripe_account_id, office_address, office_phone, office_website")
     .eq("slug", slug.toLowerCase())
     .maybeSingle<ProviderRow>();
   if (!provider?.stripe_account_id) notFound();
@@ -59,14 +66,22 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
     notFound();
   }
 
-  const heading = <ProviderHeader name={provider.display_name} color={provider.brand_color} logoPath={provider.logo_path} />;
+  const contact = contactLines({ address: provider.office_address, phone: provider.office_phone, website: provider.office_website });
+  const heading = <ClientHeader name={provider.display_name} color={provider.brand_color} logoPath={provider.logo_path} />;
+  const frame = (children: ReactNode) => (
+    <ClientShell contact={contact}>
+      <ClientCard color={provider.brand_color}>{children}</ClientCard>
+    </ClientShell>
+  );
 
   if (!paid) {
-    return (
+    return frame(
       <>
         {heading}
-        <p className="mt-6 text-sm">Your payment hasn&apos;t gone through yet. If you were charged, please contact {provider.display_name}.</p>
-      </>
+        <p className="mt-6 text-center text-sm text-ink-muted">
+          Your payment hasn&apos;t gone through yet. If you were charged, please contact {provider.display_name}.
+        </p>
+      </>,
     );
   }
 
@@ -80,13 +95,13 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
   // Stripe has confirmed the payment to the client, but its message to our server
   // (the webhook) can take a few seconds. Check again shortly.
   if (!purchase) {
-    return (
+    return frame(
       <>
         {heading}
-        <p className="mt-6 font-medium">Payment received. Thank you!</p>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Setting up your {provider.vocab_plural}…</p>
+        <p className="mt-6 text-center font-medium text-ink">Payment received. Thank you!</p>
+        <p className="mt-1 text-center text-sm text-ink-muted">Setting up your {provider.vocab_plural}…</p>
         <AutoRefresh seconds={3} />
-      </>
+      </>,
     );
   }
 
@@ -108,15 +123,20 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
   ]);
   const unit = purchase.visits_purchased === 1 ? provider.vocab_singular : provider.vocab_plural;
 
-  return (
+  return frame(
     <>
       {heading}
-      <p className="mt-6 text-lg font-medium">You&apos;re all set. Thank you!</p>
-      <div className="mt-4 rounded-lg border border-zinc-200 p-4 text-sm dark:border-zinc-800">
+      <div className="mt-6 text-center">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-2xl text-green-700 dark:bg-green-950 dark:text-green-400" aria-hidden>
+          ✓
+        </span>
+        <p className="mt-3 text-lg font-semibold text-ink">You&apos;re all set. Thank you!</p>
+      </div>
+      <div className="mt-5 rounded-xl bg-surface-muted p-4 text-sm">
         <p>
           <span className="font-medium">{purchase.package_name}</span>: {purchase.visits_purchased} {unit}
         </p>
-        <p className="text-zinc-500">{describeExpiry(purchase.expires_days)}</p>
+        <p className="text-ink-muted">{describeExpiry(purchase.expires_days)}</p>
         {balance && (
           <p className="mt-2">
             {provider.vocab_plural.charAt(0).toUpperCase() + provider.vocab_plural.slice(1)} available now:{" "}
@@ -127,15 +147,15 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
       {pass && (
         <a
           href={`/pass/${pass.token}`}
-          className="mt-6 block rounded-md px-4 py-3 text-center font-medium text-white"
+          className="mt-6 block rounded-xl px-4 py-3.5 text-center font-semibold text-white shadow-sm hover:opacity-90"
           style={{ backgroundColor: provider.brand_color }}
         >
           Open your pass
         </a>
       )}
-      <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-4 text-center text-sm text-ink-muted">
         We&apos;ve also emailed your pass to you. Show its code at each {provider.vocab_singular} to check in.
       </p>
-    </>
+    </>,
   );
 }

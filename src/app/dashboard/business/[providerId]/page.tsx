@@ -1,7 +1,9 @@
-import { Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/config/brand";
+import { Icon } from "@/components/icons";
+import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader, Row, Stat, type Trend } from "@/components/ui";
 import { requireManager } from "@/lib/auth";
 import { monthName, monthStart } from "@/lib/dates";
 import { formatCents } from "@/lib/packages";
@@ -14,7 +16,7 @@ export const metadata: Metadata = { title: `Overview · ${brand.name}` };
 // security limits it to this business.
 export default function OverviewPage({ params }: PageProps<"/dashboard/business/[providerId]">) {
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
+    <main className="w-full max-w-6xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <OverviewContent params={params} />
       </Suspense>
@@ -45,29 +47,11 @@ function fmtDate(iso: string, timeZone: string, withTime = false) {
   });
 }
 
-function Delta({ now, before, label, money = false }: { now: number; before: number; label: string; money?: boolean }) {
+function trend(now: number, before: number, label: string, money = false): Trend {
   const diff = now - before;
-  if (before === 0 && now === 0) return <p className="mt-1 text-xs text-zinc-500">No change vs {label}</p>;
-  const up = diff > 0;
-  const text = money ? formatCents(Math.abs(diff)) : Math.abs(diff).toLocaleString("en-US");
-  return (
-    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-      <span className={diff === 0 ? "" : up ? "text-green-800 dark:text-green-500" : "text-red-700 dark:text-red-400"}>
-        {diff === 0 ? "No change" : `${up ? "▲ up" : "▼ down"} ${text}`}
-      </span>{" "}
-      vs {label}
-    </p>
-  );
-}
-
-function Tile({ label, value, children }: { label: string; value: string; children?: ReactNode }) {
-  return (
-    <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-      <p className="text-sm text-zinc-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">{value}</p>
-      {children}
-    </div>
-  );
+  if (diff === 0) return { direction: "flat", text: `vs ${label}` };
+  const amount = money ? formatCents(Math.abs(diff)) : Math.abs(diff).toLocaleString("en-US");
+  return { direction: diff > 0 ? "up" : "down", text: `${amount} vs ${label}` };
 }
 
 async function OverviewContent({ params }: { params: Promise<{ providerId: string }> }) {
@@ -217,7 +201,7 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
   const clientLink = (accountId: string) => {
     const n = names.get(accountId);
     return n ? (
-      <Link href={`/dashboard/business/${providerId}/clients/${n.clientId}`} className="underline">
+      <Link href={`/dashboard/business/${providerId}/clients/${n.clientId}`} className="font-medium hover:underline">
         {n.name}
       </Link>
     ) : (
@@ -228,103 +212,124 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
   const one = provider.vocab_singular;
   const many = provider.vocab_plural;
   const Many = many.charAt(0).toUpperCase() + many.slice(1);
-  const card = "mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800";
+  const base = `/dashboard/business/${providerId}`;
+  const activity = activityRes.data ?? [];
 
   return (
     <>
-      <Link href="/dashboard" className="text-sm underline">
-        ← Dashboard
-      </Link>
-      <h1 className="mt-4 text-2xl font-semibold text-brand">{provider.display_name}</h1>
-      <p className="mt-1 text-sm text-zinc-500">{monthName(tz, now)} so far</p>
+      <PageHeader
+        eyebrow={`${monthName(tz, now)} so far`}
+        title={provider.display_name}
+        actions={
+          <>
+            <Link href={`${base}/clients`} className={buttonClass("secondary")}>
+              <Icon name="clients" className="h-4 w-4" />
+              Clients
+            </Link>
+            <Link href={`${base}/scan`} className={buttonClass("primary")}>
+              <Icon name="scan" className="h-4 w-4" />
+              Scan a pass
+            </Link>
+          </>
+        }
+      />
 
       {openDisputes.length > 0 && (
-        <section className="mt-6 rounded-lg border-2 border-amber-500 p-4" role="alert">
-          <h2 className="font-medium">⚠ Needs attention</h2>
-          <ul className="mt-2 space-y-2 text-sm">
-            {openDisputes.map((d) => {
-              const account = d.metadata.payment_intent ? accountOfPayment.get(d.metadata.payment_intent) : undefined;
-              return (
-                <li key={d.entity_id}>
-                  <span className="font-medium">Card dispute</span>
-                  {account ? <> from {clientLink(account)}</> : null}
-                  {isOwner && d.metadata.amount_cents ? <> for {formatCents(d.metadata.amount_cents)}</> : null} · opened{" "}
-                  {fmtDate(d.created_at, tz)}
-                  <span className="block text-xs text-zinc-600 dark:text-zinc-400">
-                    The client asked their bank to reverse the payment. Respond in your Stripe dashboard (Payments, then
-                    Disputes). If the dispute is lost, their unused {many} are removed automatically.
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+        <div className="mb-6">
+          <Callout title="Needs attention">
+            <ul className="space-y-2">
+              {openDisputes.map((d) => {
+                const account = d.metadata.payment_intent ? accountOfPayment.get(d.metadata.payment_intent) : undefined;
+                return (
+                  <li key={d.entity_id}>
+                    <span className="font-medium">Card dispute</span>
+                    {account ? <> from {clientLink(account)}</> : null}
+                    {isOwner && d.metadata.amount_cents ? <> for {formatCents(d.metadata.amount_cents)}</> : null} · opened{" "}
+                    {fmtDate(d.created_at, tz)}
+                    <span className="block text-xs opacity-80">
+                      The client asked their bank to reverse the payment. Respond in your Stripe dashboard (Payments, then
+                      Disputes). If the dispute is lost, their unused {many} are removed automatically.
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </Callout>
+        </div>
       )}
 
-      {isOwner && (
-        <section className="mt-6">
-          <p className="text-sm text-zinc-500">Sales this month, after refunds</p>
-          <p className="text-5xl font-semibold">{formatCents(netThis)}</p>
-          <Delta now={netThis} before={netBefore} label={lastMonthLabel} money />
-          {refundedThis > 0 && (
-            <p className="mt-1 text-xs text-zinc-500">
-              {formatCents(grossThis)} in sales, {formatCents(refundedThis)} refunded
-            </p>
+      <section className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${isOwner ? "xl:grid-cols-4" : "xl:grid-cols-3"}`}>
+        {isOwner && (
+          <Stat
+            label="Sales this month, after refunds"
+            value={formatCents(netThis)}
+            trend={trend(netThis, netBefore, lastMonthLabel, true)}
+            hint={refundedThis > 0 ? `${formatCents(grossThis)} in sales, ${formatCents(refundedThis)} refunded` : undefined}
+          />
+        )}
+        <Stat
+          label="Packages sold"
+          value={salesThis.length.toLocaleString("en-US")}
+          trend={trend(salesThis.length, salesBefore.length, lastMonthLabel)}
+        />
+        <Stat label={`${Many} checked in`} value={visitsThis.toLocaleString("en-US")} trend={trend(visitsThis, visitsBefore, lastMonthLabel)} />
+        <Stat
+          label={`Prepaid ${many} not yet used`}
+          value={outstandingVisits.toLocaleString("en-US")}
+          hint={isOwner ? `About ${formatCents(outstandingValue)} paid in advance` : undefined}
+        />
+      </section>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card
+          title="Expiring in the next 30 days"
+          description={`A friendly reminder now can save a client from losing ${many}.`}
+          actions={expiring.length > 0 ? <Badge tone="amber">{expiring.length}</Badge> : undefined}
+        >
+          {expiring.length === 0 ? (
+            <EmptyState>Nothing expiring soon.</EmptyState>
+          ) : (
+            <ul className="divide-y divide-line">
+              {expiring.map((e) => (
+                <Row
+                  key={e.purchase_id}
+                  aside={
+                    <>
+                      {e.remaining} {e.remaining === 1 ? one : many} · {fmtDate(e.expires_at!, tz)}
+                    </>
+                  }
+                >
+                  {clientLink(e.visit_account_id)}
+                </Row>
+              ))}
+            </ul>
           )}
-        </section>
-      )}
+        </Card>
 
-      <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Tile label="Packages sold" value={salesThis.length.toLocaleString("en-US")}>
-          <Delta now={salesThis.length} before={salesBefore.length} label={lastMonthLabel} />
-        </Tile>
-        <Tile label={`${Many} checked in`} value={visitsThis.toLocaleString("en-US")}>
-          <Delta now={visitsThis} before={visitsBefore} label={lastMonthLabel} />
-        </Tile>
-        <Tile label={`Prepaid ${many} not yet used`} value={outstandingVisits.toLocaleString("en-US")}>
-          {isOwner && <p className="mt-1 text-xs text-zinc-500">About {formatCents(outstandingValue)} paid in advance</p>}
-        </Tile>
-      </section>
-
-      <section className={card}>
-        <h2 className="mb-1 font-medium">Expiring in the next 30 days</h2>
-        <p className="mb-3 text-xs text-zinc-500">A friendly reminder now can save a client from losing {many}.</p>
-        {expiring.length === 0 ? (
-          <p className="text-sm text-zinc-500">Nothing expiring soon.</p>
-        ) : (
-          <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
-            {expiring.map((e) => (
-              <li key={e.purchase_id} className="flex flex-wrap justify-between gap-2 py-2">
-                <span>{clientLink(e.visit_account_id)}</span>
-                <span className="text-zinc-600 dark:text-zinc-400">
-                  {e.remaining} {e.remaining === 1 ? one : many} · expires {fmtDate(e.expires_at!, tz)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className={card}>
-        <h2 className="mb-3 font-medium">Recent activity</h2>
-        {(activityRes.data ?? []).length === 0 ? (
-          <p className="text-sm text-zinc-500">No activity yet.</p>
-        ) : (
-          <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
-            {(activityRes.data ?? []).map((a) => (
-              <li key={a.id} className="flex flex-wrap justify-between gap-2 py-2">
-                <span>
-                  {clientLink(a.visit_account_id)} <span className="text-zinc-500">· {ACTIVITY_LABEL[a.kind] ?? a.kind}</span>
-                </span>
-                <span className="text-zinc-500">
-                  <span className="mr-3 font-mono">{a.delta > 0 ? `+${a.delta}` : a.delta}</span>
-                  {fmtDate(a.created_at, tz, true)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <Card title="Recent activity" actions={<Link href={`${base}/clients`} className="text-sm text-ink-muted hover:text-ink">All clients →</Link>}>
+          {activity.length === 0 ? (
+            <EmptyState>No activity yet.</EmptyState>
+          ) : (
+            <ul className="divide-y divide-line">
+              {activity.map((a) => (
+                <Row
+                  key={a.id}
+                  aside={
+                    <>
+                      <span className={`mr-3 font-mono ${a.delta > 0 ? "text-green-700 dark:text-green-400" : ""}`}>
+                        {a.delta > 0 ? `+${a.delta}` : a.delta}
+                      </span>
+                      {fmtDate(a.created_at, tz, true)}
+                    </>
+                  }
+                >
+                  {clientLink(a.visit_account_id)} <span className="text-ink-muted">· {ACTIVITY_LABEL[a.kind] ?? a.kind}</span>
+                </Row>
+              ))}
+            </ul>
+          )}
+        </Card>
+      </div>
     </>
   );
 }

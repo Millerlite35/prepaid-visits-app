@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: `Client · ${brand.name}` };
 
 export default function ClientPage(props: PageProps<"/dashboard/business/[providerId]/clients/[clientId]">) {
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
+    <main className="w-full max-w-3xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <ClientContent {...props} />
       </Suspense>

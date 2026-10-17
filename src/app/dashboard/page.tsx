@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Icon } from "@/components/icons";
 import { InstallApp } from "@/components/install-app";
+import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader } from "@/components/ui";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { unusedBackupCodeCount } from "@/lib/backup-codes";
@@ -16,8 +18,7 @@ export const metadata: Metadata = { title: `Dashboard · ${brand.name}` };
 
 export default function DashboardPage() {
   return (
-    <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold text-brand">Dashboard</h1>
+    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="mt-4 text-sm">Loading…</p>}>
         <DashboardContent />
       </Suspense>
@@ -77,153 +78,137 @@ async function DashboardContent() {
 
   const backupCodesLeft = await unusedBackupCodeCount(user.id);
 
+  const memberships = data ?? [];
+
   return (
     <>
-      <p className="mt-1 text-sm text-zinc-500">Signed in as {user.email}</p>
+      <PageHeader
+        title="Your businesses"
+        description={<>Signed in as {user.email}</>}
+        actions={
+          <Link href="/dashboard/new-business" className={buttonClass("secondary")}>
+            Add a business
+          </Link>
+        }
+      />
 
       {invites && invites.length > 0 && (
-        <section className="mt-8 rounded-lg border-2 border-brand p-4">
-          <h2 className="font-medium">Invitations</h2>
-          <ul className="mt-2 space-y-3 text-sm">
-            {invites.map((i) => (
-              <li key={i.id} className="flex flex-wrap items-center justify-between gap-3">
-                <span>
-                  <span className="font-medium">{i.providers?.display_name ?? "A business"}</span> invited you as{" "}
-                  {ROLE_LABELS[i.role] ?? i.role}.
-                </span>
-                <form action={acceptInvite.bind(null, i.id)}>
-                  <button className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white">
-                    Join {i.providers?.display_name ?? "business"}
-                  </button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className="mb-6">
+          <Callout tone="green" title="Invitations">
+            <ul className="space-y-3">
+              {invites.map((i) => (
+                <li key={i.id} className="flex flex-wrap items-center justify-between gap-3">
+                  <span>
+                    <span className="font-medium">{i.providers?.display_name ?? "A business"}</span> invited you as{" "}
+                    {ROLE_LABELS[i.role] ?? i.role}.
+                  </span>
+                  <form action={acceptInvite.bind(null, i.id)}>
+                    <button className={buttonClass("primary", "sm")}>Join {i.providers?.display_name ?? "business"}</button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          </Callout>
+        </div>
       )}
 
-      <section className="mt-8 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="font-medium">Your businesses</h2>
-        {error ? (
-          <p className="mt-2 text-sm text-red-600">Couldn&apos;t load your businesses. Try refreshing.</p>
-        ) : data.length === 0 ? (
-          <>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              You&apos;re not part of a business yet.
-            </p>
-            <Link
-              href="/dashboard/new-business"
-              className="mt-4 inline-block rounded-md bg-brand px-4 py-2 text-sm font-medium text-white"
-            >
-              Create your business
-            </Link>
-          </>
-        ) : (
-          <>
-            <ul className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
-              {data.map((m) => {
-                const p = m.providers;
-                const base = `/dashboard/business/${m.provider_id}`;
-                return (
-                  <li key={m.provider_id} className="py-3">
-                    {p && (m.role === "owner" || m.role === "manager") ? (
-                      <Link href={base} className="font-medium underline">
-                        {p.display_name}
-                      </Link>
-                    ) : (
-                      <span className="font-medium">{p?.display_name ?? names.get(m.provider_id) ?? "A business"}</span>
-                    )}{" "}
-                    <span className="text-zinc-500">({m.role.replace("_", " ")})</span>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                      <Link href={`${base}/scan`} className="font-medium underline">
-                        Scan
-                      </Link>
-                      {p && (m.role === "owner" || m.role === "manager") && (
-                        <>
-                          <Link href={`${base}/clients`} className="underline">
-                            Clients
-                          </Link>
-                          <Link href={`${base}/packages`} className="underline">
-                            Packages
-                          </Link>
-                          <Link href={`${base}/marketing`} className="underline">
-                            Flyers and signs
-                          </Link>
-                          <Link href={`${base}/cards`} className="underline">
-                            QR cards
-                          </Link>
-                        </>
-                      )}
-                      {p && m.role === "owner" && (
-                        <>
-                          <Link href={`${base}/settings`} className="underline">
-                            Page settings
-                          </Link>
-                          <Link href={`${base}/staff`} className="underline">
-                            Staff
-                          </Link>
-                        </>
-                      )}
-                      {p && (
-                        <a
-                          href={p.page_access === "private" ? `/${p.slug}?key=${p.private_access_key}` : `/${p.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          View purchase page ↗
-                        </a>
-                      )}
+      {error ? (
+        <Callout tone="red">Couldn&apos;t load your businesses. Try refreshing.</Callout>
+      ) : memberships.length === 0 ? (
+        <Card>
+          <EmptyState action={{ href: "/dashboard/new-business", label: "Create your business" }}>
+            You&apos;re not part of a business yet.
+          </EmptyState>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {memberships.map((m) => {
+            const p = m.providers;
+            const base = `/dashboard/business/${m.provider_id}`;
+            const manager = !!p && (m.role === "owner" || m.role === "manager");
+            const name = p?.display_name ?? names.get(m.provider_id) ?? "A business";
+            return (
+              <Card key={m.provider_id}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={manager ? base : `${base}/scan`} className="text-lg font-semibold text-ink hover:underline">
+                      {name}
+                    </Link>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      <Badge>{ROLE_LABELS[m.role] ?? m.role.replace("_", " ")}</Badge>
+                      {p && <PaymentsBadge provider={p} />}
                     </div>
-                    {p && <PaymentsStatus provider={p} isOwner={m.role === "owner"} />}
-                  </li>
-                );
-              })}
-            </ul>
-            <Link href="/dashboard/new-business" className="mt-4 inline-block text-sm underline">
-              Add another business
-            </Link>
-          </>
-        )}
-      </section>
+                  </div>
+                </div>
+                {p && !p.stripe_charges_enabled && <PaymentsSetup provider={p} isOwner={m.role === "owner"} />}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {manager && (
+                    <Link href={base} className={buttonClass("primary", "sm")}>
+                      Open
+                    </Link>
+                  )}
+                  <Link href={`${base}/scan`} className={buttonClass(manager ? "secondary" : "primary", "sm")}>
+                    <Icon name="scan" className="h-4 w-4" />
+                    Scan
+                  </Link>
+                  {p && (
+                    <a
+                      href={p.page_access === "private" ? `/${p.slug}?key=${p.private_access_key}` : `/${p.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={buttonClass("ghost", "sm")}
+                    >
+                      Purchase page
+                      <Icon name="external" className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       <InstallApp appName={brand.name} />
 
       {backupCodesLeft === 0 && (
-        <p className="mt-6 rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
-          ⚠ If you lose your phone, you&apos;ll need a backup code to get back in.{" "}
-          <Link href="/dashboard/security" className="font-medium underline">
-            Make backup codes
-          </Link>
-        </p>
+        <div className="mt-6">
+          <Callout title="Make backup codes">
+            If you lose your phone, you&apos;ll need a backup code to get back in.{" "}
+            <Link href="/dashboard/security" className="font-medium underline">
+              Make backup codes
+            </Link>
+          </Callout>
+        </div>
       )}
 
       <form action={signOut} className="mt-8">
-        <button className="text-sm underline">Sign out</button>
+        <button className="text-sm text-ink-muted hover:text-ink hover:underline">Sign out</button>
       </form>
     </>
   );
 }
 
-function PaymentsStatus({ provider, isOwner }: { provider: NonNullable<Membership["providers"]>; isOwner: boolean }) {
-  if (provider.stripe_charges_enabled) {
-    return <p className="mt-1 text-green-700 dark:text-green-500">✓ Ready to accept payments</p>;
-  }
+function PaymentsBadge({ provider }: { provider: NonNullable<Membership["providers"]> }) {
+  return provider.stripe_charges_enabled ? (
+    <Badge tone="green">✓ Taking payments</Badge>
+  ) : (
+    <Badge tone="amber">Payments not set up</Badge>
+  );
+}
+
+function PaymentsSetup({ provider, isOwner }: { provider: NonNullable<Membership["providers"]>; isOwner: boolean }) {
   const started = provider.stripe_account_id !== null;
   return (
-    <div className="mt-1">
-      <p className="text-zinc-600 dark:text-zinc-400">
-        {started ? "Stripe setup isn't finished yet." : "Connect Stripe to get paid for packages."}
-      </p>
+    <div className="mt-3 rounded-lg bg-surface-muted px-3 py-2.5 text-sm">
+      <p className="text-ink-muted">{started ? "Stripe setup isn't finished yet." : "Connect Stripe to get paid for packages."}</p>
       {isOwner ? (
         <form action={connectStripe} className="mt-2">
           <input type="hidden" name="providerId" value={provider.id} />
-          <button className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white">
-            {started ? "Continue Stripe setup" : "Connect Stripe"}
-          </button>
+          <button className={buttonClass("primary", "sm")}>{started ? "Continue Stripe setup" : "Connect Stripe"}</button>
         </form>
       ) : (
-        <p className="text-xs text-zinc-500">The business owner can connect Stripe.</p>
+        <p className="text-xs text-ink-muted">The business owner can connect Stripe.</p>
       )}
     </div>
   );

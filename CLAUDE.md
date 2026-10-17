@@ -312,6 +312,22 @@ default), plus a privilege check in `provider_setup_test.sql`.
   for 30 days". Remember-device must not weaken migration 0004 (the DB requires `aal2`),
   so design it carefully, not as a cookie that skips the code.
 
+## Design system (Oct 2026)
+- Tokens in `src/app/globals.css`: `canvas` (page background), `surface` / `surface-muted`
+  (cards), `line` (borders), `ink` / `ink-muted` (text), with dark-mode values. Use them
+  (`bg-surface`, `border-line`, `text-ink-muted`) instead of raw zinc greys in new work.
+  `brand` = the product colour (staff app chrome); client pages use the PROVIDER's colour.
+- Staff building blocks in `src/components/ui.tsx`: `PageHeader`, `Card`, `Stat` (+ `Trend`),
+  `Badge`, `Callout`, `EmptyState`, `Row`, `buttonClass(variant, size)`. Icons: `src/components/icons.tsx`.
+- Staff shell: `dashboard/layout.tsx` (sticky top bar on the canvas); business pages get a
+  role-aware sidebar (`dashboard/business/[providerId]/layout.tsx` + `components/business-nav.tsx`,
+  a tab strip on phones). The sidebar is a convenience: pages still check access themselves.
+- Client pages (purchase, thank-you, pass) use `src/components/client-shell.tsx`
+  (`ClientShell`, `ClientCard` with the provider-colour top bar, `ClientHeader`); office
+  contact in the footer except on the pass page (kept discreet).
+- Still on the old look inside the new shell: clients, client detail, packages, settings,
+  staff, scan, help, security. Convert them to the components above.
+
 ## Flyers, signs and QR cards (steps 10 and 13a)
 - Design styles shared by both (`src/lib/design-styles.ts`): professional, warm, minimal,
   classic, bordered, all built on the provider's brand colour; heading fonts (`DESIGN_FONTS`,

@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: `Clients · ${brand.name}` };
 
 export default function ClientsPage(props: PageProps<"/dashboard/business/[providerId]/clients">) {
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
+    <main className="w-full max-w-3xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <ClientsContent {...props} />
       </Suspense>

@@ -25,6 +25,10 @@ export type PublicProvider = {
   stripe_charges_enabled: boolean;
   terms_text: string;
   terms_version: number;
+  // the practice's own contact details (public business info), shown in the footer
+  office_address: string | null;
+  office_phone: string | null;
+  office_website: string | null;
 };
 
 export type PublicPackage = {
@@ -48,7 +52,7 @@ export async function loadPublicProvider(slug: string, key: string | undefined):
   const { data } = await getAdminClient()
     .from("providers")
     .select(
-      "id, slug, display_name, brand_color, logo_path, vocab_singular, vocab_plural, pass_label, page_access, private_access_key, stripe_account_id, stripe_charges_enabled, terms_text, terms_version",
+      "id, slug, display_name, brand_color, logo_path, vocab_singular, vocab_plural, pass_label, page_access, private_access_key, stripe_account_id, stripe_charges_enabled, terms_text, terms_version, office_address, office_phone, office_website",
     )
     .eq("slug", slug.toLowerCase())
     .maybeSingle<PublicProvider>();

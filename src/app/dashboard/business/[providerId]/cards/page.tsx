@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: `QR cards · ${brand.name}` };
 // link it with the first scan.
 export default function CardsPage({ params }: PageProps<"/dashboard/business/[providerId]/cards">) {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+    <main className="w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <CardsContent params={params} />
       </Suspense>

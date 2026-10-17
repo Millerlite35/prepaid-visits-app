@@ -73,7 +73,7 @@ export function InstallApp({ appName }: { appName: string }) {
   if (view === "hidden") return null;
 
   return (
-    <section className="mt-8 rounded-lg border border-zinc-200 p-4 text-sm dark:border-zinc-800">
+    <section className="mt-6 rounded-xl border border-line bg-surface px-5 py-4 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
       <h2 className="font-medium">Install the {appName} app</h2>
       <p className="mt-1 text-zinc-600 dark:text-zinc-400">
         Put it on your home screen: one tap to open, full screen, no browser bar. Handy for scanning at the front desk.

@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: `Edit package · ${brand.name}` };
 
 export default function EditPackagePage({ params }: PageProps<"/dashboard/business/[providerId]/packages/[packageId]">) {
   return (
-    <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">
+    <main className="w-full max-w-xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <EditPackageContent params={params} />
       </Suspense>
