@@ -39,7 +39,7 @@ export function ClientHeader({ name, color, logoPath, subtitle }: { name: string
     <header className="text-center">
       {logo && (
         // eslint-disable-next-line @next/next/no-img-element -- provider-uploaded logo from storage
-        <img src={logo} alt={`${name} logo`} className="mx-auto mb-3 max-h-20 max-w-[240px] object-contain" />
+        <img src={logo} alt={`${name} logo`} className="mx-auto mb-3 max-h-32 max-w-[280px] object-contain" />
       )}
       <h1 className={logo ? "text-lg font-semibold text-ink" : "text-2xl font-semibold"} style={logo ? undefined : { color }}>
         {name}

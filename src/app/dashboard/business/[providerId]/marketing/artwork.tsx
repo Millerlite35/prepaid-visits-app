@@ -97,6 +97,13 @@ function Frame({ c, s, insetIn = 0.25 }: Ctx & { insetIn?: number }) {
   switch (s.frame) {
     case "band":
       return <div style={{ ...abs, left: 0, right: 0, bottom: 0, height: "0.3in", background: stripe }} />;
+    case "topbar":
+      return (
+        <>
+          <div style={{ ...abs, left: 0, right: 0, top: 0, height: "0.45in", background: stripe }} />
+          <div style={{ ...abs, left: 0, right: 0, bottom: 0, height: "0.08in", background: stripe }} />
+        </>
+      );
     case "stripe":
       return <div style={{ ...abs, left: 0, top: 0, bottom: 0, width: "0.3in", background: stripe }} />;
     case "line":

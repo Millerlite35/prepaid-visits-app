@@ -71,7 +71,7 @@ export function StylePicker({ value, onChange, color }: { value: DesignStyleId; 
   return (
     <fieldset>
       <legend className="text-sm font-medium">Design style</legend>
-      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <div className="mt-2 grid grid-cols-2 gap-2 2xl:grid-cols-3">
         {DESIGN_STYLE_IDS.map((id) => {
           const s = DESIGN_STYLES[id];
           return (

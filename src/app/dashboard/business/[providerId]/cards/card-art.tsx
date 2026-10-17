@@ -31,6 +31,7 @@ export function QrCard({ b, qr, s }: { b: CardBrand; qr: string; s: DesignStyle 
     >
       {/* the style's frame */}
       {s.frame === "band" && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "0.14in", background: stripe }} />}
+      {s.frame === "topbar" && <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: "0.16in", background: stripe }} />}
       {s.frame === "stripe" && <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "0.12in", background: stripe }} />}
       {s.frame === "rules" && (
         <>
@@ -49,7 +50,7 @@ export function QrCard({ b, qr, s }: { b: CardBrand; qr: string; s: DesignStyle 
           position: "relative",
           height: "100%",
           boxSizing: "border-box",
-          padding: s.frame === "stripe" ? "0.18in 0.16in 0.18in 0.3in" : "0.2in 0.18in",
+          padding: s.frame === "stripe" ? "0.18in 0.16in 0.18in 0.3in" : s.frame === "topbar" ? "0.28in 0.18in 0.16in" : "0.2in 0.18in",
           display: "flex",
           alignItems: "center",
           gap: "0.14in",

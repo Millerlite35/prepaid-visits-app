@@ -40,15 +40,16 @@ export async function GET(request: Request, { params }: RouteContext<"/dashboard
           alignItems: "center",
           background: style.pageBg,
           color: style.ink,
-          borderLeft: style.frame === "stripe" ? `28px solid ${stripe}` : undefined,
-          border: style.frame === "double" ? `12px solid ${accent}` : undefined,
+          ...(style.frame === "stripe" ? { borderLeft: `28px solid ${stripe}` } : {}),
+          ...(style.frame === "topbar" ? { borderTop: `44px solid ${stripe}` } : {}),
+          ...(style.frame === "double" ? { border: `12px solid ${accent}` } : {}),
           padding: "70px 70px 0",
           fontFamily: "sans-serif",
         }}
       >
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element -- rendered to an image on the server
-          <img src={logo} alt="" style={{ maxHeight: 130, maxWidth: 600, objectFit: "contain" }} />
+          <img src={logo} alt="" style={{ maxHeight: 200, maxWidth: 600, objectFit: "contain" }} />
         ) : (
           <div style={{ fontSize: 56, fontWeight: 700, color: accent }}>{data.businessName}</div>
         )}

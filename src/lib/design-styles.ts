@@ -2,7 +2,7 @@
 // small set of colours, fonts and frame choices built around the provider's own brand
 // colour, so every business still looks like itself.
 
-export type DesignStyleId = "professional" | "warm" | "minimal" | "classic" | "bordered";
+export type DesignStyleId = "professional" | "warm" | "minimal" | "classic" | "bordered" | "modern";
 
 export type DesignStyle = {
   label: string;
@@ -14,7 +14,7 @@ export type DesignStyle = {
   stripe: (brand: string) => string; // decorative band / stripe
   headingFont: string;
   bodyFont: string;
-  frame: "band" | "stripe" | "line" | "rules" | "double";
+  frame: "band" | "stripe" | "line" | "rules" | "double" | "topbar";
   packageBoxes: boolean; // boxed package cards on the flyer, or plain lines
 };
 
@@ -86,6 +86,19 @@ export const DESIGN_STYLES: Record<DesignStyleId, DesignStyle> = {
     headingFont: SERIF,
     bodyFont: SANS,
     frame: "double",
+    packageBoxes: true,
+  },
+  modern: {
+    label: "Modern",
+    note: "Bold colour bar across the top",
+    pageBg: "#ffffff",
+    ink: "#111827",
+    muted: "#4b5563",
+    accent: (b) => b,
+    stripe: (b) => b,
+    headingFont: SANS,
+    bodyFont: SANS,
+    frame: "topbar",
     packageBoxes: true,
   },
 };

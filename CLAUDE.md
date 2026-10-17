@@ -339,11 +339,13 @@ default), plus a privilege check in `provider_setup_test.sql`.
 
 ## Flyers, signs and QR cards (steps 10 and 13a)
 - Design styles shared by both (`src/lib/design-styles.ts`): professional, warm, minimal,
-  classic, bordered, all built on the provider's brand colour; heading fonts (`DESIGN_FONTS`,
+  classic, bordered, modern (top colour bar), all built on the provider's brand colour; heading fonts (`DESIGN_FONTS`,
   Google fonts self-hosted via next/font in `src/lib/design-fonts.ts`, variables on <html>,
   preload off). Choices remembered per browser (localStorage), never on the server.
 - Flyers `/dashboard/business/[id]/marketing` (requireManager): flyer, 5x7 counter sign,
-  table tent, social post (`marketing/social` route, next/og; no WebP logos there). Content
+  table tent, social post (`marketing/social` route, next/og; no WebP logos there; next/og
+  CRASHES on style keys set to `undefined`, so add optional styles with `...(cond ? {..} : {})`;
+  the Download button fetches the PNG and saves it from a blob URL). Content
   from the provider's own ACTIVE packages (`src/lib/marketing.ts`, `src/lib/flyer-content.ts`).
   QR = purchase page URL (includes `?key=` for private pages; the page warns). Printing is
   the browser's Save as PDF at real size (`@page` + print CSS inside the component).

@@ -99,6 +99,40 @@ export function Studio(props: Props) {
     return `${props.socialBase}?${q.toString()}`;
   }, [content.headline, content.message, selected, usualCents, props.socialBase, styleId]);
   const [socialSrc, setSocialSrc] = useState(socialUrl);
+  const [downloading, setDownloading] = useState<"idle" | "working" | "failed">("idle");
+  // the social preview is drawn on the server: show progress, and retry once if it fails
+  // (a browser won't re-request an image address that failed before)
+  const [preview, setPreview] = useState<{ state: "loading" | "ready" | "failed"; attempt: number }>({ state: "loading", attempt: 0 });
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- a new image address starts loading
+    setPreview({ state: "loading", attempt: 0 });
+  }, [socialSrc]);
+  const previewSrc = preview.attempt ? `${socialSrc}&retry=${preview.attempt}` : socialSrc;
+  function previewFailed() {
+    if (preview.attempt < 2) setTimeout(() => setPreview((v) => ({ state: "loading", attempt: v.attempt + 1 })), 1500);
+    else setPreview((v) => ({ ...v, state: "failed" }));
+  }
+
+  // Fetch the image and save it as a file. (A plain download link is ignored by some
+  // browsers and in-app browsers, so nothing happens.)
+  async function downloadSocial() {
+    setDownloading("working");
+    try {
+      const res = await fetch(socialUrl, { credentials: "same-origin" });
+      if (!res.ok || !res.headers.get("content-type")?.startsWith("image/")) throw new Error(`status ${res.status}`);
+      const url = URL.createObjectURL(await res.blob());
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${props.businessName.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "social"}-post.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      setDownloading("idle");
+    } catch {
+      setDownloading("failed");
+    }
+  }
   useEffect(() => {
     const t = setTimeout(() => setSocialSrc(socialUrl), 500);
     return () => clearTimeout(t);
@@ -200,13 +234,23 @@ export function Studio(props: Props) {
         )}
 
         {template === "social" ? (
-          <a
-            href={socialSrc}
-            download="social-post.png"
-            className="inline-block rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90"
-          >
-            Download image
-          </a>
+          <div>
+            <button
+              type="button"
+              onClick={downloadSocial}
+              disabled={downloading === "working"}
+              className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+            >
+              {downloading === "working" ? "Preparing image…" : "Download image"}
+            </button>
+            {downloading === "failed" ? (
+              <p role="alert" className="mt-2 text-xs text-red-600">
+                Couldn&apos;t download. Right-click the preview and choose &quot;Save image as…&quot; instead.
+              </p>
+            ) : (
+              <p className="mt-2 text-xs text-ink-muted">Saves a 1080 × 1080 PNG to your Downloads folder.</p>
+            )}
+          </div>
         ) : (
           <div>
             <button onClick={() => window.print()} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
@@ -223,8 +267,24 @@ export function Studio(props: Props) {
       <div>
         <p className="mb-2 text-sm font-medium print:hidden">Preview</p>
         {template === "social" ? (
-          // eslint-disable-next-line @next/next/no-img-element -- generated image from our own route
-          <img src={socialSrc} alt="Social post preview" width={PREVIEW_WIDTH_PX} height={PREVIEW_WIDTH_PX} className="rounded-md border border-line" />
+          <div className="relative overflow-hidden rounded-md border border-line bg-surface" style={{ width: PREVIEW_WIDTH_PX, height: PREVIEW_WIDTH_PX }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- generated image from our own route */}
+            <img
+              key={previewSrc}
+              src={previewSrc}
+              alt="Social post preview"
+              width={PREVIEW_WIDTH_PX}
+              height={PREVIEW_WIDTH_PX}
+              onLoad={() => setPreview((v) => ({ ...v, state: "ready" }))}
+              onError={previewFailed}
+              className={preview.state === "ready" ? "" : "invisible"}
+            />
+            {preview.state !== "ready" && (
+              <p className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-ink-muted">
+                {preview.state === "failed" ? "Couldn't draw the preview. Refresh the page to try again." : "Making the preview…"}
+              </p>
+            )}
+          </div>
         ) : (
           <>
             {/* the page size the browser should print at */}
