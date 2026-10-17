@@ -41,7 +41,7 @@ function dollars(cents: number): string {
 export function packageLines(p: FlyerPackage, singular: string, plural: string, usualPriceCents: number | null) {
   const perVisit = Math.round(p.priceCents / p.visits);
   const saving =
-    usualPriceCents && usualPriceCents > perVisit ? Math.round((1 - perVisit / usualPriceCents) * 100) : 0;
+    usualPriceCents && usualPriceCents > perVisit ? Math.floor((1 - perVisit / usualPriceCents) * 100 + 1e-6) : 0;
   return {
     title: p.name,
     detail: `${p.visits} ${p.visits === 1 ? singular : plural} for ${dollars(p.priceCents)}`,

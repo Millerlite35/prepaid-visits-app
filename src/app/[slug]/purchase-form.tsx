@@ -43,7 +43,7 @@ export function PurchaseForm({ action, packages, singular, plural, brandColor, t
   const ring = { "--tw-ring-color": brandColor } as React.CSSProperties;
   // "Save 10%" against the practice's regular single-visit price, when they've set one
   const savingPercent = (p: PublicPackage) =>
-    usualPriceCents && p.visits > 1 ? Math.floor((1 - perVisit(p) / usualPriceCents) * 100) : 0;
+    usualPriceCents && p.visits > 1 ? Math.floor((1 - perVisit(p) / usualPriceCents) * 100 + 1e-6) : 0;
 
   return (
     <form action={formAction} className="space-y-8">

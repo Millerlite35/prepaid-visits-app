@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // no Next.js badge in the corner during development (it shows up in demo recordings)
+  devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
   // logo uploads are up to 1 MB; leave room for the rest of the form

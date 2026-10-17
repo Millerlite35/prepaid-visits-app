@@ -52,3 +52,6 @@ next-env.d.ts
 
 # demo logo files (fictional practice, not part of the app)
 /logos/
+
+# demo pack (fictional practice marketing material, not part of the app)
+/demo/

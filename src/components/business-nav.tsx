@@ -46,18 +46,18 @@ export function BusinessNav({ groups, overviewHref, businessName, logo }: { grou
 
       {/* desktop sidebar */}
       <aside className="hidden w-64 shrink-0 border-r border-line bg-surface lg:block print:hidden">
-        <div className="sticky top-14 flex max-h-[calc(100vh-3.5rem)] flex-col overflow-y-auto px-3 py-5">
-          <div className="mb-5 px-2">
+        <div className="sticky top-14 flex max-h-[calc(100vh-3.5rem)] flex-col overflow-y-auto px-3 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mb-4 px-2">
             {/* eslint-disable-next-line @next/next/no-img-element -- provider-uploaded logo from storage */}
-            {logo && <img src={logo} alt="" className="mb-2 h-10 w-auto max-w-[180px] object-contain" />}
-            <p className="truncate font-semibold text-ink">{businessName}</p>
+            {logo && <img src={logo} alt="" className="mb-2 h-12 w-auto max-w-[180px] object-contain" />}
+            <p className="leading-snug font-semibold text-ink">{businessName}</p>
             <Link href="/dashboard" className="mt-0.5 inline-flex items-center gap-1 text-xs text-ink-muted hover:text-ink">
               <Icon name="back" className="h-3 w-3" />
               All businesses
             </Link>
           </div>
           {groups.map((g) => (
-            <div key={g.label} className="mb-4">
+            <div key={g.label} className="mb-3">
               <p className="mb-1 px-2 text-[11px] font-medium tracking-wider text-ink-muted uppercase">{g.label}</p>
               <ul className="space-y-0.5">
                 {g.items.map((item) => (
@@ -67,7 +67,7 @@ export function BusinessNav({ groups, overviewHref, businessName, logo }: { grou
                       target={item.external ? "_blank" : undefined}
                       aria-current={active(item.href) ? "page" : undefined}
                       className={cx(
-                        "flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition",
+                        "flex items-center gap-2.5 rounded-lg px-2 py-[5px] text-sm transition",
                         active(item.href) ? "bg-brand/10 font-medium text-brand" : "text-ink-muted hover:bg-surface-muted hover:text-ink",
                       )}
                     >
