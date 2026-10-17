@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireEnv } from "@/lib/env";
+import { allow, clientIp, LIMITS } from "@/lib/rate-limit";
 import { createCheckout, loadActivePackages, loadPublicProvider, notSellingReason } from "@/lib/payments/checkout";
 
 export type PurchaseState = { error?: string };
@@ -31,6 +32,13 @@ export async function startCheckout(
   if (formData.get("acceptTerms") !== "on") return { error: "Please read and accept the terms to continue." };
   if (acceptedVersion !== provider.terms_version) {
     return { error: "The terms were just updated. Please refresh the page and review them again." };
+  }
+  // stops someone flooding the provider's Stripe account with checkout sessions
+  if (
+    !(await allow("checkout-ip", await clientIp(), LIMITS.checkoutPerIp)) ||
+    !(await allow("checkout-email", email, LIMITS.checkoutPerEmail))
+  ) {
+    return { error: "Too many attempts. Please wait a little while and try again." };
   }
 
   const site = requireEnv("SITE_URL");

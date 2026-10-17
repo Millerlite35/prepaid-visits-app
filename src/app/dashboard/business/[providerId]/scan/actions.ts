@@ -1,6 +1,7 @@
 "use server";
 
 import { requireStaff } from "@/lib/auth";
+import { allow, LIMITS } from "@/lib/rate-limit";
 import { getAdminClient } from "@/lib/supabase/admin";
 
 // Check-ins go ONLY through record_visit() (hard rule 5): it locks the client's account so
@@ -25,6 +26,8 @@ function readToken(raw: string): string | null {
 
 export async function checkIn(providerId: string, code: string, force: boolean): Promise<ScanResult> {
   const user = await requireStaff(providerId);
+  // a real front desk scans a few people a minute; this stops anyone guessing codes
+  if (!(await allow("scan-user", user.id, LIMITS.scanPerUser))) return { result: "error" };
   const token = readToken(code);
   if (!token) return { result: "unknown_code" };
 

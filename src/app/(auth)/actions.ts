@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireEnv } from "@/lib/env";
+import { allow, clientIp, LIMITS } from "@/lib/rate-limit";
 import { createSessionClient } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; message?: string };
@@ -12,6 +13,10 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   if (!email || !password) return { error: "Enter your email and password." };
+  // Supabase also limits sign-ins; this stops password guessing from one machine early
+  if (!(await allow("signin-ip", await clientIp(), LIMITS.signInPerIp))) {
+    return { error: "Too many sign-in attempts. Please wait 10 minutes and try again." };
+  }
 
   const supabase = await createSessionClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });

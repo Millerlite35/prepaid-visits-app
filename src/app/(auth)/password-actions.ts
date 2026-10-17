@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { requireSignedIn } from "@/lib/auth";
 import { requireEnv } from "@/lib/env";
+import { allow, clientIp, LIMITS } from "@/lib/rate-limit";
 import { createSessionClient } from "@/lib/supabase/server";
 
 // Forgot password. Two safeguards:
@@ -17,6 +18,9 @@ const MIN_PASSWORD_LENGTH = 12;
 export async function requestPasswordReset(_prev: PasswordState, formData: FormData): Promise<PasswordState> {
   const email = String(formData.get("email") ?? "").trim();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: "Enter your email address." };
+  if (!(await allow("reset-ip", await clientIp(), LIMITS.resetPerIp))) {
+    return { error: "Too many requests. Please wait a few minutes and try again." };
+  }
 
   const supabase = await createSessionClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {

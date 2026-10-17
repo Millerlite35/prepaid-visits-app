@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { sessionCookieOptions } from "@/lib/supabase/cookie-options";
 
 // Runs before every page request. Its only job is keeping the login session fresh:
 // Supabase logins use short-lived tokens that are renewed here and saved in cookies.
@@ -13,6 +14,7 @@ export async function proxy(request: NextRequest) {
   if (!url || !key) return response; // the home page system check explains missing settings
 
   const supabase = createServerClient(url, key, {
+    cookieOptions: sessionCookieOptions,
     cookies: {
       getAll() {
         return request.cookies.getAll();

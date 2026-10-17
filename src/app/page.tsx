@@ -14,12 +14,15 @@ export default function Home() {
         Development build · test mode · fake data only
       </p>
 
-      <section className="mt-8 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="font-medium">System check</h2>
-        <Suspense fallback={<p className="mt-3 text-sm">Checking…</p>}>
-          <SystemCheck />
-        </Suspense>
-      </section>
+      {/* development only: the live site shouldn't describe its own setup */}
+      {process.env.NODE_ENV !== "production" && (
+        <section className="mt-8 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+          <h2 className="font-medium">System check</h2>
+          <Suspense fallback={<p className="mt-3 text-sm">Checking…</p>}>
+            <SystemCheck />
+          </Suspense>
+        </section>
+      )}
 
       <p className="mt-6 text-sm">
         <Link href="/login" className="underline">

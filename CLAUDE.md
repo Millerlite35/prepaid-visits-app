@@ -89,12 +89,16 @@ Files in `supabase/migrations/`, run in order:
 13. `0013_support.sql`: `support_requests` (server-only: RLS on, no policies, all grants
     revoked from anon/authenticated)
 
+14. `0014_rate_limits.sql`: `rate_limits` (server-only) and `hit_rate_limit(bucket, limit,
+    window_seconds)` (fixed window; true = allowed; prunes rows older than a day)
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
-`staff_test.sql`, `external_refunds_test.sql`, `support_test.sql` in `supabase/tests/`.
+`staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`
+in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -278,6 +282,24 @@ default), plus a privilege check in `provider_setup_test.sql`.
   `SUPPORT_EMAIL` with reply-to = the sender. Form warns: no client health details.
 - Two-step at every sign-in on a new device is intentional; ideas to lighten it later
   (app Face ID, remember device, passkeys) are pilot questions.
+
+## Security hardening (step 11b)
+- Headers on every response (`next.config.ts`): CSP `frame-ancestors 'none'`, `base-uri`,
+  `object-src 'none'`, `form-action 'self' https://*.stripe.com` (add any new form/redirect
+  target here); X-Frame-Options DENY; nosniff; Referrer-Policy strict-origin-when-cross-
+  origin (keeps pass and `?key=` links from leaking); Permissions-Policy camera=(self) only;
+  HSTS in production. No script CSP yet (Next inline scripts need nonces; revisit at hosting).
+- Login cookies are httpOnly + sameSite lax (+ secure in production), set in
+  `src/lib/supabase/cookie-options.ts` and used by both `proxy.ts` and `server.ts`.
+  Consequence: **never create a browser Supabase client**; all Supabase calls stay on the server.
+- Rate limits (`src/lib/rate-limit.ts`, `allow(kind, who, LIMITS.x)`; IPs/emails hashed):
+  checkout 10/10 min per IP + 5/hour per email, sign-in 20/10 min per IP, reset 5/hour per
+  IP, scanner 120/min per user, support 5/hour per user. If the check errors it ALLOWS and
+  logs (never locks everyone out). IP = first `x-forwarded-for`: confirm the host sets it
+  honestly when choosing hosting.
+- `/` system check renders only outside production.
+- Admin-client review (Oct 2026): every use in `src/app` follows a `require*` check, a
+  verified Stripe signature, or an unguessable token/session id. Keep it that way.
 
 ## Open decisions
 - Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the

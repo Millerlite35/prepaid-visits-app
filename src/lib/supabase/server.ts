@@ -2,6 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { requireEnv } from "@/lib/env";
+import { sessionCookieOptions } from "@/lib/supabase/cookie-options";
 
 // Database client acting AS the signed-in staff member (read from their login cookie).
 // Row-level security applies, so it only ever sees that person's own business data.
@@ -13,6 +14,7 @@ export async function createSessionClient() {
     requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
     requireEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
     {
+      cookieOptions: sessionCookieOptions,
       cookies: {
         getAll() {
           return cookieStore.getAll();
