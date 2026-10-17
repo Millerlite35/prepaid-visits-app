@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { brand } from "@/config/brand";
+import { installableApp } from "@/lib/app-metadata";
+
+export const metadata = installableApp;
 
 // A slim bar on every dashboard page: our brand (back to the dashboard), Security and Help.
 // Static on purpose: no login reads here, so it never slows the page down.

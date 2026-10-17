@@ -8,7 +8,7 @@ const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/;
 // the app's own pages. ADD EVERY NEW TOP-LEVEL ROUTE HERE.
 const RESERVED = new Set([
   // routes that exist now
-  "auth", "dashboard", "forgot-password", "kiosk", "login", "mfa", "pass", "reset-password", "signup",
+  "app-icon", "apple-icon", "auth", "dashboard", "forgot-password", "icon", "kiosk", "login", "mfa", "pass", "reset-password", "signup",
   // routes we are likely to need
   "about", "account", "admin", "api", "app", "billing", "card", "cards", "check-in", "checkin", "checkout",
   "contact", "help", "logout", "new", "passes", "pay", "pricing", "privacy",

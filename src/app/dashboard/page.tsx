@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InstallApp } from "@/components/install-app";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { unusedBackupCodeCount } from "@/lib/backup-codes";
@@ -179,6 +180,8 @@ async function DashboardContent() {
           </>
         )}
       </section>
+
+      <InstallApp appName={brand.name} />
 
       {backupCodesLeft === 0 && (
         <p className="mt-6 rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">

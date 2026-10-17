@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { brand } from "@/config/brand";
@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: brand.name,
   description: brand.tagline,
 };
+
+// colours the phone's status bar / browser bar to match the brand
+export const viewport: Viewport = { themeColor: brand.colors.primary };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

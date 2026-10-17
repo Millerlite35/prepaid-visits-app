@@ -309,6 +309,21 @@ default), plus a privilege check in `provider_setup_test.sql`.
   for 30 days". Remember-device must not weaken migration 0004 (the DB requires `aal2`),
   so design it carefully, not as a cookie that skips the code.
 
+## Installable app ("Add to Home Screen")
+- Manifest `/app.webmanifest` (route handler `src/app/app.webmanifest/route.ts`; name,
+  colours from `brand`; start_url `/dashboard`; standalone). Linked ONLY on staff pages via
+  `installableApp` (`src/lib/app-metadata.ts`) in the dashboard, (auth), mfa and kiosk
+  layouts, never on purchase/pass pages (a client saving their pass mustn't land on the
+  dashboard). Root layout sets `viewport.themeColor`.
+- Icons drawn from brand colours (`src/lib/app-icon.tsx`, no name in the picture):
+  `/app-icon/192`, `/app-icon/512`, `/app-icon/maskable-512`, `src/app/apple-icon.tsx`,
+  `src/app/icon.tsx` (tab icon). Default favicon removed.
+- No service worker / offline cache on purpose (client data stays on the server).
+- `<InstallApp>` card on the dashboard (`src/components/install-app.tsx`): one-click on
+  Chrome/Edge/Android (`beforeinstallprompt`), Share > Add to Home Screen steps on iPhone/
+  iPad, hidden when already installed or after "Not now" (localStorage).
+- Phones can only install from a real https address, so phone testing waits for hosting.
+
 ## Security hardening (step 11b)
 - Headers on every response (`next.config.ts`): CSP `frame-ancestors 'none'`, `base-uri`,
   `object-src 'none'`, `form-action 'self' https://*.stripe.com` (add any new form/redirect
