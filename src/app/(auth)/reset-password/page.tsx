@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: `Choose a new password · ${brand.nam
 export default function ResetPasswordPage() {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold text-brand">Choose a new password</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Choose a new password</h1>
       <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
         <ResetGate />
       </Suspense>

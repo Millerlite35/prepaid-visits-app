@@ -20,6 +20,7 @@ export type MarketingData = {
   purchaseUrl: string;
   shortUrl: string;
   contact: string[];
+  usualPriceCents: number | null;
   qrDataUrl: string;
   packages: FlyerPackage[];
 };
@@ -38,6 +39,7 @@ type ProviderRow = {
   office_address: string | null;
   office_phone: string | null;
   office_website: string | null;
+  usual_price_cents: number | null;
 };
 
 export async function loadMarketingData(providerId: string): Promise<MarketingData | null> {
@@ -46,7 +48,7 @@ export async function loadMarketingData(providerId: string): Promise<MarketingDa
     db
       .from("providers")
       .select(
-        "display_name, brand_color, logo_path, vocab_singular, vocab_plural, slug, page_access, private_access_key, stripe_charges_enabled, terms_text, office_address, office_phone, office_website",
+        "display_name, brand_color, logo_path, vocab_singular, vocab_plural, slug, page_access, private_access_key, stripe_charges_enabled, terms_text, office_address, office_phone, office_website, usual_price_cents",
       )
       .eq("id", providerId)
       .maybeSingle<ProviderRow>(),
@@ -86,6 +88,7 @@ export async function loadMarketingData(providerId: string): Promise<MarketingDa
     purchaseUrl,
     shortUrl: `${new URL(site).host}/${p.slug}`,
     contact: contactLines({ address: p.office_address, phone: p.office_phone, website: p.office_website }),
+    usualPriceCents: p.usual_price_cents,
     qrDataUrl: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
     packages: (pkgs ?? []).map((k) => ({ id: k.id, name: k.name, visits: k.visits, priceCents: k.price_cents })),
   };

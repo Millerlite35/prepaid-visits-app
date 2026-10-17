@@ -31,11 +31,8 @@ async function MarketingContent({ params }: { params: Promise<{ providerId: stri
   return (
     <>
       <div className="print:hidden">
-        <Link href={`/dashboard/business/${providerId}`} className="text-sm underline">
-          ← {data.businessName}
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-brand">Flyers and signs</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink">Flyers and signs</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Put your packages in front of clients in the waiting room. Each design has a QR code that opens your purchase
           page.
         </p>
@@ -45,7 +42,7 @@ async function MarketingContent({ params }: { params: Promise<{ providerId: stri
           </p>
         )}
         {data.isPrivate && (
-          <p className="mt-4 rounded-md bg-zinc-100 p-3 text-sm dark:bg-zinc-800">
+          <p className="mt-4 rounded-md bg-surface-muted p-3 text-sm">
             Your purchase page is private, so this QR code includes your private link: anyone who scans it can buy. That&apos;s
             fine for flyers in your office. To share more widely, make the page public in{" "}
             <Link href={`/dashboard/business/${providerId}/settings`} className="underline">
@@ -63,6 +60,7 @@ async function MarketingContent({ params }: { params: Promise<{ providerId: stri
         qrDataUrl={data.qrDataUrl}
         shortUrl={data.shortUrl}
         contact={data.contact}
+        usualPriceCents={data.usualPriceCents}
         singular={data.singular}
         plural={data.plural}
         packages={data.packages}

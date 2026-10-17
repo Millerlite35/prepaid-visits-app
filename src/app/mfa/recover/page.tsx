@@ -11,8 +11,8 @@ export const metadata: Metadata = { title: `Use a backup code · ${brand.name}` 
 export default function MfaRecoverPage() {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold text-brand">Lost your phone?</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Lost your phone?</h1>
+      <p className="mt-2 text-sm text-ink-muted">
         Enter one of the backup codes you saved when you set up two-step verification. Your old
         authenticator will be removed, and you&apos;ll sign in again to set up your new phone.
       </p>
@@ -31,7 +31,7 @@ async function RecoverGate() {
       <div className="mt-6">
         <BackupCodeForm />
       </div>
-      <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-6 text-sm text-ink-muted">
         No backup codes?{" "}
         {supportEmail ? (
           <>

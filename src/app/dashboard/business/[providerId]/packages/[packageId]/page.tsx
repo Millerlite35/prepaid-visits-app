@@ -28,9 +28,9 @@ async function EditPackageContent({ params }: { params: Promise<{ providerId: st
   const [providerRes, packageRes] = await Promise.all([
     db
       .from("providers")
-      .select("vocab_singular, vocab_plural")
+      .select("vocab_singular, vocab_plural, usual_price_cents")
       .eq("id", providerId)
-      .single<{ vocab_singular: string; vocab_plural: string }>(),
+      .single<{ vocab_singular: string; vocab_plural: string; usual_price_cents: number | null }>(),
     db
       .from("package_templates")
       .select("name, description, visits, price_cents, expires_days")
@@ -45,8 +45,8 @@ async function EditPackageContent({ params }: { params: Promise<{ providerId: st
       <Link href={`/dashboard/business/${providerId}/packages`} className="text-sm underline">
         ← Packages
       </Link>
-      <h1 className="mb-2 mt-4 text-2xl font-semibold text-brand">Edit package</h1>
-      <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+      <h1 className="mb-2 mt-4 text-2xl font-semibold tracking-tight text-ink">Edit package</h1>
+      <p className="mb-6 text-sm text-ink-muted">
         Changes apply to future purchases. Clients who already bought this package keep what
         they paid for.
       </p>
@@ -56,6 +56,7 @@ async function EditPackageContent({ params }: { params: Promise<{ providerId: st
         vocabSingular={providerRes.data.vocab_singular}
         vocabPlural={providerRes.data.vocab_plural}
         submitLabel="Save changes"
+        usualPriceCents={providerRes.data.usual_price_cents}
       />
     </>
   );

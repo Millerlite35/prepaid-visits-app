@@ -135,24 +135,24 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
             ).map(([id, label, note]) => (
               <label
                 key={id}
-                className={`cursor-pointer rounded-md border p-2 text-sm ${mode === id ? "border-brand ring-1 ring-brand" : "border-zinc-300 dark:border-zinc-700"}`}
+                className={`cursor-pointer rounded-md border p-2 text-sm ${mode === id ? "border-brand ring-1 ring-brand" : "border-line"}`}
               >
                 <input type="radio" name="print-mode" className="sr-only" checked={mode === id} onChange={() => setMode(id)} />
                 <span className="font-medium">{label}</span>
-                <span className="block text-xs text-zinc-500">{note}</span>
+                <span className="block text-xs text-ink-muted">{note}</span>
               </label>
             ))}
           </div>
         </fieldset>
 
         {mode === "avery" && (
-          <div className="space-y-3 rounded-md border border-zinc-200 p-3 text-sm dark:border-zinc-800">
+          <div className="space-y-3 rounded-xl border border-line bg-surface p-4 text-sm">
             <label className="flex items-center gap-2">
               Start at card position
               <select
                 value={startSlot}
                 onChange={(e) => setStartSlot(Number(e.target.value))}
-                className="rounded-md border border-zinc-300 px-2 py-1 dark:border-zinc-700 dark:bg-zinc-900"
+                className="rounded-md border border-line bg-surface px-2 py-1"
               >
                 {Array.from({ length: PER_SHEET }, (_, i) => (
                   <option key={i} value={i + 1}>
@@ -160,11 +160,11 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
                   </option>
                 ))}
               </select>
-              <span className="text-xs text-zinc-500">(for a half-used sheet: 1-2 top row, 9-10 bottom)</span>
+              <span className="text-xs text-ink-muted">(for a half-used sheet: 1-2 top row, 9-10 bottom)</span>
             </label>
             <div>
               <p className="font-medium">Printer alignment</p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-ink-muted">
                 Each step is 1/16 in. Print a test on plain paper, hold it over a card sheet against a window, then nudge.
                 Remembered on this computer.
               </p>
@@ -194,13 +194,13 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
           </div>
         )}
 
-        <div className="space-y-3 rounded-md border border-zinc-200 p-3 text-sm dark:border-zinc-800">
+        <div className="space-y-3 rounded-xl border border-line bg-surface p-4 text-sm">
           <p className="font-medium">Cards to print</p>
           <div className="flex flex-wrap items-center gap-2">
             <select
               value={count}
               onChange={(e) => setCount(Number(e.target.value))}
-              className="rounded-md border border-zinc-300 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900"
+              className="rounded-md border border-line bg-surface px-2 py-1.5"
             >
               {batchSizes.map((n) => (
                 <option key={n} value={n}>
@@ -212,7 +212,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
               type="button"
               disabled={pending}
               onClick={() => run(() => makeCards(count))}
-              className="rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60"
+              className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
             >
               {pending ? "Working…" : "Make new cards"}
             </button>
@@ -233,7 +233,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
                 {state.fresh ? "Made" : "Loaded"} {cards.length} card{cards.length === 1 ? "" : "s"}
                 {mode === "avery" ? ` on ${sheets.length} sheet${sheets.length === 1 ? "" : "s"}` : ""}. Each has its own code.
               </p>
-              <button type="button" onClick={() => window.print()} className="rounded-md bg-brand px-4 py-2 font-medium text-white">
+              <button type="button" onClick={() => window.print()} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
                 Print or save as PDF
               </button>
               <p className="text-xs">
@@ -247,7 +247,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
       <div>
         <p className="mb-2 text-sm font-medium">{cards.length ? "First sheet" : "Preview"}</p>
         {cards.length && mode === "avery" ? (
-          <div className="overflow-hidden rounded-md border border-zinc-200 shadow-sm" style={{ width: 8.5 * 96 * 0.55, height: 11 * 96 * 0.55 }}>
+          <div className="overflow-hidden rounded-md border border-line shadow-sm" style={{ width: 8.5 * 96 * 0.55, height: 11 * 96 * 0.55 }}>
             <div style={{ transform: "scale(0.55)", transformOrigin: "top left" }}>
               <Sheet cards={sheets[0]} startSlot={startSlot} nudge={nudge} b={brand} s={s} />
             </div>
@@ -257,7 +257,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
             <div className="w-fit overflow-hidden rounded-md shadow-md ring-1 ring-zinc-200">
               <QrCard b={brand} qr={cards[0]?.qrDataUrl ?? sampleQr} s={s} />
             </div>
-            <p className="max-w-[3.5in] text-xs text-zinc-500">
+            <p className="max-w-[3.5in] text-xs text-ink-muted">
               Shown at real size. Only your business, the label and a QR code are printed: nothing about the client, so a lost
               card reveals nothing. Link a card to a client by scanning it the first time.
             </p>

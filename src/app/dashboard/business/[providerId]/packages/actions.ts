@@ -4,7 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { packagePresets } from "@/config/package-presets";
 import { requireManager } from "@/lib/auth";
-import { PACKAGE_LIMITS, formatCents, parseMoneyToCents, parsePackageForm, presetPriceCents } from "@/lib/packages";
+import { MAX_DISCOUNT_PERCENT, PACKAGE_LIMITS, formatCents, parseDiscount, parseMoneyToCents, parsePackageForm, presetPriceCents } from "@/lib/packages";
 import { createSessionClient } from "@/lib/supabase/server";
 
 // All package changes are made AS the signed-in user, so row-level security also checks
@@ -110,10 +110,19 @@ export async function addPresetPackages(providerId: string, _prev: PackageFormSt
   const presets = packagePresets.filter((p) => chosen.has(p.id));
   if (presets.length === 0) return { error: "Tick at least one package to add." };
 
+  // each package's % off, as edited on the form (the preset's own if left out)
+  const discountOf = new Map<string, number>();
+  for (const p of presets) {
+    const raw = formData.get(`discount_${p.id}`);
+    const pct = raw === null ? p.discountPercent : parseDiscount(String(raw));
+    if (pct === null) return { error: `Enter a % off between 0 and ${MAX_DISCOUNT_PERCENT} for ${p.name}.` };
+    discountOf.set(p.id, pct);
+  }
+
   const rows = presets.map((p) => ({
     name: p.name,
     visits: p.visits,
-    price_cents: presetPriceCents(perVisit, p.visits, p.discountPercent),
+    price_cents: presetPriceCents(perVisit, p.visits, discountOf.get(p.id)!),
     expires_days: p.expiresDays,
   }));
   if (rows.some((r) => r.price_cents > PACKAGE_LIMITS.priceMaxCents)) {

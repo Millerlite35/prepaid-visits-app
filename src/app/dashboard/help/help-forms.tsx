@@ -23,17 +23,17 @@ export function FaqList({ topics }: { topics: FaqTopic[] }) {
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search help, e.g. refund, camera, staff"
         aria-label="Search help"
-        className="block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+        className="block w-full rounded-md border border-line bg-surface px-3 py-2"
       />
       {shown.length === 0 && (
-        <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-4 text-sm text-ink-muted">
           No answers match that. Try other words, or contact support below.
         </p>
       )}
       {shown.map((t) => (
         <section key={t.id} className="mt-6">
           <h2 className="mb-2 font-medium">{t.title}</h2>
-          <div className="divide-y divide-zinc-200 rounded-lg border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+          <div className="divide-y divide-line rounded-lg border border-line">
             {t.items.map((i) => (
               <details key={i.q} className="group p-3" open={words.length > 0}>
                 <summary className="cursor-pointer list-none text-sm font-medium">
@@ -53,7 +53,7 @@ export function FaqList({ topics }: { topics: FaqTopic[] }) {
 }
 
 // ---------------------------------------------------------------- contact support
-const inputClass = "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+const inputClass = "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 // the page they came from (read in the browser; empty during the server render)
 const noSubscribe = () => () => {};
@@ -120,7 +120,7 @@ export function SupportForm({
       <label className="block text-sm">
         <span className="font-medium">Your message</span>
         <textarea name="message" required rows={6} maxLength={3000} className={inputClass} />
-        <span className="mt-1 block text-xs text-zinc-500">
+        <span className="mt-1 block text-xs text-ink-muted">
           Please don&apos;t include client health details. A client&apos;s name is fine if we need to look
           something up.
         </span>

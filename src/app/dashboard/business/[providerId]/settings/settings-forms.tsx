@@ -18,7 +18,7 @@ import type { SettingsState } from "./actions";
 type Action = (prev: SettingsState, formData: FormData) => Promise<SettingsState>;
 
 const inputClass =
-  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+  "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 function Result({ state, pending }: { state: SettingsState; pending: boolean }) {
   if (pending) return null;
@@ -29,7 +29,7 @@ function Result({ state, pending }: { state: SettingsState; pending: boolean }) 
 
 function SaveButton({ pending, label = "Save" }: { pending: boolean; label?: string }) {
   return (
-    <button disabled={pending} className="rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60">
+    <button disabled={pending} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
       {pending ? "Saving…" : label}
     </button>
   );
@@ -99,7 +99,7 @@ export function PageDetailsForm({ action, initial }: { action: Action; initial: 
           <input name="vocabPlural" required maxLength={SETTINGS_LIMITS.vocabMax} value={plural} onChange={(e) => setPlural(e.target.value)} className={inputClass} />
         </label>
       </div>
-      <p className="-mt-2 text-xs text-zinc-500">
+      <p className="-mt-2 text-xs text-ink-muted">
         Shown to clients, e.g. &ldquo;6 {plural || "visits"} for $450&rdquo;.
       </p>
 
@@ -109,7 +109,7 @@ export function PageDetailsForm({ action, initial }: { action: Action; initial: 
         {labelProblem ? (
           <span className="mt-1 block text-xs text-red-600">{labelProblem}</span>
         ) : (
-          <span className="mt-1 block text-xs text-zinc-500">Keep it neutral. Others may see it on a client&apos;s phone.</span>
+          <span className="mt-1 block text-xs text-ink-muted">Keep it neutral. Others may see it on a client&apos;s phone.</span>
         )}
       </label>
 
@@ -132,7 +132,7 @@ export function PageDetailsForm({ action, initial }: { action: Action; initial: 
             value={isHexColor(color) ? color.toLowerCase() : "#1b4d3e"}
             onChange={(e) => setColor(e.target.value.toUpperCase())}
             aria-label="Custom colour"
-            className="h-8 w-12 cursor-pointer rounded border border-zinc-300 dark:border-zinc-700"
+            className="h-8 w-12 cursor-pointer rounded border border-line"
           />
           <span className="rounded-md px-3 py-1 text-sm font-medium text-white" style={{ backgroundColor: color }}>
             Buy now
@@ -192,7 +192,7 @@ export function AddressForm({
           spellCheck={false}
           className={inputClass}
         />
-        <span className="mt-1 block break-all text-xs text-zinc-500">{siteHost}/{slug}</span>
+        <span className="mt-1 block break-all text-xs text-ink-muted">{siteHost}/{slug}</span>
         {slugProblem && <span className="mt-1 block text-xs text-red-600">{slugProblem}</span>}
         {slug !== initialSlug && !slugProblem && (
           <span className="mt-1 block text-xs text-amber-700 dark:text-amber-500">
@@ -239,7 +239,7 @@ export function PrivateLink({ url, renewAction }: { url: string; renewAction: ()
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium">Private link</p>
-      <p className="break-all rounded-md bg-zinc-100 p-2 font-mono text-xs dark:bg-zinc-900">{url}</p>
+      <p className="break-all rounded-md bg-surface-muted p-2 font-mono text-xs dark:bg-zinc-900">{url}</p>
       <div className="flex flex-wrap items-center gap-4 text-sm">
         <button type="button" onClick={copy} className="underline">
           {copied ? "Copied ✓" : "Copy link"}
@@ -253,7 +253,7 @@ export function PrivateLink({ url, renewAction }: { url: string; renewAction: ()
           />
         </form>
       </div>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         Make a new link if the old one was shared more widely than you wanted.
       </p>
     </div>
@@ -288,7 +288,7 @@ export function TermsForm({
   return (
     <form action={formAction} className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-ink-muted">
           Version {version}. Each saved change becomes a new version, and every sale records
           which version the client accepted.
         </p>
@@ -317,7 +317,7 @@ export function TermsForm({
         placeholder="Explain expiration, refunds of unused visits, what happens if you stop offering services, and transfers."
         className={`${inputClass} font-mono text-sm`}
       />
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         {terms.length.toLocaleString()} / {SETTINGS_LIMITS.termsMax.toLocaleString()} characters. The starter
         template is a plain-language starting point, not legal advice. Have your attorney review your terms.
       </p>
@@ -355,7 +355,36 @@ export function ContactForm({
         <span className="text-sm font-medium">Website</span>
         <input name="website" defaultValue={initial.website ?? ""} maxLength={100} autoCapitalize="none" spellCheck={false} placeholder="yourpractice.com" className={inputClass} />
       </label>
-      <p className="text-xs text-zinc-500">All optional. Leave a box empty to leave it off.</p>
+      <p className="text-xs text-ink-muted">All optional. Leave a box empty to leave it off.</p>
+      <Result state={state} pending={pending} />
+      <SaveButton pending={pending} />
+    </form>
+  );
+}
+
+// ---------------------------------------------------------------- regular price
+export function UsualPriceForm({ action, initialCents, singular }: { action: Action; initialCents: number | null; singular: string }) {
+  const [state, formAction, pending] = useActionState(action, {});
+  return (
+    <form action={formAction} className="space-y-4">
+      <label className="block">
+        <span className="text-sm font-medium">Regular price for one {singular}</span>
+        <span className="mt-1 flex items-center gap-1">
+          $
+          <input
+            name="usualPrice"
+            defaultValue={initialCents ? (initialCents / 100).toFixed(initialCents % 100 ? 2 : 0) : ""}
+            inputMode="decimal"
+            placeholder="e.g. 150"
+            className={`${inputClass} mt-0 w-32`}
+          />
+        </span>
+        <span className="mt-1 block text-xs text-ink-muted">
+          Optional. Shows clients how much each package saves (for example &quot;Save 10%&quot;) on your purchase page and
+          flyers. Only enter a price you really charge for a single {singular}: advertising a made-up &quot;regular&quot;
+          price isn&apos;t allowed.
+        </span>
+      </label>
       <Result state={state} pending={pending} />
       <SaveButton pending={pending} />
     </form>

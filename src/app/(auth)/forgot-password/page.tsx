@@ -8,8 +8,8 @@ export const metadata: Metadata = { title: `Reset password · ${brand.name}` };
 export default function ForgotPasswordPage() {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold text-brand">Reset your password</h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Reset your password</h1>
+      <p className="mt-1 text-sm text-ink-muted">
         Enter the email you sign in with. We&apos;ll send you a link to choose a new password.
       </p>
       <ForgotPasswordForm />

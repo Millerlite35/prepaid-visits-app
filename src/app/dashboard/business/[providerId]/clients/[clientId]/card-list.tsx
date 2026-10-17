@@ -31,15 +31,15 @@ export function CardList({ cards }: { cards: Card[] }) {
   return (
     <>
       {cards.length === 0 ? (
-        <p className="text-sm text-zinc-500">No QR cards.</p>
+        <p className="text-sm text-ink-muted">No QR cards.</p>
       ) : (
-        <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+        <ul className="divide-y divide-line text-sm">
           {cards.map((c) => (
             <CancelCard key={c.id} cancel={c.cancel} linkedAt={c.linkedAt} />
           ))}
         </ul>
       )}
-      <p className="mt-2 text-xs text-zinc-500">
+      <p className="mt-2 text-xs text-ink-muted">
         To give them a card: scan a new, unused card on the Scan page and choose this client. Lost card? Cancel it here,
         then link a new one.
       </p>

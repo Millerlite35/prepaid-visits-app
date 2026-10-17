@@ -22,6 +22,7 @@ type Props = {
   qrDataUrl: string;
   shortUrl: string;
   contact: string[];
+  usualPriceCents: number | null;
   singular: string;
   plural: string;
   packages: FlyerPackage[];
@@ -64,7 +65,7 @@ export function Studio(props: Props) {
   const [selected, setSelected] = useState<string[]>(props.packages.slice(0, MAX_FLYER_PACKAGES).map((p) => p.id));
   const [headline, setHeadline] = useState(defaultHeadline(props.plural));
   const [message, setMessage] = useState(defaultMessage(props.plural));
-  const [usual, setUsual] = useState("");
+  const [usual, setUsual] = useState(props.usualPriceCents ? String(props.usualPriceCents / 100) : "");
   const [logoWidth, setLogoWidth] = useState<number | null>(null);
 
   // warn if the logo is too small to print sharply
@@ -121,11 +122,11 @@ export function Studio(props: Props) {
             {(["flyer", "sign", "tent", "social"] as Template[]).map((t) => (
               <label
                 key={t}
-                className={`cursor-pointer rounded-md border p-2 text-sm ${template === t ? "border-brand ring-1 ring-brand" : "border-zinc-300 dark:border-zinc-700"}`}
+                className={`cursor-pointer rounded-md border p-2 text-sm ${template === t ? "border-brand ring-1 ring-brand" : "border-line"}`}
               >
                 <input type="radio" name="template" className="sr-only" checked={template === t} onChange={() => setTemplate(t)} />
                 <span className="font-medium">{t === "social" ? "Social post" : TEMPLATES[t].label}</span>
-                <span className="block text-xs text-zinc-500">{t === "social" ? "Square image for Instagram/Facebook" : TEMPLATES[t].note}</span>
+                <span className="block text-xs text-ink-muted">{t === "social" ? "Square image for Instagram/Facebook" : TEMPLATES[t].note}</span>
               </label>
             ))}
           </div>
@@ -137,7 +138,7 @@ export function Studio(props: Props) {
         <fieldset>
           <legend className="text-sm font-medium">Packages to show (up to {MAX_FLYER_PACKAGES})</legend>
           {props.packages.length === 0 ? (
-            <p className="mt-1 text-sm text-zinc-500">No active packages yet.</p>
+            <p className="mt-1 text-sm text-ink-muted">No active packages yet.</p>
           ) : (
             <ul className="mt-2 space-y-1 text-sm">
               {props.packages.map((p) => (
@@ -163,7 +164,7 @@ export function Studio(props: Props) {
             value={headline}
             maxLength={FLYER_LIMITS.headline}
             onChange={(e) => setHeadline(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2 text-sm"
           />
         </label>
         <label className="block">
@@ -173,7 +174,7 @@ export function Studio(props: Props) {
             maxLength={FLYER_LIMITS.message}
             rows={3}
             onChange={(e) => setMessage(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2 text-sm"
           />
         </label>
         <label className="block">
@@ -185,10 +186,10 @@ export function Studio(props: Props) {
               inputMode="decimal"
               placeholder="e.g. 80"
               onChange={(e) => setUsual(e.target.value)}
-              className="block w-28 rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+              className="block w-28 rounded-md border border-line bg-surface px-3 py-2"
             />
           </span>
-          <span className="mt-1 block text-xs text-zinc-500">Adds a &quot;Save 15%&quot; line to each package. Not saved anywhere.</span>
+          <span className="mt-1 block text-xs text-ink-muted">Adds a &quot;Save 15%&quot; line to each package. Filled in from your regular price in Page settings.</span>
         </label>
 
         {props.logo && logoWidth !== null && logoWidth < MIN_LOGO_WIDTH_PX && (
@@ -202,16 +203,16 @@ export function Studio(props: Props) {
           <a
             href={socialSrc}
             download="social-post.png"
-            className="inline-block rounded-md bg-brand px-4 py-2 font-medium text-white"
+            className="inline-block rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90"
           >
             Download image
           </a>
         ) : (
           <div>
-            <button onClick={() => window.print()} className="rounded-md bg-brand px-4 py-2 font-medium text-white">
+            <button onClick={() => window.print()} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
               Print or save as PDF
             </button>
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-ink-muted">
               In the print window choose &quot;Save as PDF&quot; (or your printer), paper size {print?.landscape ? "Letter, landscape" : "Letter"},
               margins &quot;None&quot;, and tick &quot;Background graphics&quot;.
             </p>
@@ -223,14 +224,14 @@ export function Studio(props: Props) {
         <p className="mb-2 text-sm font-medium print:hidden">Preview</p>
         {template === "social" ? (
           // eslint-disable-next-line @next/next/no-img-element -- generated image from our own route
-          <img src={socialSrc} alt="Social post preview" width={PREVIEW_WIDTH_PX} height={PREVIEW_WIDTH_PX} className="rounded-md border border-zinc-200 dark:border-zinc-800" />
+          <img src={socialSrc} alt="Social post preview" width={PREVIEW_WIDTH_PX} height={PREVIEW_WIDTH_PX} className="rounded-md border border-line" />
         ) : (
           <>
             {/* the page size the browser should print at */}
             <style>{`@page { size: ${print!.landscape ? "11in 8.5in" : "8.5in 11in"}; margin: 0; }
 ${PRINT_CSS}`}</style>
             <div
-              className="artwork-frame overflow-hidden rounded-md border border-zinc-200 shadow-sm dark:border-zinc-800"
+              className="artwork-frame overflow-hidden rounded-md border border-line shadow-sm"
               style={{ width: PREVIEW_WIDTH_PX, height: print!.heightIn * 96 * scale }}
             >
               <div id="print-area" className="artwork-scale" style={{ ["--s" as string]: scale }}>

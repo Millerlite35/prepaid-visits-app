@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { ClientCard, ClientHeader, ClientShell } from "@/components/client-shell";
+import { formatCents } from "@/lib/packages";
 import { contactLines } from "@/lib/page-settings";
 import { loadActivePackages, loadPublicProvider, notSellingReason } from "@/lib/payments/checkout";
 import { startCheckout } from "./actions";
@@ -80,6 +81,12 @@ async function PurchaseContent({ params, searchParams }: PageProps<"/[slug]">) {
     <ClientShell contact={contact}>
       <ClientCard color={provider.brand_color}>
         {header}
+        {provider.usual_price_cents && (
+          <p className="mt-4 text-center text-sm text-ink-muted">
+            Regular price <span className="font-medium text-ink">{formatCents(provider.usual_price_cents)}</span> per{" "}
+            {provider.vocab_singular}. Packages save you more.
+          </p>
+        )}
         <HowItWorks singular={provider.vocab_singular} />
         <div className="mt-8">
           <PurchaseForm
@@ -90,6 +97,7 @@ async function PurchaseContent({ params, searchParams }: PageProps<"/[slug]">) {
             brandColor={provider.brand_color}
             termsText={provider.terms_text}
             termsVersion={provider.terms_version}
+            usualPriceCents={provider.usual_price_cents}
           />
         </div>
       </ClientCard>

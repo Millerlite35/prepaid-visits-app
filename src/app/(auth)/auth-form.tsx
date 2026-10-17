@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { signIn, signUp, type FormState } from "./actions";
 
 const inputClass =
-  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+  "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
   const isSignup = mode === "signup";
@@ -37,7 +37,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
           autoComplete={isSignup ? "new-password" : "current-password"}
           className={inputClass}
         />
-        {isSignup && <span className="mt-1 block text-xs text-zinc-500">At least 12 characters.</span>}
+        {isSignup && <span className="mt-1 block text-xs text-ink-muted">At least 12 characters.</span>}
       </label>
 
       {state.error && (
@@ -48,7 +48,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
 
       <button
         disabled={pending}
-        className="w-full rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60"
+        className="w-full rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
       >
         {pending ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
       </button>

@@ -1,11 +1,20 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { EXPIRY_CHOICES, PACKAGE_LIMITS, expiryChoiceFor, formatCents, parseMoneyToCents } from "@/lib/packages";
+import {
+  EXPIRY_CHOICES,
+  PACKAGE_LIMITS,
+  discountPercent,
+  expiryChoiceFor,
+  formatCents,
+  parseDiscount,
+  parseMoneyToCents,
+  presetPriceCents,
+} from "@/lib/packages";
 import type { PackageFormState } from "./actions";
 
 const inputClass =
-  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+  "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 export type PackageValues = {
   name: string;
@@ -21,17 +30,44 @@ type Props = {
   vocabSingular: string;
   vocabPlural: string;
   submitLabel: string;
+  usualPriceCents: number | null; // regular price per visit (Page settings), for % off
 };
 
-export function PackageForm({ action, initial, vocabSingular, vocabPlural, submitLabel }: Props) {
+export function PackageForm({ action, initial, vocabSingular, vocabPlural, submitLabel, usualPriceCents }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
   const [visits, setVisits] = useState(initial ? String(initial.visits) : "");
   const [price, setPrice] = useState(initial ? (initial.price_cents / 100).toFixed(2) : "");
   const [expiry, setExpiry] = useState(expiryChoiceFor(initial?.expires_days ?? 365));
 
+  // % off is only a helper for the price: the price is what's saved
+  const [usual, setUsual] = useState(usualPriceCents ? String(usualPriceCents / 100) : "");
+  const usualCents = parseMoneyToCents(usual);
+  const startPct =
+    initial && usualPriceCents ? String(Math.max(0, discountPercent(usualPriceCents, initial.visits, initial.price_cents))) : "";
+  const [pct, setPct] = useState(startPct);
+
   const priceCents = parseMoneyToCents(price);
   const visitCount = Number(visits);
   const perVisit = priceCents && visitCount >= 1 ? Math.round(priceCents / visitCount) : null;
+
+  const priceFor = (v: number, d: number) => (usualCents && v >= 1 ? (presetPriceCents(usualCents, v, d) / 100).toFixed(2) : null);
+  function changePct(raw: string) {
+    setPct(raw);
+    const d = parseDiscount(raw);
+    const next = d === null ? null : priceFor(visitCount, d);
+    if (next) setPrice(next);
+  }
+  function changeVisits(raw: string) {
+    setVisits(raw);
+    const d = parseDiscount(pct);
+    const next = d === null ? null : priceFor(Number(raw), d);
+    if (next) setPrice(next);
+  }
+  function changePrice(raw: string) {
+    setPrice(raw);
+    const cents = parseMoneyToCents(raw);
+    if (cents && usualCents && visitCount >= 1) setPct(String(Math.max(0, discountPercent(usualCents, visitCount, cents))));
+  }
 
   return (
     <form action={formAction} className="space-y-4">
@@ -63,7 +99,7 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
             min={1}
             max={PACKAGE_LIMITS.visitsMax}
             value={visits}
-            onChange={(e) => setVisits(e.target.value)}
+            onChange={(e) => changeVisits(e.target.value)}
             className={inputClass}
           />
         </label>
@@ -74,17 +110,51 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
             inputMode="decimal"
             required
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={(e) => changePrice(e.target.value)}
             placeholder="240.00"
             className={inputClass}
           />
         </label>
       </div>
       {perVisit !== null && (
-        <p className="-mt-2 text-xs text-zinc-500">
+        <p className="-mt-2 text-xs text-ink-muted">
           {formatCents(perVisit)} per {vocabSingular}
         </p>
       )}
+
+      <div className="flex flex-wrap items-end gap-3 rounded-xl bg-surface-muted p-3 text-sm">
+        <label className="block">
+          <span className="text-xs font-medium text-ink-muted">Regular price per {vocabSingular}</span>
+          <span className="mt-1 flex items-center gap-1">
+            $
+            <input
+              value={usual}
+              inputMode="decimal"
+              onChange={(e) => setUsual(e.target.value)}
+              placeholder="150"
+              className="w-24 rounded-lg border border-line bg-surface px-2 py-1.5"
+            />
+          </span>
+        </label>
+        <label className="block">
+          <span className="text-xs font-medium text-ink-muted">% off</span>
+          <span className="mt-1 flex items-center gap-1">
+            <input
+              value={pct}
+              inputMode="numeric"
+              onChange={(e) => changePct(e.target.value)}
+              disabled={!usualCents}
+              placeholder="10"
+              className="w-16 rounded-lg border border-line bg-surface px-2 py-1.5 text-right disabled:opacity-50"
+            />
+            %
+          </span>
+        </label>
+        <p className="min-w-[12rem] flex-1 text-xs text-ink-muted">
+          Type a % off to work out the price, or type the price yourself. Only the price is saved.
+          {!usualPriceCents && " Tip: set your regular price in Page settings so it fills in here."}
+        </p>
+      </div>
 
       <label className="block">
         <span className="text-sm font-medium">Expiry</span>
@@ -110,7 +180,7 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
           />
         </label>
       )}
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         Some states limit expiration dates on prepaid services. Check with your attorney before
         choosing one.
       </p>
@@ -120,7 +190,7 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
           {state.error}
         </p>
       )}
-      <button disabled={pending} className="rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60">
+      <button disabled={pending} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Saving…" : submitLabel}
       </button>
     </form>

@@ -5,7 +5,7 @@ import { checkSlug, slugify } from "@/lib/slug";
 import { createBusiness, type BusinessFormState } from "./actions";
 
 const inputClass =
-  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+  "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 // The browser's time zone, read without a server/browser mismatch (empty on the server).
 const noSubscribe = () => () => {};
@@ -47,7 +47,7 @@ export function NewBusinessForm({ siteHost }: { siteHost: string }) {
           spellCheck={false}
           className={inputClass}
         />
-        <span className="mt-1 block break-all text-xs text-zinc-500">
+        <span className="mt-1 block break-all text-xs text-ink-muted">
           {siteHost}/{slug || "your-business"}
         </span>
         {slug && slugProblem && <span className="mt-1 block text-xs text-red-600">{slugProblem}</span>}
@@ -63,11 +63,11 @@ export function NewBusinessForm({ siteHost }: { siteHost: string }) {
 
       <button
         disabled={pending || !name.trim() || !!slugProblem}
-        className="w-full rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60"
+        className="w-full rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
       >
         {pending ? "Creating…" : "Create business"}
       </button>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         Your purchase page starts private. You can change the name, web address and page
         settings later.
       </p>

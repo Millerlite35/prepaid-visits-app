@@ -17,7 +17,7 @@ export function SetupFlow() {
         )}
         <button
           disabled={starting}
-          className="rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {starting ? "Preparing…" : "Set up authenticator app"}
         </button>
@@ -32,7 +32,7 @@ export function SetupFlow() {
         <li>Add an account and scan this QR code.</li>
         <li>Enter the 6-digit code the app shows.</li>
       </ol>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         Scanned a code here before? Delete that older entry from your app. Only this new one will work.
       </p>
       {/* eslint-disable-next-line @next/next/no-img-element -- QR code is an inline data URL, nothing to optimize */}
@@ -43,7 +43,7 @@ export function SetupFlow() {
         height={180}
         className="rounded bg-white p-2"
       />
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         Can&apos;t scan? Enter this setup key instead:{" "}
         <code className="select-all break-all">{enroll.secret}</code>
       </p>

@@ -10,8 +10,8 @@ export const metadata: Metadata = { title: `Set up two-step verification · ${br
 export default function MfaSetupPage() {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold text-brand">Set up two-step verification</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Set up two-step verification</h1>
+      <p className="mt-2 text-sm text-ink-muted">
         Each sign-in will also ask for a code from your phone, so a stolen password alone
         can&apos;t open your account.
       </p>

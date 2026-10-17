@@ -143,26 +143,26 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
   const purchases = purchasesRes.data ?? [];
   const ledger = ledgerRes.data ?? [];
   const pass = passRes.data;
-  const card = "mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800";
+  const card = "mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
 
   return (
     <>
       <Link href={`/dashboard/business/${providerId}/clients`} className="text-sm underline">
         ← Clients
       </Link>
-      <h1 className="mt-4 text-2xl font-semibold text-brand">{client.full_name}</h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">{client.full_name}</h1>
+      <p className="mt-1 text-sm text-ink-muted">
         {client.email} · client since {fmt(client.created_at)}
       </p>
 
       <section className={`${card} flex flex-wrap items-center gap-6`}>
         <div>
-          <p className="text-sm text-zinc-500">{many.charAt(0).toUpperCase() + many.slice(1)} left</p>
+          <p className="text-sm text-ink-muted">{many.charAt(0).toUpperCase() + many.slice(1)} left</p>
           <p className="text-4xl font-semibold text-brand">{balance?.usable_visits ?? 0}</p>
         </div>
         {balance?.next_expiry && (
           <div>
-            <p className="text-sm text-zinc-500">Next expiry</p>
+            <p className="text-sm text-ink-muted">Next expiry</p>
             <p className="font-medium">{fmt(balance.next_expiry)}</p>
           </div>
         )}
@@ -170,7 +170,7 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
 
       <section className={card}>
         <h2 className="mb-1 font-medium">Pass</h2>
-        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mb-4 text-sm text-ink-muted">
           {pass ? (
             <>
               Active since {fmt(pass.issued_at)}.{" "}
@@ -203,9 +203,9 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
       <section className={card}>
         <h2 className="mb-3 font-medium">Purchases</h2>
         {purchases.length === 0 ? (
-          <p className="text-sm text-zinc-500">No purchases.</p>
+          <p className="text-sm text-ink-muted">No purchases.</p>
         ) : (
-          <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+          <ul className="divide-y divide-line text-sm">
             {purchases.map((p) => {
               const remaining = remainingByPurchase.get(p.id) ?? 0;
               const refunded = refundedByPurchase.get(p.id) ?? 0;
@@ -218,7 +218,7 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
                     <span>
                       <span className="font-medium">{p.package_name}</span>: {p.visits_purchased}{" "}
                       {p.visits_purchased === 1 ? one : many} · {formatCents(p.price_cents)}
-                      <span className="block text-xs text-zinc-500">
+                      <span className="block text-xs text-ink-muted">
                         {p.package_name === "Complimentary" ? "Added" : "Bought"} {fmt(p.paid_at)}
                         {p.expires_at ? ` · expires ${fmt(p.expires_at)}` : " · never expires"}
                         {p.stripe_payment_intent_id ? ` · accepted terms v${p.terms_version}` : ""} · {remaining} unused
@@ -253,17 +253,17 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
       <section className={card}>
         <h2 className="mb-3 font-medium">History</h2>
         {ledger.length === 0 ? (
-          <p className="text-sm text-zinc-500">Nothing yet.</p>
+          <p className="text-sm text-ink-muted">Nothing yet.</p>
         ) : (
           <table className="w-full text-left text-sm">
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody className="divide-y divide-line">
               {ledger.map((l) => (
                 <tr key={l.id}>
-                  <td className="py-2 pr-3 text-zinc-500">{fmt(l.created_at, true)}</td>
+                  <td className="py-2 pr-3 text-ink-muted">{fmt(l.created_at, true)}</td>
                   <td className="py-2 pr-3">
                     {KIND_LABEL[l.kind] ?? l.kind}
                     {l.note && (l.kind === "adjust" || l.kind === "refund") && l.note !== "Refund" && (
-                      <span className="block text-xs text-zinc-500">{l.note}</span>
+                      <span className="block text-xs text-ink-muted">{l.note}</span>
                     )}
                   </td>
                   <td className={`py-2 text-right font-mono ${l.delta > 0 ? "text-green-700 dark:text-green-500" : "text-red-700 dark:text-red-400"}`}>

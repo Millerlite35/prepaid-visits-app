@@ -12,16 +12,16 @@ export const metadata: Metadata = { title: `Help · ${brand.name}` };
 export default function HelpPage() {
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
-      <h1 className="text-2xl font-semibold text-brand">Help</h1>
-      <p className="mt-1 text-sm text-zinc-500">Answers to common questions, and a way to reach us.</p>
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Help</h1>
+      <p className="mt-1 text-sm text-ink-muted">Answers to common questions, and a way to reach us.</p>
 
       <div className="mt-6">
         <FaqList topics={helpFaq} />
       </div>
 
-      <section id="contact" className="mt-10 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <section id="contact" className="mt-10 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <h2 className="font-medium">Contact support</h2>
-        <p className="mb-4 mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mb-4 mt-1 text-sm text-ink-muted">
           Didn&apos;t find your answer? Send us a message and we&apos;ll reply by email.
         </p>
         <Suspense fallback={<p className="text-sm">Loading…</p>}>
@@ -62,11 +62,11 @@ async function SupportSection() {
       {recent && recent.length > 0 && (
         <div className="mt-6">
           <h3 className="text-sm font-medium">Your recent messages</h3>
-          <ul className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+          <ul className="mt-2 divide-y divide-line text-sm">
             {recent.map((r) => (
               <li key={r.id} className="flex justify-between gap-3 py-2">
                 <span>{TOPIC_LABEL[r.topic] ?? r.topic}</span>
-                <span className="text-zinc-500">
+                <span className="text-ink-muted">
                   {new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })} ·{" "}
                   {r.status === "open" ? "Received" : r.status === "answered" ? "Answered" : "Closed"}
                 </span>

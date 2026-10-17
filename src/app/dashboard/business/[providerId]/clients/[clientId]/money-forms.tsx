@@ -7,7 +7,7 @@ import type { MoneyState } from "./money-actions";
 
 type Action = (prev: MoneyState, formData: FormData) => Promise<MoneyState>;
 
-const inputClass = "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+const inputClass = "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 function Result({ state, pending }: { state: MoneyState; pending: boolean }) {
   if (pending) return null;
@@ -64,7 +64,7 @@ export function RefundForm({
         requestId.current ??= crypto.randomUUID();
         if (requestInput.current) requestInput.current.value = requestId.current;
       }}
-      className="mt-2 space-y-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+      className="mt-2 space-y-3 rounded-md border border-line p-3"
     >
       <input ref={requestInput} type="hidden" name="requestId" defaultValue="" />
       <div className="grid grid-cols-2 gap-3">
@@ -82,12 +82,12 @@ export function RefundForm({
             }}
             className={inputClass}
           />
-          <span className="mt-1 block text-xs text-zinc-500">{remaining} unused on this purchase</span>
+          <span className="mt-1 block text-xs text-ink-muted">{remaining} unused on this purchase</span>
         </label>
         <label className="block text-sm">
           <span className="font-medium">Refund amount (USD)</span>
           <input name="amount" inputMode="decimal" value={shownAmount} onChange={(e) => setAmount(e.target.value)} className={inputClass} />
-          <span className={`mt-1 block text-xs ${tooMuch ? "text-red-600" : "text-zinc-500"}`}>
+          <span className={`mt-1 block text-xs ${tooMuch ? "text-red-600" : "text-ink-muted"}`}>
             Up to {formatCents(refundableCents)} · suggested {formatCents(suggested)}
           </span>
         </label>
@@ -96,7 +96,7 @@ export function RefundForm({
         <span className="font-medium">Reason (optional, for your records)</span>
         <input name="reason" maxLength={200} className={inputClass} />
       </label>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         The money goes back to the client&apos;s card from your Stripe account, and our platform fee is refunded
         to you in proportion. The cancelled {plural} come off their balance straight away.
       </p>
@@ -111,7 +111,7 @@ export function RefundForm({
             className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white"
           />
         ) : (
-          <span className="text-sm text-zinc-500">Enter an amount up to {formatCents(refundableCents)}.</span>
+          <span className="text-sm text-ink-muted">Enter an amount up to {formatCents(refundableCents)}.</span>
         )}
         <button type="button" onClick={() => setOpen(false)} className="text-sm underline">
           Close
@@ -146,10 +146,10 @@ export function AdjustForm({ action, plural }: { action: Action; plural: string 
         <span className="font-medium">Reason (required)</span>
         <input name="note" required maxLength={200} placeholder="e.g. Make-up for a cancelled class" className={inputClass} />
       </label>
-      <button disabled={pending} className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium disabled:opacity-50 dark:border-zinc-700">
+      <button disabled={pending} className="rounded-md border border-line px-4 py-2 text-sm font-medium disabled:opacity-50">
         {pending ? "Saving…" : "Save change"}
       </button>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-muted">
         For corrections and goodwill. No money moves. The reason is kept in the client&apos;s history.
       </p>
       <Result state={state} pending={pending} />

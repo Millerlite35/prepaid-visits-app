@@ -8,8 +8,8 @@ export const metadata: Metadata = { title: `Create account · ${brand.name}` };
 export default function SignupPage() {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold text-brand">Create your account</h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Create your account</h1>
+      <p className="mt-1 text-sm text-ink-muted">
         For providers selling visit packages with {brand.name}.
       </p>
       <AuthForm mode="signup" />

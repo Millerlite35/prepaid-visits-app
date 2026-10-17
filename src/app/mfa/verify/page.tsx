@@ -12,8 +12,8 @@ export const metadata: Metadata = { title: `Enter your code · ${brand.name}` };
 export default function MfaVerifyPage() {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold text-brand">Enter your code</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Enter your code</h1>
+      <p className="mt-2 text-sm text-ink-muted">
         Open your authenticator app and enter the 6-digit code for {brand.name}.
       </p>
       <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>

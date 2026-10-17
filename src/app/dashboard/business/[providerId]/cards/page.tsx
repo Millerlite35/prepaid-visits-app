@@ -52,11 +52,8 @@ async function CardsContent({ params }: { params: Promise<{ providerId: string }
 
   return (
     <>
-      <Link href={`/dashboard/business/${providerId}`} className="text-sm underline">
-        ← {p.display_name}
-      </Link>
-      <h1 className="mt-2 text-2xl font-semibold text-brand">QR cards</h1>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink">QR cards</h1>
+      <p className="mt-1 text-sm text-ink-muted">
         For clients who&apos;d rather carry a card than use a phone wallet. Print a batch, hand one over, and link it to
         the client the first time you scan it. It works alongside their emailed pass, for all their future packages.
       </p>
@@ -65,7 +62,7 @@ async function CardsContent({ params }: { params: Promise<{ providerId: string }
         <strong>{counts.linked}</strong> linked to clients
       </p>
       {!p.office_address && !p.office_phone && !p.office_website && (
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm text-ink-muted">
           Tip: add your office address and phone in{" "}
           <Link href={`/dashboard/business/${providerId}/settings`} className="underline">
             Page settings

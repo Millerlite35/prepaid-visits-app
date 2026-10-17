@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { requestPasswordReset, setNewPassword, type PasswordState } from "./password-actions";
 
 const inputClass =
-  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+  "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 function Result({ state, pending }: { state: PasswordState; pending: boolean }) {
   if (pending) return null;
@@ -29,7 +29,7 @@ export function ForgotPasswordForm() {
         <input name="email" type="email" required autoComplete="email" className={inputClass} />
       </label>
       <Result state={state} pending={pending} />
-      <button disabled={pending} className="w-full rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60">
+      <button disabled={pending} className="w-full rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Sending…" : "Email me a reset link"}
       </button>
     </form>
@@ -44,7 +44,7 @@ export function NewPasswordForm({ needsCode }: { needsCode: boolean }) {
       <label className="block">
         <span className="text-sm font-medium">New password</span>
         <input name="password" type="password" required minLength={12} autoComplete="new-password" className={inputClass} />
-        <span className="mt-1 block text-xs text-zinc-500">At least 12 characters.</span>
+        <span className="mt-1 block text-xs text-ink-muted">At least 12 characters.</span>
       </label>
       <label className="block">
         <span className="text-sm font-medium">Type it again</span>
@@ -62,14 +62,14 @@ export function NewPasswordForm({ needsCode }: { needsCode: boolean }) {
             required
             className={`${inputClass} w-56 text-lg tracking-widest`}
           />
-          <span className="mt-1 block text-xs text-zinc-500">
+          <span className="mt-1 block text-xs text-ink-muted">
             This proves it&apos;s really you, even if someone else got into your email. Lost your phone?
             Enter one of your backup codes here instead.
           </span>
         </label>
       )}
       <Result state={state} pending={pending} />
-      <button disabled={pending} className="w-full rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60">
+      <button disabled={pending} className="w-full rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Saving…" : "Save new password"}
       </button>
     </form>

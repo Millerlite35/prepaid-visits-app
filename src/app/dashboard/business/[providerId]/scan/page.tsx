@@ -34,12 +34,12 @@ async function ScanContent({ params }: { params: Promise<{ providerId: string }>
   return (
     <>
       <div className="mb-4 flex items-baseline justify-between gap-3">
-        <h1 className="text-xl font-semibold text-brand">Check in</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-ink">Check in</h1>
         <Link href="/dashboard" className="text-sm underline">
           Dashboard
         </Link>
       </div>
-      <p className="mb-4 text-sm text-zinc-500">{provider?.display_name}</p>
+      <p className="mb-4 text-sm text-ink-muted">{provider?.display_name}</p>
       <Scanner
         checkIn={checkIn.bind(null, providerId)}
         undo={undoCheckIn.bind(null, providerId)}
@@ -51,7 +51,7 @@ async function ScanContent({ params }: { params: Promise<{ providerId: string }>
             : { find: findClientsForCard.bind(null, providerId), link: linkScannedCard.bind(null, providerId) }
         }
       />
-      <p className="mt-8 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-8 text-sm text-ink-muted">
         Have a USB QR scanner on the front desk?{" "}
         <Link href={`/kiosk/${providerId}`} className="font-medium underline">
           Open the self check-in screen

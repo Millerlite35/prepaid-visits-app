@@ -13,6 +13,7 @@ type Props = {
   brandColor: string;
   termsText: string;
   termsVersion: number;
+  usualPriceCents: number | null;
 };
 
 const inputClass =
@@ -30,7 +31,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
   );
 }
 
-export function PurchaseForm({ action, packages, singular, plural, brandColor, termsText, termsVersion }: Props) {
+export function PurchaseForm({ action, packages, singular, plural, brandColor, termsText, termsVersion, usualPriceCents }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
   const [selected, setSelected] = useState(packages.length === 1 ? packages[0].id : "");
   const [showTerms, setShowTerms] = useState(false);
@@ -40,6 +41,9 @@ export function PurchaseForm({ action, packages, singular, plural, brandColor, t
   const perVisit = (p: PublicPackage) => p.price_cents / p.visits;
   const best = packages.length > 1 ? packages.reduce((a, b) => (perVisit(b) < perVisit(a) ? b : a)) : null;
   const ring = { "--tw-ring-color": brandColor } as React.CSSProperties;
+  // "Save 10%" against the practice's regular single-visit price, when they've set one
+  const savingPercent = (p: PublicPackage) =>
+    usualPriceCents && p.visits > 1 ? Math.floor((1 - perVisit(p) / usualPriceCents) * 100) : 0;
 
   return (
     <form action={formAction} className="space-y-8">
@@ -82,6 +86,11 @@ export function PurchaseForm({ action, packages, singular, plural, brandColor, t
                       </span>
                     )}
                   </span>
+                  {savingPercent(p) >= 1 && (
+                    <span className="mt-1 inline-flex rounded-full bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-950 dark:text-green-400">
+                      Save {savingPercent(p)}% vs {formatCents(usualPriceCents!)} each
+                    </span>
+                  )}
                   <span className="block text-xs text-ink-muted">{describeExpiry(p.expires_days)}</span>
                   {p.description && <span className="mt-1.5 block text-sm text-ink-muted">{p.description}</span>}
                 </span>

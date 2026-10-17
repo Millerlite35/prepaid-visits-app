@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import type { InviteState } from "./actions";
 
-const inputClass = "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+const inputClass = "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
 export function InviteForm({
   action,
@@ -39,7 +39,7 @@ export function InviteForm({
             <option value="scan_only">Front desk (scan only)</option>
             <option value="manager">Manager</option>
           </select>
-          <span className="mt-1 block text-xs text-zinc-500">{roleHelp[role]}</span>
+          <span className="mt-1 block text-xs text-ink-muted">{roleHelp[role]}</span>
         </label>
         <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
           {pending ? "Inviting…" : "Send invitation"}
@@ -52,7 +52,7 @@ export function InviteForm({
           <p role="status" className="text-sm text-green-700 dark:text-green-500">✓ {state.message}</p>
           {state.shareText && (
             <>
-              <pre className="whitespace-pre-wrap rounded-md bg-zinc-100 p-3 text-xs dark:bg-zinc-900">{state.shareText}</pre>
+              <pre className="whitespace-pre-wrap rounded-md bg-surface-muted p-3 text-xs dark:bg-zinc-900">{state.shareText}</pre>
               <button type="button" onClick={() => copy(state.shareText!)} className="text-sm underline">
                 {copied ? "Copied ✓" : "Copy message"}
               </button>

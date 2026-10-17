@@ -18,7 +18,7 @@ export function BackupCodesPanel({ unused, brandName }: { unused: number; brandN
         </p>
         <ul className="grid grid-cols-2 gap-2 font-mono text-base">
           {state.codes.map((c) => (
-            <li key={c} className="rounded bg-zinc-100 px-3 py-1.5 text-center dark:bg-zinc-800">
+            <li key={c} className="rounded bg-surface-muted px-3 py-1.5 text-center">
               {c}
             </li>
           ))}
@@ -27,18 +27,18 @@ export function BackupCodesPanel({ unused, brandName }: { unused: number; brandN
           <button
             type="button"
             onClick={() => navigator.clipboard.writeText(text).then(() => setCopied(true))}
-            className="rounded-md border border-zinc-300 px-3 py-1.5 font-medium dark:border-zinc-700"
+            className="rounded-lg border border-line bg-surface px-3 py-1.5 font-medium shadow-sm hover:bg-surface-muted"
           >
             {copied ? "Copied ✓" : "Copy"}
           </button>
           <a
             href={`data:text/plain;charset=utf-8,${encodeURIComponent(text)}`}
             download="backup-codes.txt"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 font-medium dark:border-zinc-700"
+            className="rounded-lg border border-line bg-surface px-3 py-1.5 font-medium shadow-sm hover:bg-surface-muted"
           >
             Download .txt
           </a>
-          <button type="button" onClick={() => window.print()} className="rounded-md border border-zinc-300 px-3 py-1.5 font-medium dark:border-zinc-700">
+          <button type="button" onClick={() => window.print()} className="rounded-lg border border-line bg-surface px-3 py-1.5 font-medium shadow-sm hover:bg-surface-muted">
             Print
           </button>
         </div>
@@ -60,7 +60,7 @@ export function BackupCodesPanel({ unused, brandName }: { unused: number; brandN
           confirmLabel="Make new codes"
           pending={pending}
           pendingLabel="Making codes…"
-          className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium dark:border-zinc-700"
+          className="rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm hover:bg-surface-muted"
         />
       ) : (
         <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white disabled:opacity-60">

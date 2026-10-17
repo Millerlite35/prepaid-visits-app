@@ -19,7 +19,7 @@ export function BackupCodeForm() {
           spellCheck={false}
           placeholder="abcde-fghjk"
           maxLength={20}
-          className="mt-1 block w-56 rounded-md border border-zinc-300 px-3 py-2 font-mono text-lg dark:border-zinc-700 dark:bg-zinc-900"
+          className="mt-1 block w-56 rounded-md border border-line bg-surface px-3 py-2 font-mono text-lg"
         />
       </label>
       {state.error && (
@@ -27,7 +27,7 @@ export function BackupCodeForm() {
           {state.error}
         </p>
       )}
-      <button disabled={pending} className="rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60">
+      <button disabled={pending} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Checking…" : "Use backup code"}
       </button>
     </form>

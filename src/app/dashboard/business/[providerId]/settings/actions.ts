@@ -13,6 +13,7 @@ import {
   passLabelProblem,
 } from "@/lib/page-settings";
 import { removeLogoFile, uploadLogo } from "@/lib/logos";
+import { parseMoneyToCents } from "@/lib/packages";
 import { checkSlug } from "@/lib/slug";
 import { createSessionClient } from "@/lib/supabase/server";
 
@@ -127,4 +128,14 @@ export async function saveContact(providerId: string, _prev: SettingsState, form
     office_phone: cleaned.value.phone,
     office_website: cleaned.value.website,
   });
+}
+
+// The regular price of a single visit (optional), used to show savings to clients.
+export async function saveUsualPrice(providerId: string, _prev: SettingsState, formData: FormData): Promise<SettingsState> {
+  await requireOwner(providerId);
+  const raw = String(formData.get("usualPrice") ?? "").trim();
+  if (!raw) return saveProvider(providerId, { usual_price_cents: null });
+  const cents = parseMoneyToCents(raw);
+  if (cents === null || cents < 100 || cents > 1000000) return { error: "Enter a price between $1 and $10,000, or leave it empty." };
+  return saveProvider(providerId, { usual_price_cents: cents });
 }

@@ -29,12 +29,12 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="flex h-24 items-center justify-center rounded-md border border-dashed border-zinc-300 bg-white p-2 dark:border-zinc-700">
+      <div className="flex h-24 items-center justify-center rounded-md border border-dashed border-line bg-white p-2">
         {shown ? (
           // eslint-disable-next-line @next/next/no-img-element -- user-uploaded logo or local preview
           <img src={shown} alt="Logo preview" className="max-h-20 max-w-full object-contain" />
         ) : (
-          <span className="text-sm text-zinc-400">No logo yet</span>
+          <span className="text-sm text-ink-muted">No logo yet</span>
         )}
       </div>
 
@@ -45,9 +45,9 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
           accept={LOGO_TYPES.join(",")}
           required
           onChange={(e) => choose(e.target.files?.[0])}
-          className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-2 dark:file:bg-zinc-800"
+          className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-2 dark:file:bg-zinc-800"
         />
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-ink-muted">
           PNG, JPG or WebP, up to 1 MB. A wide logo on a transparent or white background works best.
         </p>
         {problem && <p className="text-sm text-red-600">{problem}</p>}
@@ -55,7 +55,7 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
         {!pending && state.saved && <p role="status" className="text-sm text-green-700 dark:text-green-500">✓ Logo saved</p>}
         <button
           disabled={pending || !preview}
-          className="rounded-md bg-brand px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {pending ? "Uploading…" : "Upload logo"}
         </button>

@@ -192,10 +192,10 @@ export function Scanner({ checkIn, undo, singular, plural, cardLinking }: Props)
             autoCapitalize="none"
             spellCheck={false}
             placeholder="Click here, then scan with a USB scanner"
-            className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2 font-mono text-sm"
           />
         </label>
-        <button className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium dark:border-zinc-700">Check in</button>
+        <button className="rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm hover:bg-surface-muted">Check in</button>
       </form>
     </div>
   );
@@ -368,7 +368,7 @@ function LinkCardPanel({
                 }}
                 className="w-full rounded-md bg-white/90 px-3 py-2 text-left text-black disabled:opacity-60"
               >
-                <span className="font-medium">{c.name}</span> <span className="text-sm text-zinc-600">{c.email}</span>
+                <span className="font-medium">{c.name}</span> <span className="text-sm text-ink-muted">{c.email}</span>
               </button>
             </li>
           ))}

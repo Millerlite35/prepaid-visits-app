@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { brand } from "@/config/brand";
 import { requireOwner } from "@/lib/auth";
@@ -55,32 +54,29 @@ async function StaffContent({ params }: { params: Promise<{ providerId: string }
     }),
   );
   const openInvites = (invites ?? []).filter((i) => new Date(i.expires_at) > new Date());
-  const card = "mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800";
+  const card = "mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
 
   return (
     <>
-      <Link href="/dashboard" className="text-sm underline">
-        ← Dashboard
-      </Link>
-      <h1 className="mt-4 text-2xl font-semibold text-brand">Staff</h1>
-      <p className="mt-1 text-sm text-zinc-500">{provider?.display_name}</p>
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Staff</h1>
+      <p className="mt-1 text-sm text-ink-muted">{provider?.display_name}</p>
 
       <section className={card}>
         <h2 className="mb-3 font-medium">People with access</h2>
-        <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+        <ul className="divide-y divide-line text-sm">
           {people.map((p) => (
             <li key={p.user_id} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <span>
                 <span className="font-medium">{p.email}</span>
-                {p.user_id === me.id && <span className="text-zinc-500"> (you)</span>}
-                <span className="block text-xs text-zinc-500">
+                {p.user_id === me.id && <span className="text-ink-muted"> (you)</span>}
+                <span className="block text-xs text-ink-muted">
                   {ROLE_LABELS[p.role] ?? p.role} · since {fmt(p.created_at)}
                 </span>
               </span>
               {p.role !== "owner" && (
                 <span className="flex flex-wrap items-center gap-3">
                   <form action={changeRole.bind(null, providerId, p.user_id)} className="flex items-center gap-2">
-                    <select name="role" defaultValue={p.role} className="rounded-md border border-zinc-300 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+                    <select name="role" defaultValue={p.role} className="rounded-md border border-line bg-surface px-2 py-1 text-sm">
                       <option value="scan_only">Front desk (scan only)</option>
                       <option value="manager">Manager</option>
                     </select>
@@ -104,12 +100,12 @@ async function StaffContent({ params }: { params: Promise<{ providerId: string }
       {openInvites.length > 0 && (
         <section className={card}>
           <h2 className="mb-3 font-medium">Waiting to join</h2>
-          <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+          <ul className="divide-y divide-line text-sm">
             {openInvites.map((i) => (
               <li key={i.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <span>
                   <span className="font-medium">{i.email}</span>
-                  <span className="block text-xs text-zinc-500">
+                  <span className="block text-xs text-ink-muted">
                     {ROLE_LABELS[i.role] ?? i.role} · invited {fmt(i.created_at)} · expires {fmt(i.expires_at)}
                   </span>
                 </span>

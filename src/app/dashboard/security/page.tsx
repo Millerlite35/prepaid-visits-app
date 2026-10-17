@@ -11,10 +11,7 @@ export const metadata: Metadata = { title: `Security · ${brand.name}` };
 export default function SecurityPage({ searchParams }: PageProps<"/dashboard/security">) {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
-      <Link href="/dashboard" className="text-sm underline">
-        ← Dashboard
-      </Link>
-      <h1 className="mt-2 text-2xl font-semibold text-brand">Security</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Security</h1>
       <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
         <SecurityContent searchParams={searchParams} />
       </Suspense>
@@ -29,7 +26,7 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
 
   return (
     <>
-      <p className="mt-1 text-sm text-zinc-500">Signed in as {user.email}</p>
+      <p className="mt-1 text-sm text-ink-muted">Signed in as {user.email}</p>
 
       {justSetUp && unused === 0 && (
         <p className="mt-6 rounded-md bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
@@ -37,9 +34,9 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
         </p>
       )}
 
-      <section className="mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <section className="mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <h2 className="font-medium">Backup codes</h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-ink-muted">
           If you lose the phone with your authenticator app, a backup code gets you back in. Each code works
           once. Using one removes your old authenticator so you can set up the new phone, and we email you
           when it happens.
@@ -57,9 +54,9 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
         <BackupCodesPanel unused={unused} brandName={brand.name} />
       </section>
 
-      <section className="mt-6 rounded-lg border border-zinc-200 p-4 text-sm dark:border-zinc-800">
+      <section className="mt-6 rounded-lg border border-line p-4 text-sm">
         <h2 className="font-medium">Password</h2>
-        <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-ink-muted">
           To change it, sign out and use{" "}
           <Link href="/forgot-password" className="underline">
             Forgot password

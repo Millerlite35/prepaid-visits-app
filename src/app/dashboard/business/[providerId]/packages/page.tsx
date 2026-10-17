@@ -31,7 +31,7 @@ type PackageRow = {
   active: boolean;
 };
 
-type ProviderVocab = { display_name: string; vocab_singular: string; vocab_plural: string };
+type ProviderVocab = { display_name: string; vocab_singular: string; vocab_plural: string; usual_price_cents: number | null };
 
 async function PackagesContent({ params }: { params: Promise<{ providerId: string }> }) {
   const { providerId } = await params;
@@ -40,7 +40,7 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
   // read as the signed-in user: row-level security limits this to their own business
   const db = await createSessionClient();
   const [providerRes, packagesRes, soldRes] = await Promise.all([
-    db.from("providers").select("display_name, vocab_singular, vocab_plural").eq("id", providerId).single<ProviderVocab>(),
+    db.from("providers").select("display_name, vocab_singular, vocab_plural, usual_price_cents").eq("id", providerId).single<ProviderVocab>(),
     db
       .from("package_templates")
       .select("id, name, description, visits, price_cents, expires_days, active")
@@ -65,35 +65,32 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
 
   return (
     <>
-      <Link href="/dashboard" className="text-sm underline">
-        ← Dashboard
-      </Link>
-      <h1 className="mt-4 text-2xl font-semibold text-brand">Packages</h1>
-      <p className="mt-1 text-sm text-zinc-500">{provider.display_name}</p>
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Packages</h1>
+      <p className="mt-1 text-sm text-ink-muted">{provider.display_name}</p>
 
       <section className="mt-8">
         <h2 className="font-medium">Your packages</h2>
         {packages.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-sm text-ink-muted">
             No packages yet. Use Quick start below, or create your own.
           </p>
         ) : (
-          <ul className="mt-3 divide-y divide-zinc-200 rounded-lg border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+          <ul className="mt-3 divide-y divide-line rounded-lg border border-line">
             {packages.map((p) => (
               <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 p-4 text-sm">
                 <div className={p.active ? "" : "opacity-60"}>
                   <p className="font-medium">
                     {p.name}
-                    {!p.active && <span className="ml-2 text-xs font-normal text-zinc-500">(not for sale)</span>}
+                    {!p.active && <span className="ml-2 text-xs font-normal text-ink-muted">(not for sale)</span>}
                   </p>
                   <p>
                     {p.visits} {p.visits === 1 ? one : many} · {formatCents(p.price_cents)}{" "}
-                    <span className="text-zinc-500">
+                    <span className="text-ink-muted">
                       ({formatCents(Math.round(p.price_cents / p.visits))} per {one})
                     </span>
                   </p>
-                  <p className="text-xs text-zinc-500">{describeExpiry(p.expires_days)}</p>
-                  {p.description && <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{p.description}</p>}
+                  <p className="text-xs text-ink-muted">{describeExpiry(p.expires_days)}</p>
+                  {p.description && <p className="mt-1 text-xs text-ink-muted">{p.description}</p>}
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <Link href={`/dashboard/business/${providerId}/packages/${p.id}`} className="underline">
@@ -114,17 +111,23 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
         )}
       </section>
 
-      <section className="mt-10 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <section className="mt-10 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <h2 className="font-medium">Quick start</h2>
-        <p className="mb-4 mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mb-4 mt-1 text-sm text-ink-muted">
           Add ready-made packages priced from your usual rate, with a discount for buying more.
         </p>
-        <QuickStart action={addPresetPackages.bind(null, providerId)} vocabSingular={one} vocabPlural={many} />
+        <QuickStart
+          action={addPresetPackages.bind(null, providerId)}
+          vocabSingular={one}
+          vocabPlural={many}
+          usualPriceCents={providerRes.data?.usual_price_cents ?? null}
+        />
       </section>
 
-      <section className="mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <section className="mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <h2 className="mb-4 font-medium">Create your own package</h2>
         <PackageForm
+          usualPriceCents={providerRes.data?.usual_price_cents ?? null}
           action={createPackage.bind(null, providerId)}
           vocabSingular={one}
           vocabPlural={many}

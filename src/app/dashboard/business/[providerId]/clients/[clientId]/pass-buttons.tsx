@@ -22,12 +22,12 @@ export function PassButtons({ resend, reissue, hasPass }: { resend: Action; reis
         <form action={resendAction}>
           <button
             disabled={!hasPass || resending}
-            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium disabled:opacity-50 dark:border-zinc-700"
+            className="rounded-md border border-line px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
             {resending ? "Sending…" : "Resend pass email"}
           </button>
         </form>
-        <p className="mt-1 text-xs text-zinc-500">For a client who can&apos;t find their email. Same pass, same code.</p>
+        <p className="mt-1 text-xs text-ink-muted">For a client who can&apos;t find their email. Same pass, same code.</p>
         <Result state={resendState} />
       </div>
 
@@ -41,7 +41,7 @@ export function PassButtons({ resend, reissue, hasPass }: { resend: Action; reis
             className="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-700 dark:border-red-800 dark:text-red-400"
           />
         </form>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-ink-muted">
           For a lost phone or a pass that was shared. Their balance stays the same.
         </p>
         <Result state={reissueState} />

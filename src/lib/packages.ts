@@ -62,6 +62,21 @@ export function presetPriceCents(perVisitCents: number, visits: number, discount
   return Math.round((perVisitCents * visits * (100 - discountPercent)) / 100 / 100) * 100;
 }
 
+// "% off" a package gets, between 0 and 90 (whole numbers). null if it isn't one.
+export const MAX_DISCOUNT_PERCENT = 90;
+export function parseDiscount(raw: string): number | null {
+  const s = raw.trim().replace(/%$/, "");
+  if (!/^\d{1,2}$/.test(s)) return null;
+  const n = Number(s);
+  return n <= MAX_DISCOUNT_PERCENT ? n : null;
+}
+
+// The other way round: what % off a price is, against the regular price per visit
+export function discountPercent(perVisitCents: number, visits: number, priceCents: number): number {
+  const full = perVisitCents * visits;
+  return full > 0 ? Math.round((1 - priceCents / full) * 100) : 0;
+}
+
 function parseExpiry(choice: string, customDays: string): { days: number | null } | { error: string } {
   if (choice === "none") return { days: null };
   const raw = choice === "custom" ? customDays.trim() : choice;

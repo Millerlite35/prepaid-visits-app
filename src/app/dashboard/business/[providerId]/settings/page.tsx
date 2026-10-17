@@ -1,14 +1,13 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireOwner } from "@/lib/auth";
 import { requireEnv } from "@/lib/env";
 import { createSessionClient } from "@/lib/supabase/server";
 import { logoUrl } from "@/lib/branding";
-import { newPrivateLink, removeLogo, saveAddressAndAccess, saveContact, saveLogo, savePageDetails, saveTerms } from "./actions";
+import { newPrivateLink, removeLogo, saveAddressAndAccess, saveContact, saveLogo, savePageDetails, saveTerms, saveUsualPrice } from "./actions";
 import { LogoForm } from "./logo-form";
-import { AddressForm, ContactForm, PageDetailsForm, PrivateLink, TermsForm, type PageDetails } from "./settings-forms";
+import { AddressForm, ContactForm, PageDetailsForm, PrivateLink, TermsForm, UsualPriceForm, type PageDetails } from "./settings-forms";
 
 export const metadata: Metadata = { title: `Page settings · ${brand.name}` };
 
@@ -36,6 +35,7 @@ type ProviderSettings = PageDetails & {
   office_address: string | null;
   office_phone: string | null;
   office_website: string | null;
+  usual_price_cents: number | null;
 };
 
 async function SettingsContent({ params }: { params: Promise<{ providerId: string }> }) {
@@ -47,7 +47,7 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
   const { data: p, error } = await db
     .from("providers")
     .select(
-      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version, logo_path, office_address, office_phone, office_website",
+      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version, logo_path, office_address, office_phone, office_website, usual_price_cents",
     )
     .eq("id", providerId)
     .single<ProviderSettings>();
@@ -55,15 +55,12 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
 
   const site = requireEnv("SITE_URL");
   const privateUrl = `${site}/${p.slug}?key=${p.private_access_key}`;
-  const card = "mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800";
+  const card = "mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
 
   return (
     <>
-      <Link href="/dashboard" className="text-sm underline">
-        ← Dashboard
-      </Link>
-      <h1 className="mt-4 text-2xl font-semibold text-brand">Page settings</h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Page settings</h1>
+      <p className="mt-1 text-sm text-ink-muted">
         What clients see on {p.display_name}&apos;s purchase page, passes and emails.{" "}
         <a href={privateUrlOrPublic(site, p)} target="_blank" rel="noopener noreferrer" className="underline">
           View your purchase page ↗
@@ -96,8 +93,14 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
       </section>
 
       <section className={card}>
+        <h2 className="mb-1 font-medium">Regular price</h2>
+        <p className="mb-4 text-sm text-ink-muted">What one {p.vocab_singular} costs without a package.</p>
+        <UsualPriceForm action={saveUsualPrice.bind(null, providerId)} initialCents={p.usual_price_cents} singular={p.vocab_singular} />
+      </section>
+
+      <section className={card}>
         <h2 className="mb-1 font-medium">Office contact</h2>
-        <p className="mb-4 text-sm text-zinc-500">Printed on your QR cards and flyers.</p>
+        <p className="mb-4 text-sm text-ink-muted">Printed on your QR cards and flyers.</p>
         <ContactForm
           action={saveContact.bind(null, providerId)}
           initial={{ address: p.office_address, phone: p.office_phone, website: p.office_website }}
@@ -113,7 +116,7 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
           siteHost={new URL(site).host}
         />
         {p.page_access === "private" && (
-          <div className="mt-6 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+          <div className="mt-6 border-t border-line pt-4">
             <PrivateLink url={privateUrl} renewAction={newPrivateLink.bind(null, providerId)} />
           </div>
         )}

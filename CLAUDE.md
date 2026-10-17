@@ -99,13 +99,17 @@ Files in `supabase/migrations/`, run in order:
 16. `0016_provider_contact.sql`: `providers.office_address / office_phone / office_website`
     (the practice's own contact, optional, length checks; added to the column grant list)
 
+17. `0017_usual_price.sql`: `providers.usual_price_cents` (regular single-visit price, optional,
+    $1-$10,000; column grant). Purchase page shows "Regular price" + "Save N%" per package;
+    flyers default their savings box from it. Must be a price really charged (settings hint).
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
 `staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`,
-`backup_codes_test.sql`, `provider_contact_test.sql` in `supabase/tests/`.
+`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql` in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -230,6 +234,10 @@ default), plus a privilege check in `provider_setup_test.sql`.
   provider's usual per-visit price minus a discount). Shared rules, money parsing and
   formatting in `src/lib/packages.ts` (limits: 1-100 visits, $1-$10,000, expiry 1-3650
   days or never).
+- % off (Oct 2026): quick start has an editable % off per preset (`discount_<id>`, 0-90,
+  `parseDiscount`); the package form has regular price + % off helpers that work out the
+  price (and follow a typed price via `discountPercent`). Only the price is stored. Both
+  default the regular price from `providers.usual_price_cents`.
 - Packages with sales can't be deleted, only paused (`active = false`). Purchases keep
   their own snapshot, so edits never change past sales.
 - UI uses the provider's `vocab_singular` / `vocab_plural` ("visit"/"class"), never a
@@ -325,8 +333,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Client pages (purchase, thank-you, pass) use `src/components/client-shell.tsx`
   (`ClientShell`, `ClientCard` with the provider-colour top bar, `ClientHeader`); office
   contact in the footer except on the pass page (kept discreet).
-- Still on the old look inside the new shell: clients, client detail, packages, settings,
-  staff, scan, help, security. Convert them to the components above.
+- Sign-in, sign-up, password and two-step pages use `src/components/auth-frame.tsx` (from the
+  (auth) and mfa layouts). Older pages were moved onto the tokens with a class-for-class pass;
+  new or reworked pages should use the `ui.tsx` components directly.
 
 ## Flyers, signs and QR cards (steps 10 and 13a)
 - Design styles shared by both (`src/lib/design-styles.ts`): professional, warm, minimal,
