@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
 import { signOut } from "../../(auth)/actions";
@@ -29,6 +30,11 @@ async function VerifyGate() {
       <div className="mt-6">
         <CodeForm action={verifySignIn} submitLabel="Continue" />
       </div>
+      <p className="mt-6 text-sm">
+        <Link href="/mfa/recover" className="underline">
+          Lost your phone? Use a backup code
+        </Link>
+      </p>
       <form action={signOut} className="mt-8">
         <button className="text-sm underline">Sign out</button>
       </form>

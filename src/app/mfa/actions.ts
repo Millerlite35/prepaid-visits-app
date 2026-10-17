@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
+import { redeemBackupCode, removeAuthenticator, unusedBackupCodeCount } from "@/lib/backup-codes";
 import { createSessionClient } from "@/lib/supabase/server";
 
 export type EnrollState = { factorId?: string; qrCode?: string; secret?: string; error?: string };
@@ -53,7 +54,7 @@ export async function confirmEnrollment(_prev: CodeState, formData: FormData): P
   const supabase = await createSessionClient();
   const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
   if (error) return { error: BAD_CODE };
-  redirect("/dashboard");
+  redirect("/dashboard/security?setup=1"); // next: make backup codes
 }
 
 // Every sign-in after setup: password, then this code.
@@ -78,4 +79,24 @@ export async function verifySignIn(_prev: CodeState, formData: FormData): Promis
 function readCode(formData: FormData): string | null {
   const code = String(formData.get("code") ?? "").replace(/\s/g, "");
   return /^\d{6}$/.test(code) ? code : null;
+}
+
+// Lost phone: a backup code replaces the authenticator code. The old authenticator is
+// removed (which signs them out everywhere), then they sign in again and set up the new one.
+export async function recoverWithBackupCode(_prev: CodeState, formData: FormData): Promise<CodeState> {
+  const user = await requireSignedIn();
+  const raw = String(formData.get("backupCode") ?? "");
+  const result = await redeemBackupCode(user.id, raw);
+  if (result === "too_many") return { error: "Too many tries. Please wait an hour, or contact support." };
+  if (result === "wrong") return { error: "That backup code didn't work. Each code can only be used once." };
+
+  try {
+    await removeAuthenticator(user.id, user.email, await unusedBackupCodeCount(user.id));
+  } catch (e) {
+    console.error("remove authenticator after backup code failed:", e instanceof Error ? e.message : e);
+    return { error: "Your code was accepted but something went wrong. Please contact support." };
+  }
+  const supabase = await createSessionClient();
+  await supabase.auth.signOut({ scope: "local" });
+  redirect("/login?recovered=1");
 }

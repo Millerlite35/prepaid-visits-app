@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
+import { unusedBackupCodeCount } from "@/lib/backup-codes";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { createSessionClient } from "@/lib/supabase/server";
 import { signOut } from "../(auth)/actions";
@@ -72,6 +73,8 @@ async function DashboardContent() {
       .returns<{ id: string; display_name: string }[]>();
     rows?.forEach((r) => names.set(r.id, r.display_name));
   }
+
+  const backupCodesLeft = await unusedBackupCodeCount(user.id);
 
   return (
     <>
@@ -176,6 +179,15 @@ async function DashboardContent() {
           </>
         )}
       </section>
+
+      {backupCodesLeft === 0 && (
+        <p className="mt-6 rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+          ⚠ If you lose your phone, you&apos;ll need a backup code to get back in.{" "}
+          <Link href="/dashboard/security" className="font-medium underline">
+            Make backup codes
+          </Link>
+        </p>
+      )}
 
       <form action={signOut} className="mt-8">
         <button className="text-sm underline">Sign out</button>

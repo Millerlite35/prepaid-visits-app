@@ -69,6 +69,10 @@ export const helpFaq: FaqTopic[] = [
         a: "Allow camera access when the browser asks (or via the camera icon in the address bar). Close other apps using the camera, like Zoom. Some in-app browsers block cameras, so open the page in Safari or Chrome. You can always type or paste the code instead.",
       },
       {
+        q: "Can clients check themselves in at the front desk?",
+        a: "Yes. Plug a USB QR scanner into the front-desk computer, open Scan, then \"Open the self check-in screen\" and click Start. Clients hold their pass under the scanner and see their first name and how many visits are left; anything wrong says \"Please see the front desk\". Buy a scanner that reads QR codes from phone screens (often called a 2D or hands-free/presentation scanner, about $30 to $80) and works as a USB keyboard with Enter after each scan; most do out of the box. No scanner? Choose \"Start with this device's camera\" instead: a laptop webcam or a tablet on a stand facing clients works, and they hold their phone up to it. Sign that computer in with a scan-only staff account, so leaving the screen only reaches the scanner.",
+      },
+      {
         q: "A client lost their phone or can't find their pass.",
         a: "Open the client and click \"Resend pass email\" to send the same pass again. If the pass may be in someone else's hands, click \"Cancel pass and send a new one\": the old code stops working straight away and their balance stays the same.",
       },
@@ -106,7 +110,11 @@ export const helpFaq: FaqTopic[] = [
       },
       {
         q: "I lost the phone with my authenticator app.",
-        a: "Contact support below. For your security we'll confirm it's really you before resetting your two-step verification.",
+        a: "Sign in with your password, then choose \"Lost your phone? Use a backup code\" and enter one of your backup codes. Your old authenticator is removed and you set up the new phone. Forgot your password too? Use Forgot password, and enter the backup code where it asks for the 6-digit code. No backup codes? Email support from your account's email address; for your security we'll confirm it's really you first.",
+      },
+      {
+        q: "What are backup codes?",
+        a: "Ten one-time codes that get you in if you lose your authenticator phone. Make them under Security (top of every page). Print them or keep them in a password manager, not on the same phone. Each works once; make a new set whenever you're running low.",
       },
     ],
   },

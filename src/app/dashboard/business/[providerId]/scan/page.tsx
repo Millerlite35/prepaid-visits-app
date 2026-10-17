@@ -46,6 +46,13 @@ async function ScanContent({ params }: { params: Promise<{ providerId: string }>
         singular={provider?.vocab_singular ?? "visit"}
         plural={provider?.vocab_plural ?? "visits"}
       />
+      <p className="mt-8 text-sm text-zinc-600 dark:text-zinc-400">
+        Have a USB QR scanner on the front desk?{" "}
+        <Link href={`/kiosk/${providerId}`} className="font-medium underline">
+          Open the self check-in screen
+        </Link>{" "}
+        and clients can check themselves in.
+      </p>
     </>
   );
 }

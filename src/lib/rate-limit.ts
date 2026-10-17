@@ -14,6 +14,7 @@ export const LIMITS = {
   signInPerIp: { limit: 20, windowSeconds: 600 },
   resetPerIp: { limit: 5, windowSeconds: 3600 },
   scanPerUser: { limit: 120, windowSeconds: 60 },
+  backupCodePerUser: { limit: 5, windowSeconds: 3600 },
 } as const;
 
 function hash(value: string): string {

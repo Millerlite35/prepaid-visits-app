@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { cameraErrorMessage, makeDetector } from "@/lib/qr-detector";
 import type { ScanResult, UndoResult } from "./actions";
 
 type Props = {
@@ -9,33 +10,6 @@ type Props = {
   singular: string;
   plural: string;
 };
-
-type Detector = { detect(source: HTMLVideoElement): Promise<{ rawValue: string }[]> };
-type NativeDetectorClass = {
-  new (options: { formats: string[] }): Detector;
-  getSupportedFormats(): Promise<string[]>;
-};
-
-// Use the browser's built-in QR reader where there is one (Chrome on Android); otherwise
-// our self-hosted decoder (needed for iPhone Safari).
-async function makeDetector(): Promise<Detector> {
-  const Native = (window as unknown as { BarcodeDetector?: NativeDetectorClass }).BarcodeDetector;
-  if (Native) {
-    try {
-      if ((await Native.getSupportedFormats()).includes("qr_code")) return new Native({ formats: ["qr_code"] });
-    } catch {
-      // fall through to the decoder below
-    }
-  }
-  const mod = await import("barcode-detector/ponyfill");
-  mod.prepareZXingModule({
-    overrides: {
-      locateFile: (path: string, prefix: string) =>
-        path.endsWith(".wasm") ? `/vendor/zxing_reader-${mod.ZXING_WASM_VERSION}.wasm` : prefix + path,
-    },
-  });
-  return new mod.BarcodeDetector({ formats: ["qr_code"] });
-}
 
 // Short beep + buzz so staff know the result without looking closely.
 function feedback(good: boolean, audio: AudioContext | null) {
@@ -131,19 +105,10 @@ export function Scanner({ checkIn, undo, singular, plural }: Props) {
       void loop();
     } catch (e) {
       stopCamera();
-      const name = e instanceof Error ? e.name : "";
-      const messages: Record<string, string> = {
-        NotAllowedError:
-          "Camera access is blocked. Allow the camera for this site in your browser settings (the camera icon in the address bar), then try again.",
-        SecurityError: "This browser or app doesn't allow camera access. Open this page in Chrome, Edge or Safari.",
-        NotFoundError: "No camera was found on this device. Use a USB scanner or type the code below.",
-        OverconstrainedError: "No camera was found on this device. Use a USB scanner or type the code below.",
-        NotReadableError: "The camera is busy in another app (e.g. Zoom or Teams). Close it there and try again.",
-      };
       setCameraError(
-        !window.isSecureContext
-          ? "The camera only works on a secure (https) address. Use the box below for now."
-          : (messages[name] ?? "Couldn't start the camera. You can use a USB scanner or type the code below."),
+        window.isSecureContext
+          ? `${cameraErrorMessage(e, "Couldn't start the camera.")} You can use a USB scanner or type the code below.`
+          : "The camera only works on a secure (https) address. Use the box below for now.",
       );
     }
   }

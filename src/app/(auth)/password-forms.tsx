@@ -55,15 +55,16 @@ export function NewPasswordForm({ needsCode }: { needsCode: boolean }) {
           <span className="text-sm font-medium">6-digit code from your authenticator app</span>
           <input
             name="code"
-            inputMode="numeric"
             autoComplete="one-time-code"
-            pattern="\d{6}"
-            maxLength={6}
+            autoCapitalize="none"
+            spellCheck={false}
+            maxLength={20}
             required
-            className={`${inputClass} w-40 text-lg tracking-widest`}
+            className={`${inputClass} w-56 text-lg tracking-widest`}
           />
           <span className="mt-1 block text-xs text-zinc-500">
-            This proves it&apos;s really you, even if someone else got into your email.
+            This proves it&apos;s really you, even if someone else got into your email. Lost your phone?
+            Enter one of your backup codes here instead.
           </span>
         </label>
       )}

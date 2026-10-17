@@ -92,13 +92,17 @@ Files in `supabase/migrations/`, run in order:
 14. `0014_rate_limits.sql`: `rate_limits` (server-only) and `hit_rate_limit(bucket, limit,
     window_seconds)` (fixed window; true = allowed; prunes rows older than a day)
 
+15. `0015_backup_codes.sql`: `mfa_backup_codes` (server-only; SHA-256 hashes only) and
+    `replace_backup_codes(user, hashes[])` (new set replaces all old codes), `use_backup_code(
+    user, hash)` (one use; audits used/rejected)
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
-`staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`
-in `supabase/tests/`.
+`staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`,
+`backup_codes_test.sql` in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -142,6 +146,14 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (`requireSignedIn`; if the user has an authenticator, its code is REQUIRED before
   `updateUser({ password })`, so email access alone can't take over an account; then
   other sessions are signed out). Actions in `src/app/(auth)/password-actions.ts`.
+- Backup codes (`src/lib/backup-codes.ts`): 10 one-time codes `xxxxx-xxxxx` (~50 bits),
+  made at `/dashboard/security` (shown once; copy/download/print). After two-step setup the
+  user lands on `/dashboard/security?setup=1`; the dashboard nags while they have none.
+  Lost phone: `/mfa/verify` -> `/mfa/recover` (`requireSignedIn`), or a backup code in the
+  reset-password code box. A valid code -> `removeAuthenticator` (admin deletes all TOTP
+  factors, which signs the user out EVERYWHERE) + alert email -> `/login?recovered=1` ->
+  sign in -> `/mfa/setup`. 5 tries/hour per user. No codes: founder deletes the factor in
+  the Supabase dashboard after confirming identity (FAQ says email support).
 - Provider purchase pages will live at `/{slug}`. `src/lib/slug.ts` has the slug rules
   (must match the DB check) and a RESERVED list: **add every new top-level route to it.**
 
@@ -231,6 +243,17 @@ default), plus a privilege check in `provider_setup_test.sql`.
   owners/managers any time. Beep + vibration feedback.
 - Camera needs a secure origin: works on `localhost`, NOT on `http://<LAN-ip>` from a
   phone. Phone camera testing needs https (hosting, or a tunnel).
+- Self check-in (kiosk) `/kiosk/[providerId]` (`requireStaff`; outside `/dashboard` so no
+  top bar): client-facing full-screen page for a front-desk computer with a USB QR scanner
+  (keyboard mode + Enter). Listens to page-wide keydown (no focused input; keys >1 s apart
+  start a new code). `kioskCheckIn` wraps the staff `checkIn` (never forces) and trims the
+  answer for a public screen: first name + visits left; problems say "see the front desk".
+  Result shows 5 s (good) / 8 s (problem). Start button unlocks sound, requests fullscreen;
+  wake lock keeps the screen on. "Staff" link (with confirm) exits to the scanner. Advise a
+  scan_only account on that computer. Linked from the scan page; FAQ covers buying a scanner.
+  Camera mode ("Start with this device's camera"): front camera (`facingMode: user`),
+  mirrored preview, same code ignored for 10 s; QR reading shared with the staff scanner
+  in `src/lib/qr-detector.ts` (`makeDetector`, `cameraErrorMessage`). Paste also works (testing).
 - Dashboard shows scan-only staff the business name via a server-side lookup (RLS hides
   provider rows from them), and has "View purchase page" links.
 
@@ -280,8 +303,11 @@ default), plus a privilege check in `provider_setup_test.sql`.
   fee answer reads `platformFeePercent`) and Contact support (`help/actions.ts`): saved to
   `support_requests` via the admin client after `requireUser`, max 5/hour/user, emailed to
   `SUPPORT_EMAIL` with reply-to = the sender. Form warns: no client health details.
-- Two-step at every sign-in on a new device is intentional; ideas to lighten it later
-  (app Face ID, remember device, passkeys) are pilot questions.
+- Two-step at every sign-in on a new device is intentional. The founder WANTS all three
+  ways to lighten it (decided Oct 2026): passkeys (check Supabase Auth's WebAuthn support
+  when built), Face ID/fingerprint in the store app (step 14), and "remember this device
+  for 30 days". Remember-device must not weaken migration 0004 (the DB requires `aal2`),
+  so design it carefully, not as a cookie that skips the code.
 
 ## Security hardening (step 11b)
 - Headers on every response (`next.config.ts`): CSP `frame-ancestors 'none'`, `base-uri`,
@@ -307,8 +333,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Resending a pass email / rate limits on repeat purchases: not built yet (steps 9, 11).
 - Stripe account style (who is liable for chargebacks/negative balances): testing with
   "full"; decide with the attorney before pilot. One setting in `src/config/payments.ts`.
-- Lost authenticator phone: no self-service recovery yet. For now, delete the user's
-  factor in the Supabase dashboard (Authentication > Users). Decide before pilot.
+- Lost authenticator phone WITHOUT backup codes: manual (confirm identity, then delete the
+  factor in Supabase > Authentication > Users). Decide the identity check before pilot.
 - Shared front-desk devices for scan_only staff: two-step may need a different approach.
 - Final product name (placeholder: Visit Pack). Needed before Apple pass setup and the
   Stripe platform name.
