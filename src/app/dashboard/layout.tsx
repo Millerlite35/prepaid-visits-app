@@ -9,7 +9,7 @@ export const metadata = installableApp;
 export default function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
   return (
     <>
-      <header className="border-b border-zinc-200 dark:border-zinc-800">
+      <header className="border-b border-zinc-200 print:hidden dark:border-zinc-800">
         <nav className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-3 text-sm">
           <Link href="/dashboard" className="font-semibold text-brand">
             {brand.name}
