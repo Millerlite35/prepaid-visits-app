@@ -86,12 +86,15 @@ Files in `supabase/migrations/`, run in order:
     partial removes visits in proportion (rounded down, capped at unused); writes a
     `refunds` row (status succeeded) so app refund limits see it; idempotent per request id
 
+13. `0013_support.sql`: `support_requests` (server-only: RLS on, no policies, all grants
+    revoked from anon/authenticated)
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
-`staff_test.sql`, `external_refunds_test.sql` in `supabase/tests/`.
+`staff_test.sql`, `external_refunds_test.sql`, `support_test.sql` in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
 
@@ -265,6 +268,16 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Resend pass email (same pass; at most once a minute) and "Cancel pass and send a new
   one" (`reissue_wallet_pass`, then a "reissue" email). `sendPassEmail(purchaseId,
   credentialId, kind, actorId)` with kind `purchase | resend | reissue`.
+
+## Help and support
+- `src/app/dashboard/layout.tsx`: slim top bar (brand -> /dashboard, Help) on every
+  dashboard page; static, no login reads.
+- `/dashboard/help`: searchable FAQ from `src/config/help-faq.ts` (edit answers there; the
+  fee answer reads `platformFeePercent`) and Contact support (`help/actions.ts`): saved to
+  `support_requests` via the admin client after `requireUser`, max 5/hour/user, emailed to
+  `SUPPORT_EMAIL` with reply-to = the sender. Form warns: no client health details.
+- Two-step at every sign-in on a new device is intentional; ideas to lighten it later
+  (app Face ID, remember device, passkeys) are pilot questions.
 
 ## Open decisions
 - Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the

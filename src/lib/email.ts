@@ -34,6 +34,7 @@ export async function sendEmail(args: {
   subject: string;
   html: string;
   text: string;
+  replyTo?: string;
   attachments?: { filename: string; content: Buffer; contentId?: string }[];
   idempotencyKey: string;
 }): Promise<string> {
