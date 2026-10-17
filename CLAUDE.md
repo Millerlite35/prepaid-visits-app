@@ -130,6 +130,11 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Routes: `/signup`, `/login` (forms + actions in `src/app/(auth)/`), `/auth/callback`
   (email link, fixed redirect to /dashboard), `/auth/error`, `/dashboard`,
   `/dashboard/new-business` (onboarding; calls `create_provider` with the verified user id).
+- Forgot password: `/forgot-password` (always the same "if an account exists" answer) ->
+  Supabase email -> `/auth/reset` (code exchange, fixed redirect) -> `/reset-password`
+  (`requireSignedIn`; if the user has an authenticator, its code is REQUIRED before
+  `updateUser({ password })`, so email access alone can't take over an account; then
+  other sessions are signed out). Actions in `src/app/(auth)/password-actions.ts`.
 - Provider purchase pages will live at `/{slug}`. `src/lib/slug.ts` has the slug rules
   (must match the DB check) and a RESERVED list: **add every new top-level route to it.**
 

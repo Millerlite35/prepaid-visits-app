@@ -1,0 +1,67 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { requireSignedIn } from "@/lib/auth";
+import { requireEnv } from "@/lib/env";
+import { createSessionClient } from "@/lib/supabase/server";
+
+// Forgot password. Two safeguards:
+//   * the request page never says whether an email has an account
+//   * setting the new password also needs the authenticator code, so someone who only
+//     got into the person's EMAIL still can't take over the account
+
+export type PasswordState = { error?: string; message?: string };
+
+const MIN_PASSWORD_LENGTH = 12;
+
+export async function requestPasswordReset(_prev: PasswordState, formData: FormData): Promise<PasswordState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: "Enter your email address." };
+
+  const supabase = await createSessionClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${requireEnv("SITE_URL")}/auth/reset`,
+  });
+  // Only a rate limit is worth telling them about; anything else gets the same answer.
+  if (error?.code === "over_email_send_rate_limit" || error?.status === 429) {
+    return { error: "Too many requests. Please wait a few minutes and try again." };
+  }
+  if (error) console.warn("password reset request:", error.code, error.message);
+  return {
+    message:
+      "If an account exists for that email, we've sent a link to reset your password. Open it in this same browser. It expires in an hour.",
+  };
+}
+
+export async function setNewPassword(_prev: PasswordState, formData: FormData): Promise<PasswordState> {
+  await requireSignedIn(); // the email link signed them in (password step only)
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  const code = String(formData.get("code") ?? "").replace(/\s/g, "");
+  if (password.length < MIN_PASSWORD_LENGTH) return { error: `Use at least ${MIN_PASSWORD_LENGTH} characters.` };
+  if (password !== confirm) return { error: "The two passwords don't match." };
+
+  const supabase = await createSessionClient();
+
+  // If they use an authenticator (all staff do once set up), require its code first.
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const factor = factors?.totp[0];
+  if (factor) {
+    if (!/^\d{6}$/.test(code)) return { error: "Enter the 6-digit code from your authenticator app." };
+    const { error: mfaError } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+    if (mfaError) {
+      return { error: "That code didn't work. Codes change every 30 seconds, so try the newest one." };
+    }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    if (error.code === "same_password") return { error: "That's your current password. Choose a new one." };
+    if (error.code === "weak_password") return { error: "That password is too easy to guess. Try a longer one." };
+    console.error("update password failed:", error.code, error.message);
+    return { error: "Couldn't change your password. Please request a new link and try again." };
+  }
+  // sign out any other devices, in case someone else was signed in
+  await supabase.auth.signOut({ scope: "others" });
+  redirect("/dashboard");
+}

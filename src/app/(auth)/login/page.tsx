@@ -11,7 +11,12 @@ export default function LoginPage() {
       <h1 className="text-2xl font-semibold text-brand">Sign in</h1>
       <p className="mt-1 text-sm text-zinc-500">For providers and their staff.</p>
       <AuthForm mode="signin" />
-      <p className="mt-6 text-sm">
+      <p className="mt-4 text-sm">
+        <Link href="/forgot-password" className="underline">
+          Forgot password?
+        </Link>
+      </p>
+      <p className="mt-2 text-sm">
         New here?{" "}
         <Link href="/signup" className="underline">
           Create an account

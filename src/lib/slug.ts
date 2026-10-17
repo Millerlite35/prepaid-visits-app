@@ -8,10 +8,10 @@ const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/;
 // the app's own pages. ADD EVERY NEW TOP-LEVEL ROUTE HERE.
 const RESERVED = new Set([
   // routes that exist now
-  "auth", "dashboard", "login", "mfa", "signup",
+  "auth", "dashboard", "forgot-password", "login", "mfa", "pass", "reset-password", "signup",
   // routes we are likely to need
   "about", "account", "admin", "api", "app", "billing", "card", "cards", "checkout",
-  "contact", "help", "logout", "new", "pass", "passes", "pay", "pricing", "privacy",
+  "contact", "help", "logout", "new", "passes", "pay", "pricing", "privacy",
   "scan", "scanner", "settings", "status", "support", "terms", "wallet", "www",
 ]);
 
