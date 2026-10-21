@@ -103,15 +103,28 @@ Files in `supabase/migrations/`, run in order:
     $1-$10,000; column grant). Purchase page shows "Regular price" + "Save N%" per package;
     flyers default their savings box from it. Must be a price really charged (settings hint).
 
+18. `0018_explicit_api_grants.sql`: every table/view's Data API grants written out (read from
+    the dev project 2026-10-21). No-op on the dev project; makes a FRESH project (production,
+    HIPAA, preview branch) match it, since Supabase stops auto-granting new tables on Oct 30.
+    Only needs running on a new project, after 0001-0017.
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
 `staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`,
-`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql` in `supabase/tests/`.
+`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql`, `api_grants_test.sql`
+in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
+
+**Every new table or view (from Oct 30, 2026)** needs explicit grants in the SAME migration:
+Supabase no longer auto-grants Data API access to new tables in `public`, so without them
+supabase-js returns "permission denied" (this also hits a fresh project replaying all
+migrations). Always `grant ... to service_role` (the server's admin client), plus only what
+the browser-facing roles really need (`authenticated` for RLS-protected staff reads/writes;
+`anon` almost never). Server-only tables: grant to service_role only, revoke from anon/authenticated.
 
 **Every new business function** needs `revoke execute ... from public, anon, authenticated`
 and `grant execute ... to service_role` (Supabase makes functions browser-callable by
