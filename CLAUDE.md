@@ -421,7 +421,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
   turns on in their Stripe dashboard should appear. Untested; test purchase + pass + refund in
   the sandbox before pilot, and check Klarna's rules for health services. Webhook ignores
   sessions not `paid` at completion (delayed methods like ACH would need `async_payment_*`).
-- Final product name: **VisitBundle** (visitbundle.com) chosen Oct 24, 2026 after a council
+- Final product name: **VisitBundle** (visitbundle.com, bought on Cloudflare under the business
+  account Oct 24, 2026) chosen after a council
   review; confirmed only after the USPTO search + 3 practitioner reactions (by Nov 7, 2026)
   and the attorney's trademark/patent answers (questions 6-7 in `docs/hosting-options.md`).
   Risk: "bundle" also means fixed-price procedure bundles (MDSave) in cash-pay healthcare.
