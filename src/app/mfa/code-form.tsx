@@ -28,6 +28,15 @@ export function CodeForm({ action, factorId, submitLabel }: Props) {
           className="mt-1 block w-40 rounded-md border border-line bg-surface px-3 py-2 text-lg tracking-widest"
         />
       </label>
+      <label className="flex items-start gap-2 text-sm">
+        <input type="checkbox" name="remember" className="mt-0.5 h-4 w-4 rounded border-line" />
+        <span>
+          Remember this device for 30 days
+          <span className="block text-xs text-ink-muted">
+            Leave unticked on a shared computer: you&apos;ll be signed out after 12 hours.
+          </span>
+        </span>
+      </label>
       {state.error && (
         <p role="alert" className="text-sm text-red-600">
           {state.error}

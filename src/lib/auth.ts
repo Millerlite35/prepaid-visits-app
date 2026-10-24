@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
+import { sessionExpired } from "@/lib/session-trust";
 import { createSessionClient } from "@/lib/supabase/server";
 
 export type StaffUser = { id: string; email: string };
@@ -28,6 +29,8 @@ export async function requireUser(): Promise<StaffUser> {
     const { data } = await supabase.auth.mfa.listFactors();
     redirect((data?.totp.length ?? 0) > 0 ? "/mfa/verify" : "/mfa/setup");
   }
+  // 12 hours after the code, or 30 days on a remembered device (src/lib/session-trust.ts)
+  if (await sessionExpired(claims)) redirect("/auth/expired");
   return toUser(claims);
 }
 

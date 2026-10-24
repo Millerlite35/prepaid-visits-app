@@ -108,13 +108,16 @@ Files in `supabase/migrations/`, run in order:
     HIPAA, preview branch) match it, since Supabase stops auto-granting new tables on Oct 30.
     Only needs running on a new project, after 0001-0017.
 
+19. `0019_session_trust.sql`: `session_trust` (server-only; one row per Supabase session_id:
+    did the person tick "Remember this device" when entering their code). Explicit grants.
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
 `staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`,
-`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql`, `api_grants_test.sql`
+`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql`, `api_grants_test.sql`, `session_trust_test.sql`
 in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
@@ -329,9 +332,14 @@ default), plus a privilege check in `provider_setup_test.sql`.
   `SUPPORT_EMAIL` with reply-to = the sender. Form warns: no client health details.
 - Two-step at every sign-in on a new device is intentional. The founder WANTS all three
   ways to lighten it (decided Oct 2026): passkeys (check Supabase Auth's WebAuthn support
-  when built), Face ID/fingerprint in the store app (step 14), and "remember this device
-  for 30 days". Remember-device must not weaken migration 0004 (the DB requires `aal2`),
-  so design it carefully, not as a cookie that skips the code.
+  when built), Face ID/fingerprint in the store app (step 14), and "remember this device".
+- Remember this device (built Oct 2026, `src/lib/session-trust.ts`): a checkbox on the code
+  form. It never skips the code: it decides how long the two-step session LASTS, measured
+  from the `totp` timestamp in the login token's `amr` claim: 30 days if ticked, 12 hours
+  if not (before this, sessions lasted ~400 days). `requireUser` checks it on every request
+  (one DB read, cached per request) and sends expired sessions to `/auth/expired` (route
+  handler: signs out only if really expired) -> `/login?expired=1`. Signing out always means
+  password + code again; migration 0004 (aal2) is untouched.
 
 ## Design system (Oct 2026)
 - Tokens in `src/app/globals.css`: `canvas` (page background), `surface` / `surface-muted`

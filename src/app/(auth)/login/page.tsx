@@ -30,9 +30,17 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
   );
 }
 
-// After a backup code was used (see /mfa/recover)
+// After a backup code was used (see /mfa/recover), or a sign-in ran out (/auth/expired)
 async function RecoveredNotice({ searchParams }: Pick<PageProps<"/login">, "searchParams">) {
-  if ((await searchParams).recovered !== "1") return null;
+  const params = await searchParams;
+  if (params.expired === "1") {
+    return (
+      <p role="status" className="mt-4 rounded-md bg-surface-muted p-3 text-sm text-ink">
+        For security, you were signed out. Sign in again to continue.
+      </p>
+    );
+  }
+  if (params.recovered !== "1") return null;
   return (
     <p role="status" className="mt-4 rounded-md bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
       Backup code accepted and your old authenticator was removed. Sign in again, then set up your new phone.

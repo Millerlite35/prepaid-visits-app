@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
 import { redeemBackupCode, removeAuthenticator, unusedBackupCodeCount } from "@/lib/backup-codes";
+import { saveRemember, wantsRemember } from "@/lib/session-trust";
 import { createSessionClient } from "@/lib/supabase/server";
 
 export type EnrollState = { factorId?: string; qrCode?: string; secret?: string; error?: string };
@@ -52,8 +53,9 @@ export async function confirmEnrollment(_prev: CodeState, formData: FormData): P
   if (!factorId || !code) return { error: "Enter the 6-digit code from your app." };
 
   const supabase = await createSessionClient();
-  const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
+  const { data, error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
   if (error) return { error: BAD_CODE };
+  await rememberChoice(data.access_token, wantsRemember(formData));
   redirect("/dashboard/security?setup=1"); // next: make backup codes
 }
 
@@ -68,12 +70,20 @@ export async function verifySignIn(_prev: CodeState, formData: FormData): Promis
   const factor = data?.totp[0];
   if (listError || !factor) redirect("/mfa/setup");
 
-  const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+  const { data: verified, error } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
   if (error) {
     console.warn("two-step sign-in failed:", error.code, error.message, `(${data.totp.length} factor(s))`);
     return { error: BAD_CODE };
   }
+  await rememberChoice(verified.access_token, wantsRemember(formData));
   redirect("/dashboard");
+}
+
+// "Remember this device": saved against the new (two-step) session's id
+async function rememberChoice(accessToken: string, remember: boolean): Promise<void> {
+  const supabase = await createSessionClient();
+  const { data } = await supabase.auth.getClaims(accessToken);
+  if (data?.claims) await saveRemember(data.claims, remember);
 }
 
 function readCode(formData: FormData): string | null {
