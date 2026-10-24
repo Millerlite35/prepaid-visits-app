@@ -29,7 +29,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   // logo uploads are up to 1 MB; leave room for the rest of the form
-  experimental: { serverActions: { bodySizeLimit: "2mb" } },
+  // agentUpgrade: set by `next upgrade --agent=security` (security-only update track)
+  experimental: { serverActions: { bodySizeLimit: "2mb" }, agentUpgrade: "security" },
   turbopack: {
     rules: {
       "*.css": {
