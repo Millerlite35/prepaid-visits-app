@@ -86,6 +86,13 @@ subscription price in the business plan matters a lot here.
    the provider.)
 5. Can we pilot with non-clinical providers on setup A, and add the BAA setup before
    onboarding any clinician?
+6. Name "VisitBundle" (visitbundle.com): can we use and register it? It is fairly
+   descriptive, so is the main register realistic, or the supplemental register? Anything
+   close in classes 9/42 (software) or 44 (health services)?
+7. MDSave holds patents on "prepaid healthcare bundles" (e.g. US 11,367,115, US 11,315,160:
+   a marketplace that splits one payment across several providers). Our model is one
+   provider selling its own prepaid visits, paid directly to its Stripe account. Is a
+   patent review worth doing before launch?
 
 ## Before any real client data (whichever setup)
 - Signed BAAs with every vendor that touches client data (database, app host, email).
