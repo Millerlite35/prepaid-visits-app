@@ -417,6 +417,10 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Lost authenticator phone WITHOUT backup codes: manual (confirm identity, then delete the
   factor in Supabase > Authentication > Users). Decide the identity check before pilot.
 - Shared front-desk devices for scan_only staff: two-step may need a different approach.
+- Pay over time (Klarna etc.): Checkout sets no `payment_method_types`, so methods the provider
+  turns on in their Stripe dashboard should appear. Untested; test purchase + pass + refund in
+  the sandbox before pilot, and check Klarna's rules for health services. Webhook ignores
+  sessions not `paid` at completion (delayed methods like ACH would need `async_payment_*`).
 - Final product name (placeholder: Visit Pack). Needed before Apple pass setup and the
   Stripe platform name.
 - Hosting provider with BAA: options, prices (Oct 2026) and attorney questions in

@@ -119,7 +119,8 @@ function createProviderSurvey() {
     .setHelpText(
       'You set up your packages (for example 5 visits for $360 instead of $400). Clients buy ' +
         'on your own branded page and pay by card; the money goes straight to your Stripe ' +
-        'account. They get a QR pass by email. At each visit you scan it, and it shows the ' +
+        'account. Clients can also choose to pay over time (for example with Klarna), while ' +
+        'you are paid in full up front. They get a QR pass by email. At each visit you scan it, and it shows the ' +
         'visits left. Also: printable QR cards for clients without smartphones, flyers and ' +
         'counter signs with your QR code, refunds, and staff accounts.'
     );
@@ -138,6 +139,7 @@ function createProviderSurvey() {
       'Phone pass with QR code',
       'Printed QR cards for clients',
       'Self check-in screen at the front desk',
+      'Clients can pay over time (e.g. Klarna)',
       'Flyers and signs to promote packages',
       'Seeing prepaid income and visits in one place',
     ])
