@@ -425,7 +425,11 @@ default), plus a privilege check in `provider_setup_test.sql`.
   review; confirmed only after the USPTO search + 3 practitioner reactions (by Nov 7, 2026)
   and the attorney's trademark/patent answers (questions 6-7 in `docs/hosting-options.md`).
   Risk: "bundle" also means fixed-price procedure bundles (MDSave) in cash-pay healthcare.
-  Until confirmed, `src/config/brand.ts` keeps the placeholder (Visit Pack). Needed before Apple pass setup and the
+  Until confirmed, `src/config/brand.ts` keeps the placeholder (Visit Pack).
+- Domain layout (decide BEFORE pilot: purchase-page URLs get printed into QR codes on flyers,
+  signs and cards): likely marketing site on `visitbundle.com` (founder's Lovable, under the
+  business account, never the practice's) and this app on `app.visitbundle.com`. No tracking
+  pixels/analytics on app pages; no "HIPAA compliant" claims on the marketing site. Needed before Apple pass setup and the
   Stripe platform name.
 - Hosting provider with BAA: options, prices (Oct 2026) and attorney questions in
   `docs/hosting-options.md`. Recommended: free Vercel Hobby + current Supabase now (fake data
