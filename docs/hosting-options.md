@@ -88,7 +88,10 @@ subscription price in the business plan matters a lot here.
    onboarding any clinician?
 6. Name "VisitBundle" (visitbundle.com): can we use and register it? It is fairly
    descriptive, so is the main register realistic, or the supplemental register? Anything
-   close in classes 9/42 (software) or 44 (health services)?
+   close in classes 9/42 (software) or 44 (health services)? Our USPTO check (Oct 24, 2026):
+   no "VisitBundle" / "Visit Bundle" marks. Nearby live marks: BUNDL (Inception Fertility
+   Ventures, class 36, discount fertility treatment brokerage), BUNDL (CA, Inc., class 9
+   software), BUNDL (Bundl Holding, classes 35/41/42), ONDEMAND VISIT (class 9 medical software).
 7. MDSave holds patents on "prepaid healthcare bundles" (e.g. US 11,367,115, US 11,315,160:
    a marketplace that splits one payment across several providers). Our model is one
    provider selling its own prepaid visits, paid directly to its Stripe account. Is a
