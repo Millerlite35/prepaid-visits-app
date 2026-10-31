@@ -30,6 +30,9 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
   const [mode, setMode] = useState<"scanner" | "camera">("scanner");
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
+  // "user" = the camera facing the person at the screen; "environment" = the back camera
+  const [facing, setFacing] = useState<"user" | "environment">("user");
+  const [streamVersion, setStreamVersion] = useState(0); // a new camera stream restarts the reader
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const lastCameraCodeRef = useRef({ code: "", at: 0 });
@@ -145,9 +148,30 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
     return () => {
       stopped = true;
     };
-  }, [started, mode, submit]);
+  }, [started, mode, submit, streamVersion]);
 
   useEffect(() => () => streamRef.current?.getTracks().forEach((t) => t.stop()), []);
+
+  function openCamera(which: "user" | "environment") {
+    return navigator.mediaDevices.getUserMedia({
+      // ask for a sharp picture: webcams often default to a low resolution that blurs QR codes
+      video: { facingMode: which, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false,
+    });
+  }
+
+  // front <-> back camera (phones and tablets; a laptop with one webcam just keeps it)
+  async function switchCamera() {
+    const next = facing === "user" ? "environment" : "user";
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    try {
+      streamRef.current = await openCamera(next);
+      setFacing(next);
+    } catch {
+      streamRef.current = await openCamera(facing).catch(() => null); // back to the one that worked
+    }
+    setStreamVersion((v) => v + 1);
+  }
 
   async function start(chosen: "scanner" | "camera") {
     try {
@@ -159,12 +183,7 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
     if (chosen === "camera") {
       setStarting(true);
       try {
-        // "user" = the camera facing the person at the screen (laptop webcam, tablet front camera)
-        streamRef.current = await navigator.mediaDevices.getUserMedia({
-          // ask for a sharp picture: webcams often default to a low resolution that blurs QR codes
-          video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: false,
-        });
+        streamRef.current = await openCamera(facing);
       } catch (e) {
         setStarting(false);
         setCameraError(cameraErrorMessage(e, "Couldn't start the camera."));
@@ -220,20 +239,22 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
   }
 
   return (
-    <main className="relative flex flex-1 flex-col items-center justify-center theme-light bg-white px-6 py-10 text-center text-ink select-none">
-      <div className="absolute top-8 flex flex-col items-center">
+    <main className="relative flex flex-1 flex-col items-center theme-light bg-white px-6 pt-8 pb-16 text-center text-ink select-none">
+      {/* in the page flow (not pinned), so a long name wrapping to two lines pushes the rest down */}
+      <div className="flex flex-col items-center">
         {/* eslint-disable-next-line @next/next/no-img-element -- provider-uploaded logo from storage */}
         {logo && <img src={logo} alt="" className="mb-2 max-h-20 max-w-[260px] object-contain" />}
-        <p className="text-2xl font-semibold" style={{ color }}>
+        <p className="text-xl leading-tight font-semibold text-balance sm:text-2xl" style={{ color }}>
           {name}
         </p>
       </div>
 
+      <div className="flex w-full flex-1 flex-col items-center justify-center pt-6">
       <div role="status" aria-live="polite" className="w-full max-w-2xl">
         {result === null && (
           <>
-            <p className="text-5xl font-semibold">Welcome!</p>
-            <p className="mt-6 text-2xl text-ink-muted">
+            <p className="text-4xl font-semibold sm:text-5xl">Welcome!</p>
+            <p className="mt-4 text-xl text-balance text-ink-muted sm:mt-6 sm:text-2xl">
               {mode === "camera"
                 ? "Hold your pass QR code up to the camera to check in."
                 : "Hold your pass QR code under the scanner to check in."}
@@ -248,15 +269,21 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
       </div>
 
       {mode === "camera" && (
-        // mirrored, so moving the phone feels natural; reading the code isn't affected
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          aria-label="Camera"
-          className="mt-8 aspect-[4/3] w-full max-w-sm -scale-x-100 rounded-xl bg-black object-cover"
-        />
+        <>
+          {/* front camera mirrored, so moving the phone feels natural; reading the code isn't affected */}
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            aria-label="Camera"
+            className={`mt-8 aspect-[4/3] w-full max-w-sm rounded-xl bg-black object-cover ${facing === "user" ? "-scale-x-100" : ""}`}
+          />
+          <button type="button" onClick={switchCamera} className="mt-3 text-sm text-ink-muted underline">
+            {facing === "user" ? "Use the back camera" : "Use the front camera"}
+          </button>
+        </>
       )}
+      </div>
 
       <div className="absolute right-4 bottom-4 text-sm text-ink-muted">
         {askExit ? (
