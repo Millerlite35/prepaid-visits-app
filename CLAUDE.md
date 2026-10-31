@@ -477,10 +477,16 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Hosting provider with BAA: options, prices (Oct 2026) and attorney questions in
   `docs/hosting-options.md`. Recommended: free Vercel Hobby + current Supabase now (fake data
   only, gives real https links); BAA setup chosen after the attorney answers.
+  **Preferred HIPAA route (Oct 31, 2026): AWS (setup D in `docs/hosting-options.md`)**, about
+  $30-60/month (+ safety extras $60-100), BAA free in AWS Artifact, no setup fee. RDS Postgres,
+  Amplify Hosting (NOT App Runner: not confirmed HIPAA-eligible), Cognito (logins + TOTP), SES,
+  S3, KMS. Costs a one-time ~8-12 session rebuild (Supabase Auth/DB, Resend, Vercel go away);
+  do it only after demand is proven. No NAT gateway.
 - Market (decided Oct 2026): doctors and therapists first, yoga/wellness instructors after.
-  So plan on a BAA setup (B or C in `docs/hosting-options.md`) before the pilot, unless the
-  attorney says the first (cash-pay) providers aren't covered entities. Consider a
-  higher-priced "healthcare" tier to cover the ~$1,100+/month fixed HIPAA cost.
+  So plan on a BAA setup (AWS, setup D) before the pilot, unless the attorney says the first
+  (cash-pay) providers aren't covered entities. The founder is also weighing a studio-first
+  30-day social media test (no BAA likely needed; confirm with the attorney) to prove demand
+  before the AWS move. The old ~$1,100+/month figure applies only to Supabase/Vercel HIPAA plans.
 
 ## Working style
 - Make small, testable steps. After each step, say what to run to check it works.

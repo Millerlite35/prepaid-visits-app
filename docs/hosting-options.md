@@ -57,7 +57,36 @@ keeps Supabase.
 | **About per month** | **$50-70** | **$1,100-1,250** | **$1,350-1,500** |
 | Clinicians' real clients? | Only if the attorney says no BAA is needed | Yes | Yes |
 
-The fixed HIPAA cost is about $1,100+/month whoever the clients are. At the current 1%
+**D. HIPAA on AWS (added Oct 31, 2026; the founder's preferred route, after demand is proven).**
+About **$30-60/month** to start, **$60-100** with the safety extras. The catch is a one-time
+rebuild of the plumbing (~8-12 sessions), not money. Checked against sources Oct 31, 2026:
+
+| Part | AWS service | HIPAA-eligible | About per month |
+|---|---|---|---|
+| Database | RDS Postgres db.t4g.micro + 20 GB + backups | Yes | ~$12 + ~$2-3 storage; ~$23 + storage with a standby (Multi-AZ) |
+| App hosting | Amplify Hosting (listed as "AWS Amplify Console") | Yes | ~$5-25 |
+| Staff logins + two-step (TOTP) | Cognito Essentials | Yes | $0 up to 10,000 monthly users (free tier doesn't expire) |
+| Email | SES (set "require TLS") | Yes | ~$0.10 per 1,000 emails |
+| Logos | S3 | Yes | < $1 |
+| Keys / secrets | KMS + Secrets Manager | Yes | ~$2-5 |
+| Logs / audit trail | CloudWatch + CloudTrail | Yes | ~$2-5 |
+| Firewall (recommended before real data) | WAF | Yes | ~$6-10 |
+| BAA | accepted in AWS Artifact | n/a | $0, no setup fee, no paid support plan needed |
+
+- **App Runner is NOT confirmed** on AWS's HIPAA list: don't use it. Verify that Amplify supports
+  Next.js 16 server features; if not, ECS Fargate (eligible, ~$10-30/month) instead.
+- **Avoid a NAT gateway** (~$32/month on its own, the classic surprise bill) and long CPU bursts
+  on the t4g database (billed extra in Unlimited mode).
+- Eligible services alone don't make the app compliant: encryption on, access logging, least-
+  privilege permissions, a written risk assessment and basic policies are still needed.
+- Account: sign up with shadowmodeco@gmail.com, two-step on, a billing alert (e.g. $50).
+  New accounts usually get free credits for the first months. Confirm totals in the AWS
+  pricing calculator before committing.
+- Sources: AWS HIPAA eligible services reference (aws.amazon.com/compliance/hipaa-eligible-
+  services-reference), AWS Security Blog on the self-service BAA, AWS Cognito pricing page,
+  RDS price aggregators (Holori, InfraTally).
+
+The fixed HIPAA cost of setups B/C is about $1,100+/month whoever the clients are. At the current 1%
 platform fee, that takes roughly **$110,000 of package sales a month** to cover. The
 subscription price in the business plan matters a lot here.
 
