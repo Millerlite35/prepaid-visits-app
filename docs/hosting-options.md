@@ -82,6 +82,14 @@ rebuild of the plumbing (~8-12 sessions), not money. Checked against sources Oct
 - Account: sign up with shadowmodeco@gmail.com, two-step on, a billing alert (e.g. $50).
   New accounts usually get free credits for the first months. Confirm totals in the AWS
   pricing calculator before committing.
+- **Break-even at the 1% platform fee:** $30-60/month needs about **$3,000-6,000 of package
+  sales a month**; $60-100 with the safety extras needs about **$6,000-10,000** (vs ~$110,000
+  for setups B/C). Fee income only; subscription pricing would lower this further.
+- **Considered and rejected (Oct 31, 2026): self-hosting the open-source Supabase stack** (auth,
+  data API, storage) on AWS servers. It would keep the current code, but means running and
+  patching servers alone indefinitely. Decision: rebuild on Cognito and other managed services.
+- The independent security review must cover the AWS configuration and the rebuilt login/
+  two-step code before any real client data touches it.
 - Sources: AWS HIPAA eligible services reference (aws.amazon.com/compliance/hipaa-eligible-
   services-reference), AWS Security Blog on the self-service BAA, AWS Cognito pricing page,
   RDS price aggregators (Holori, InfraTally).
@@ -125,10 +133,16 @@ subscription price in the business plan matters a lot here.
    a marketplace that splits one payment across several providers). Our model is one
    provider selling its own prepaid visits, paid directly to its Stripe account. Is a
    patent review worth doing before launch?
+8. Referral payouts: if we pay providers (or anyone) for referring other providers, do
+   fee-splitting or anti-kickback rules apply in healthcare? What structure is safe?
+9. State laws on prepaid services: do expiry dates, refund rules or unclaimed-property
+   (escheat) laws apply to unused prepaid visits? Whose obligation is it, ours or the
+   provider's, given the money goes straight to the provider's Stripe account?
 
 ## Before any real client data (whichever setup)
 - Signed BAAs with every vendor that touches client data (database, app host, email).
 - Supabase HIPAA project settings on; region chosen (hard to move later).
 - A verified email domain (needs the final product name).
 - Attorney-reviewed terms and privacy policy.
-- The independent security review (CLAUDE.md "Who is building").
+- The independent security review (CLAUDE.md "Who is building"); on setup D it also covers
+  the AWS configuration and the rebuilt login/two-step code.
