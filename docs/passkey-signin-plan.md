@@ -1,6 +1,8 @@
 # Plan: sign in with a passkey alone (no password, no 6-digit code)
 
-Status: **stage 1 built (Nov 1, 2026); stage 2 waits for the founder's go-ahead.**
+Status: **stage 1 built and tested on the live site (Oct 31, 2026); stage 2 waits for the founder's go-ahead.**
+Measured: a Supabase passkey sign-in's token says `aal: "aal1"`, `amr: [{ method: "passkey" }]` (three sign-ins,
+Vercel logs "passkey sign-in token:"). Stage 2 matches the `passkey` method.
 For the independent security review: this changes the rule that protects all provider data.
 
 ## Why one passkey is enough
