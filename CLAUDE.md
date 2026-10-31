@@ -485,6 +485,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   Amplify Hosting (NOT App Runner: not confirmed HIPAA-eligible), Cognito (logins + TOTP), SES,
   S3, KMS. Costs a one-time ~8-12 session rebuild (Supabase Auth/DB, Resend, Vercel go away);
   do it only after demand is proven. No NAT gateway.
+  Self-hosting the Supabase stack on AWS was considered and rejected (Oct 31, 2026: ongoing
+  server upkeep for a solo founder). Break-even (~$3-10k sales/month at 1%), security-review
+  scope and attorney questions 8-9 (referral payouts, state prepaid-services laws) are in the doc.
 - Market (decided Oct 2026): doctors and therapists first, yoga/wellness instructors after.
   So plan on a BAA setup (AWS, setup D) before the pilot, unless the attorney says the first
   (cash-pay) providers aren't covered entities. The founder is also weighing a studio-first
