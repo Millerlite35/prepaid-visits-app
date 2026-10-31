@@ -479,7 +479,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
   Stripe platform name.
 - Hosting provider with BAA: options, prices (Oct 2026) and attorney questions in
   `docs/hosting-options.md`. Recommended: free Vercel Hobby + current Supabase now (fake data
-  only, gives real https links); BAA setup chosen after the attorney answers.
+  only, gives real https links); BAA setup chosen after the attorney answers. Step-by-step for the
+  test deploy (env vars, Supabase redirect URL, hosted Stripe webhook): `docs/hosting-test.md`.
   **Preferred HIPAA route (Oct 31, 2026): AWS (setup D in `docs/hosting-options.md`)**, about
   $30-60/month (+ safety extras $60-100), BAA free in AWS Artifact, no setup fee. RDS Postgres,
   Amplify Hosting (NOT App Runner: not confirmed HIPAA-eligible), Cognito (logins + TOTP), SES,
