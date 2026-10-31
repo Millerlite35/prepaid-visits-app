@@ -1,11 +1,15 @@
 import { Suspense } from "react";
+import type { Viewport } from "next";
 import { BusinessNav, type NavGroup } from "@/components/business-nav";
 import { requireUser, type StaffRole } from "@/lib/auth";
 import { logoUrl } from "@/lib/branding";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { createSessionClient } from "@/lib/supabase/server";
 
-// Every business page gets the sidebar. It only shows links the person's role can use;
+// lets the phone bottom bar read the iPhone home-indicator inset (env(safe-area-inset-bottom))
+export const viewport: Viewport = { viewportFit: "cover" };
+
+// Every business page gets the sidebar (a bottom bar on phones). It only shows links the person's role can use;
 // each page still checks access itself (requireStaff / requireManager / requireOwner).
 export default function BusinessLayout({ children, params }: LayoutProps<"/dashboard/business/[providerId]">) {
   return (
@@ -13,7 +17,8 @@ export default function BusinessLayout({ children, params }: LayoutProps<"/dashb
       <Suspense fallback={<div className="hidden w-64 shrink-0 border-r border-line bg-surface lg:block" />}>
         <Nav params={params} />
       </Suspense>
-      <div className="min-w-0 flex-1">{children}</div>
+      {/* room for the phone bottom bar so it never covers the end of the page */}
+      <div className="min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">{children}</div>
     </div>
   );
 }
@@ -24,8 +29,9 @@ function groupsFor(base: string, providerId: string, role: StaffRole): NavGroup[
     {
       label: "Front desk",
       items: [
-        { href: `${base}/scan`, label: "Scan", icon: "scan" },
-        { href: `/kiosk/${providerId}`, label: "Self check-in", icon: "kiosk", external: true },
+        { href: `${base}/scan`, label: "Scan", icon: "scan", bar: true },
+        // scan-only staff have no other pages, so self check-in gets their second bar spot
+        { href: `/kiosk/${providerId}`, label: "Self check-in", icon: "kiosk", external: true, bar: !manager },
       ],
     },
   ];
@@ -33,9 +39,9 @@ function groupsFor(base: string, providerId: string, role: StaffRole): NavGroup[
     groups.unshift({
       label: "Business",
       items: [
-        { href: base, label: "Overview", icon: "overview" },
-        { href: `${base}/clients`, label: "Clients", icon: "clients" },
-        { href: `${base}/packages`, label: "Packages", icon: "packages" },
+        { href: base, label: "Overview", icon: "overview", bar: true },
+        { href: `${base}/clients`, label: "Clients", icon: "clients", bar: true },
+        { href: `${base}/packages`, label: "Packages", icon: "packages", bar: true },
       ],
     });
     groups.push({

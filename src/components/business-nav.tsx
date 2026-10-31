@@ -1,15 +1,18 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/icons";
 import { cx } from "@/components/ui";
 
-export type NavItem = { href: string; label: string; icon: IconName; external?: boolean };
+// bar: shown in the phone bottom bar (everything else goes under "More")
+export type NavItem = { href: string; label: string; icon: IconName; external?: boolean; bar?: boolean };
 export type NavGroup = { label: string; items: NavItem[] };
 
-// Sidebar on large screens, a scrollable tab strip on phones. The active page is
-// highlighted; the overview only matches its own address, other items their section.
+// Sidebar on large screens; on phones a bottom bar with Scan in the middle and a "More"
+// sheet for the rest. The active page is highlighted; the overview only matches its own
+// address, other items their section.
 export function BusinessNav({ groups, overviewHref, businessName, logo }: { groups: NavGroup[]; overviewHref: string; businessName: string; logo: string | null }) {
   const path = usePathname();
   const active = (href: string) => (href === overviewHref ? path === href : path === href || path.startsWith(`${href}/`));
@@ -17,32 +20,13 @@ export function BusinessNav({ groups, overviewHref, businessName, logo }: { grou
 
   return (
     <>
-      {/* phones and tablets */}
-      <nav aria-label="Business" className="border-b border-line bg-surface lg:hidden print:hidden">
-        <div className="flex items-center gap-2 px-4 pt-3 text-sm font-semibold text-ink">
-          {/* eslint-disable-next-line @next/next/no-img-element -- provider-uploaded logo from storage */}
-          {logo && <img src={logo} alt="" className="h-6 w-auto max-w-[80px] object-contain" />}
-          <span className="truncate">{businessName}</span>
-        </div>
-        <ul className="flex gap-1 overflow-x-auto px-3 py-2">
-          {all.map((item) => (
-            <li key={item.href} className="shrink-0">
-              <Link
-                href={item.href}
-                target={item.external ? "_blank" : undefined}
-                aria-current={active(item.href) ? "page" : undefined}
-                className={cx(
-                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm",
-                  active(item.href) ? "bg-brand/10 font-medium text-brand" : "text-ink-muted hover:bg-surface-muted hover:text-ink",
-                )}
-              >
-                <Icon name={item.icon} className="h-4 w-4" />
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {/* phones and tablets: business name on top, navigation in the bottom bar */}
+      <div className="flex items-center gap-2 border-b border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink lg:hidden print:hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element -- provider-uploaded logo from storage */}
+        {logo && <img src={logo} alt="" className="h-6 w-auto max-w-[80px] object-contain" />}
+        <span className="truncate">{businessName}</span>
+      </div>
+      <BottomBar items={all} active={active} businessName={businessName} />
 
       {/* desktop sidebar */}
       <aside className="hidden w-64 shrink-0 border-r border-line bg-surface lg:block print:hidden">
@@ -83,5 +67,137 @@ export function BusinessNav({ groups, overviewHref, businessName, logo }: { grou
         </div>
       </aside>
     </>
+  );
+}
+
+// Fixed to the bottom of the screen on phones, above the iPhone home indicator
+// (safe-area inset; the business layout sets viewport-fit=cover so the inset is known).
+// Scan sits in the middle as a raised round button; the other bar items split around it.
+function BottomBar({ items, active, businessName }: { items: NavItem[]; active: (href: string) => boolean; businessName: string }) {
+  const [open, setOpen] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const scan = items.find((i) => i.bar && i.icon === "scan");
+  const sides = items.filter((i) => i.bar && i !== scan);
+  const rest = items.filter((i) => !i.bar);
+  const moreActive = rest.some((i) => active(i.href));
+  const half = Math.ceil((sides.length + 1) / 2);
+  const left = sides.slice(0, half);
+  const right = sides.slice(half);
+
+  // Escape closes the sheet; the page behind doesn't scroll while it's open
+  useEffect(() => {
+    if (!open) return;
+    sheetRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const tab = (isActive: boolean) =>
+    cx(
+      "flex min-w-0 flex-1 flex-col items-center gap-0.5 pt-2 pb-1.5 text-[11px] leading-tight",
+      isActive ? "font-semibold text-ink" : "text-ink-muted",
+    );
+
+  return (
+    <>
+      <nav
+        aria-label="Business"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
+      >
+        <ul className="mx-auto flex max-w-md items-end px-1">
+          {left.map((item) => (
+            <li key={item.href} className="flex flex-1">
+              <BarLink item={item} className={tab(active(item.href))} current={active(item.href)} />
+            </li>
+          ))}
+          {scan && (
+            <li className="flex flex-1 justify-center">
+              <Link
+                href={scan.href}
+                aria-current={active(scan.href) ? "page" : undefined}
+                className={cx(
+                  "flex flex-col items-center gap-0.5 pb-1.5 text-[11px] leading-tight",
+                  active(scan.href) ? "font-semibold text-ink" : "text-ink-muted",
+                )}
+              >
+                <span className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white ring-4 ring-surface">
+                  <Icon name="scan" className="h-6 w-6" />
+                </span>
+                {scan.label}
+              </Link>
+            </li>
+          )}
+          {right.map((item) => (
+            <li key={item.href} className="flex flex-1">
+              <BarLink item={item} className={tab(active(item.href))} current={active(item.href)} />
+            </li>
+          ))}
+          <li className="flex flex-1">
+            <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open} className={tab(moreActive)}>
+              <Icon name="more" className="h-6 w-6" />
+              More
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/40 lg:hidden" onClick={() => setOpen(false)}>
+          <div
+            ref={sheetRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="More pages"
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+            className="rounded-t-xl bg-surface px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] outline-none"
+          >
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <p className="truncate text-sm font-semibold text-ink">{businessName}</p>
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="rounded-md p-2 text-ink-muted hover:bg-surface-muted hover:text-ink">
+                <Icon name="close" className="h-5 w-5" />
+              </button>
+            </div>
+            <ul className="divide-y divide-line">
+              {rest.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    target={item.external ? "_blank" : undefined}
+                    aria-current={active(item.href) ? "page" : undefined}
+                    onClick={() => setOpen(false)}
+                    className={cx("flex items-center gap-3 py-3 text-base", active(item.href) ? "font-semibold text-ink" : "text-ink")}
+                  >
+                    <Icon name={item.icon} className="h-5 w-5 text-ink-muted" />
+                    <span className="flex-1">{item.label}</span>
+                    {item.external && <Icon name="external" className="h-4 w-4 text-ink-muted" />}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/dashboard" onClick={() => setOpen(false)} className="flex items-center gap-3 py-3 text-base text-ink-muted">
+                  <Icon name="back" className="h-5 w-5" />
+                  All businesses
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function BarLink({ item, className, current }: { item: NavItem; className: string; current: boolean }) {
+  return (
+    <Link href={item.href} target={item.external ? "_blank" : undefined} aria-current={current ? "page" : undefined} className={className}>
+      <Icon name={item.icon} className="h-6 w-6" />
+      <span className="max-w-full truncate">{item.label}</span>
+    </Link>
   );
 }

@@ -368,8 +368,12 @@ default), plus a privilege check in `provider_setup_test.sql`.
   pills and dots. No drop shadow under staff panels (border only). Group related content in one panel
   with `divide-y` sections instead of a card each (see the client page: 3 panels, balance in the header).
 - Staff shell: `dashboard/layout.tsx` (sticky top bar on the canvas); business pages get a
-  role-aware sidebar (`dashboard/business/[providerId]/layout.tsx` + `components/business-nav.tsx`,
-  a tab strip on phones). The sidebar is a convenience: pages still check access themselves.
+  role-aware sidebar (`dashboard/business/[providerId]/layout.tsx` + `components/business-nav.tsx`).
+  On phones (below `lg`) it's a fixed bottom bar instead: items with `bar: true` (managers: Overview,
+  Clients, Scan, Packages; scan_only: Scan, Self check-in), Scan as the raised round middle button, and
+  "More" opening a sheet with the rest + All businesses. The layout sets `viewportFit: "cover"` and pads
+  pages by `5rem + env(safe-area-inset-bottom)` so the bar clears the iPhone home indicator and never
+  covers content. The sidebar/bar is a convenience: pages still check access themselves.
 - Client pages (purchase, thank-you, pass) use `src/components/client-shell.tsx`
   (`ClientShell`, `ClientCard` with the provider-colour top bar, `ClientHeader`); office
   contact in the footer except on the pass page (kept discreet).
