@@ -290,8 +290,7 @@ export function TermsForm({
     <form action={formAction} className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-ink-muted">
-          Version {version}. Each saved change becomes a new version, and every sale records
-          which version the client accepted.
+          Version {version}. Every sale records the version the client accepted.
         </p>
         {askReplace ? (
           <span className="inline-flex flex-wrap items-center gap-3 rounded-md bg-warning-soft p-2 text-sm text-warning">
@@ -356,7 +355,7 @@ export function ContactForm({
         <span className="text-sm font-medium">Website</span>
         <input name="website" defaultValue={initial.website ?? ""} maxLength={100} autoCapitalize="none" spellCheck={false} placeholder="yourpractice.com" className={inputClass} />
       </label>
-      <p className="text-xs text-ink-muted">All optional. Leave a box empty to leave it off.</p>
+      <p className="text-xs text-ink-muted">All optional.</p>
       <Result state={state} pending={pending} />
       <SaveButton pending={pending} />
     </form>

@@ -381,7 +381,14 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (`ClientShell`, `ClientCard` with the provider-colour top bar, `ClientHeader`); office
   contact in the footer except on the pass page (kept discreet).
 - Sign-in, sign-up, password and two-step pages use `src/components/auth-frame.tsx` (from the
-  (auth) and mfa layouts). Older pages were moved onto the tokens with a class-for-class pass;
+  (auth) and mfa layouts): on wide screens a navy brand panel (wordmark, a decorative pass sketch with
+  punch dots, `brand.tagline`, one privacy line) and the form on plain white; on phones the wordmark
+  above the form. Pages keep their own `<main>`; the frame strips its padding.
+- Focus: one global `:focus-visible` outline in `globals.css` (`--focus-ring`: navy, light green in dark
+  mode). Don't remove outlines; only use `outline-none` where a custom focus style replaces it.
+- Copy (Oct 31, 2026, audit step 5): helper lines only where a mistake costs money or access (refunds,
+  cancelling passes, roles, terms, prices, expiry rules); everything else is short or goes in the Help FAQ.
+- Older pages were moved onto the tokens with a class-for-class pass;
   new or reworked pages should use the `ui.tsx` components directly.
 
 ## Flyers, signs and QR cards (steps 10 and 13a)

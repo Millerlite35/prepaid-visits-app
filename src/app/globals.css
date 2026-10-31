@@ -25,6 +25,8 @@
   /* the wordmark's two colours (src/components/wordmark.tsx) */
   --wordmark-1: var(--brand-primary);
   --wordmark-2: var(--brand-accent);
+  /* keyboard focus outline (base layer below) */
+  --focus-ring: var(--brand-primary);
 }
 
 @theme inline {
@@ -99,6 +101,7 @@
     --danger-line: #7a2a22;
     --wordmark-1: #ffffff;
     --wordmark-2: var(--brand-accent-on-dark);
+    --focus-ring: var(--brand-accent-on-dark);
   }
 }
 
@@ -114,5 +117,10 @@ body {
   h1 {
     font-family: var(--font-display), Georgia, serif;
     font-optical-sizing: auto;
+  }
+  /* one visible focus outline for keyboard users and front-desk scanners, everywhere */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
   }
 }

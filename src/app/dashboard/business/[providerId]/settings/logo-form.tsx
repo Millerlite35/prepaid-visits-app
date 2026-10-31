@@ -49,7 +49,7 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
           className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-2"
         />
         <p className="text-xs text-ink-muted">
-          PNG, JPG or WebP, up to 1 MB. A wide logo on a transparent or white background works best.
+          PNG, JPG or WebP, up to 1 MB.
         </p>
         {problem && <p className="text-sm text-danger">{problem}</p>}
         {!pending && state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}

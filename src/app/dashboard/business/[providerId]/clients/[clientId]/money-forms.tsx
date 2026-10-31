@@ -151,7 +151,7 @@ export function AdjustForm({ action, plural }: { action: Action; plural: string 
         {pending ? "Saving…" : "Save change"}
       </button>
       <p className="text-xs text-ink-muted">
-        For corrections and goodwill. No money moves. The reason is kept in the client&apos;s history.
+        No money moves. The reason is kept in the client&apos;s history.
       </p>
       <Result state={state} pending={pending} />
     </form>

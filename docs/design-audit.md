@@ -81,7 +81,7 @@ should re-check these findings with it (see "Next session" at the bottom).
    radii everywhere, overview stats and the client page; other pages still use one card per section.
 4. Icons instead of typed symbols; skeletons instead of "Loading…"; retire the `/` page. **Done Oct 31**
    (plus a phone bottom bar with Scan in the middle).
-5. Sign-in/two-step pages; copy trim.
+5. Sign-in/two-step pages; copy trim. **Done Oct 31** (plus a global keyboard focus outline).
 6. Brand switch to navy/green + wordmark (after the name is confirmed).
 
 ## Next session: how to start it

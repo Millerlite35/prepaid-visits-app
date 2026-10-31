@@ -284,7 +284,6 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         <Card
           title="Expiring in the next 30 days"
-          description={`A friendly reminder now can save a client from losing ${many}.`}
           actions={expiring.length > 0 ? <Badge tone="warning">{expiring.length}</Badge> : undefined}
         >
           {expiring.length === 0 ? (

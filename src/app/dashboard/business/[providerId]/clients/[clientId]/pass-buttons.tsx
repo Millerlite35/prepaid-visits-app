@@ -28,7 +28,6 @@ export function PassButtons({ resend, reissue, hasPass }: { resend: Action; reis
             {resending ? "Sending…" : "Resend pass email"}
           </button>
         </form>
-        <p className="mt-1 text-xs text-ink-muted">For a client who can&apos;t find their email. Same pass, same code.</p>
         <Result state={resendState} />
       </div>
 

@@ -64,8 +64,7 @@ export function NewPasswordForm({ needsCode }: { needsCode: boolean }) {
             className={`${inputClass} w-56 text-lg tracking-widest`}
           />
           <span className="mt-1 block text-xs text-ink-muted">
-            This proves it&apos;s really you, even if someone else got into your email. Lost your phone?
-            Enter one of your backup codes here instead.
+            Lost your phone? Enter a backup code instead.
           </span>
         </label>
       )}

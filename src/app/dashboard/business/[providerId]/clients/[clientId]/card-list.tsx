@@ -40,8 +40,7 @@ export function CardList({ cards }: { cards: Card[] }) {
         </ul>
       )}
       <p className="mt-2 text-xs text-ink-muted">
-        To give them a card: scan a new, unused card on the Scan page and choose this client. Lost card? Cancel it here,
-        then link a new one.
+        To add a card, scan a new one on the Scan page.
       </p>
     </>
   );

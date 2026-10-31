@@ -10,7 +10,7 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Sign in</h1>
-      <p className="mt-1 text-sm text-ink-muted">For providers and their staff.</p>
+      <p className="mt-1 text-sm text-ink-muted">For practices and their staff.</p>
       <Suspense>
         <RecoveredNotice searchParams={searchParams} />
       </Suspense>

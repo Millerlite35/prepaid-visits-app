@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { packagePresets } from "@/config/package-presets";
-import { MAX_DISCOUNT_PERCENT, describeExpiry, formatCents, parseDiscount, parseMoneyToCents, presetPriceCents } from "@/lib/packages";
+import { describeExpiry, formatCents, parseDiscount, parseMoneyToCents, presetPriceCents } from "@/lib/packages";
 import type { PackageFormState } from "./actions";
 
 type Props = {
@@ -65,7 +65,7 @@ export function QuickStart({ action, vocabSingular, vocabPlural, usualPriceCents
             </div>
           );
         })}
-        <p className="text-xs text-ink-muted">Change any % off (0 to {MAX_DISCOUNT_PERCENT}). Prices round to whole dollars.</p>
+        <p className="text-xs text-ink-muted">Prices round to whole dollars.</p>
       </fieldset>
 
       {state.error && (
@@ -76,7 +76,6 @@ export function QuickStart({ action, vocabSingular, vocabPlural, usualPriceCents
       <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Adding…" : "Add selected packages"}
       </button>
-      <p className="text-xs text-ink-muted">You can rename or change any of these after adding them.</p>
     </form>
   );
 }

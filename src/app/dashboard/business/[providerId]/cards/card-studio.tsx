@@ -259,8 +259,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
               <QrCard b={brand} qr={cards[0]?.qrDataUrl ?? sampleQr} s={s} />
             </div>
             <p className="max-w-[3.5in] text-xs text-ink-muted">
-              Shown at real size. Only your business, the label and a QR code are printed: nothing about the client, so a lost
-              card reveals nothing. Link a card to a client by scanning it the first time.
+              Shown at real size. Nothing about the client is printed.
             </p>
           </div>
         )}

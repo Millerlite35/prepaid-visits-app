@@ -151,7 +151,7 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
           </span>
         </label>
         <p className="min-w-[12rem] flex-1 text-xs text-ink-muted">
-          Type a % off to work out the price, or type the price yourself. Only the price is saved.
+          Only the price is saved.
           {!usualPriceCents && " Tip: set your regular price in Page settings so it fills in here."}
         </p>
       </div>
