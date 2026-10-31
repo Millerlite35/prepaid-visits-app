@@ -26,6 +26,12 @@ const nextConfig: NextConfig = {
   },
   // no Next.js badge in the corner during development (it shows up in demo recordings)
   devIndicators: false,
+  // the app icons read Figtree's font files at request time (src/lib/app-icon.tsx)
+  outputFileTracingIncludes: {
+    "/icon": ["./node_modules/@fontsource/figtree/files/figtree-latin-*-normal.woff"],
+    "/apple-icon": ["./node_modules/@fontsource/figtree/files/figtree-latin-*-normal.woff"],
+    "/app-icon/*": ["./node_modules/@fontsource/figtree/files/figtree-latin-*-normal.woff"],
+  },
   cacheComponents: true,
   partialPrefetching: true,
   // logo uploads are up to 1 MB; leave room for the rest of the form

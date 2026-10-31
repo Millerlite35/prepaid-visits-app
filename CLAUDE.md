@@ -1,4 +1,4 @@
-# Visit Pack (placeholder name): project brief for Claude
+# VisitBundle (working name, not yet final): project brief for Claude
 
 Read this first in every session. Keep it updated as decisions change.
 
@@ -346,6 +346,15 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (cards), `line` (borders), `ink` / `ink-muted` (text), with dark-mode values. Use them
   (`bg-surface`, `border-line`, `text-ink-muted`) instead of raw zinc greys in new work.
   `brand` = the product colour (staff app chrome); client pages use the PROVIDER's colour.
+- Type (Oct 31, 2026, design audit step 1): Figtree (body) + Newsreader (serif: every `h1`, `font-display`
+  for big numbers), set in `layout.tsx`. Type scale in `globals.css` `@theme`: text-xs 13px, text-sm 15px
+  (body), text-2xl 30px (page titles), text-3xl 36px (figures). Geist Mono only for codes.
+- Logo = `<Wordmark>` (`src/components/wordmark.tsx`): `brand.name` split in two (`wordmarkParts`), first
+  part bold navy, second green, like `logos/visitbundle-logo.svg` (git-ignored). Colours in `brand.ts`
+  (navy #1E3A5F, green #4FAE7A, #6FCF97 on dark). No logo image file in the app, so a rename stays one file.
+  Shown in the top bar, sign-in/two-step pages, client "Powered by" footer. Emails: `brandedEmail()` /
+  `emailWordmark()` in `src/lib/email-layout.ts` (header on staff invite, backup-code alert, support;
+  the client pass email keeps the PRACTICE's branding on top and has the wordmark in its footer).
 - Staff building blocks in `src/components/ui.tsx`: `PageHeader`, `Card`, `Stat` (+ `Trend`),
   `Badge`, `Callout`, `EmptyState`, `Row`, `buttonClass(variant, size)`. Icons: `src/components/icons.tsx`.
 - Staff shell: `dashboard/layout.tsx` (sticky top bar on the canvas); business pages get a
@@ -389,7 +398,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
   `installableApp` (`src/lib/app-metadata.ts`) in the dashboard, (auth), mfa and kiosk
   layouts, never on purchase/pass pages (a client saving their pass mustn't land on the
   dashboard). Root layout sets `viewport.themeColor`.
-- Icons drawn from brand colours (`src/lib/app-icon.tsx`, no name in the picture):
+- Icons drawn from brand.ts (`src/lib/app-icon.tsx`: the full wordmark, white + light green on navy,
+  in Figtree from `@fontsource/figtree`; files listed in `outputFileTracingIncludes`):
   `/app-icon/192`, `/app-icon/512`, `/app-icon/maskable-512`, `src/app/apple-icon.tsx`,
   `src/app/icon.tsx` (tab icon). Default favicon removed.
 - No service worker / offline cache on purpose (client data stays on the server).
@@ -434,7 +444,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
   review; confirmed only after the USPTO search + 3 practitioner reactions (by Nov 7, 2026)
   and the attorney's trademark/patent answers (questions 6-7 in `docs/hosting-options.md`).
   Risk: "bundle" also means fixed-price procedure bundles (MDSave) in cash-pay healthcare.
-  Until confirmed, `src/config/brand.ts` keeps the placeholder (Visit Pack).
+  The founder switched `src/config/brand.ts` to VisitBundle on Oct 31, 2026, ahead of those
+  checks. If they turn it down, change it back there (one line; logo, icon, titles and emails follow).
 - Domain layout (decide BEFORE pilot: purchase-page URLs get printed into QR codes on flyers,
   signs and cards): likely marketing site on `visitbundle.com` (founder's Lovable, under the
   business account, never the practice's) and this app on `app.visitbundle.com`. No tracking

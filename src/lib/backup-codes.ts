@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, randomInt } from "node:crypto";
 import { brand } from "@/config/brand";
 import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
+import { brandedEmail } from "@/lib/email-layout";
 import { requireEnv } from "@/lib/env";
 import { allow, LIMITS } from "@/lib/rate-limit";
 import { getAdminClient } from "@/lib/supabase/admin";
@@ -95,9 +96,9 @@ async function sendBackupCodeAlert(email: string, remaining: number): Promise<vo
     "",
     `If this wasn't you: reset your password now at ${site}/forgot-password and contact support.`,
   ].join("\n");
-  const html = `<p>A backup code was just used to sign in to your ${escapeHtml(brand.name)} account, and your old authenticator app was removed.</p>
-<p><strong>If this was you:</strong> sign in again and set up your new phone. Then make new backup codes under Security. ${escapeHtml(left)}</p>
-<p><strong>If this wasn't you:</strong> <a href="${escapeHtml(site)}/forgot-password">reset your password now</a> and contact support.</p>`;
+  const html = brandedEmail(`<p style="margin:0 0 12px">A backup code was just used to sign in to your ${escapeHtml(brand.name)} account, and your old authenticator app was removed.</p>
+<p style="margin:0 0 12px"><strong>If this was you:</strong> sign in again and set up your new phone. Then make new backup codes under Security. ${escapeHtml(left)}</p>
+<p style="margin:0"><strong>If this wasn't you:</strong> <a href="${escapeHtml(site)}/forgot-password">reset your password now</a> and contact support.</p>`);
   await sendEmail({
     to: email,
     from: `"${brand.name.replace(/["<>\r\n]/g, "")}" <${requireEnv("EMAIL_FROM_ADDRESS")}>`,

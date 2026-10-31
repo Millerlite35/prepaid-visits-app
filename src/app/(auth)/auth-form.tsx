@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/password-input";
 import { signIn, signUp, type FormState } from "./actions";
 
 const inputClass =
@@ -29,9 +30,8 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
       </label>
       <label className="block">
         <span className="text-sm font-medium">Password</span>
-        <input
+        <PasswordInput
           name="password"
-          type="password"
           required
           minLength={isSignup ? 12 : undefined}
           autoComplete={isSignup ? "new-password" : "current-password"}

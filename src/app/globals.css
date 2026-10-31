@@ -10,6 +10,9 @@
   --line: #e6e5e1;
   --ink: #1c1b19;
   --ink-muted: #6b6a66;
+  /* the wordmark's two colours (src/components/wordmark.tsx) */
+  --wordmark-1: var(--brand-primary);
+  --wordmark-2: var(--brand-accent);
 }
 
 @theme inline {
@@ -24,8 +27,28 @@
   /* set from src/config/brand.ts in layout.tsx; do not hardcode brand colors here */
   --color-brand: var(--brand-primary);
   --color-brand-accent: var(--brand-accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-app-sans);
+  --font-display: var(--font-app-display);
+  --font-mono: var(--font-app-mono);
+}
+
+/* Type scale. Body copy in the app is text-sm, so text-sm is 15px (was 14px).
+   Printed flyers and cards set their own sizes in pt and are not affected. */
+@theme {
+  --text-xs: 0.8125rem; /* 13px: small print, hints */
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 0.9375rem; /* 15px: body */
+  --text-sm--line-height: 1.4rem;
+  --text-base: 1rem; /* 16px */
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem; /* 18px: section titles */
+  --text-lg--line-height: 1.6rem;
+  --text-xl: 1.3125rem; /* 21px */
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.875rem; /* 30px: page titles (serif) */
+  --text-2xl--line-height: 2.25rem;
+  --text-3xl: 2.25rem; /* 36px: big numbers (serif) */
+  --text-3xl--line-height: 2.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,6 +61,8 @@
     --line: #2a2c31;
     --ink: #ececea;
     --ink-muted: #a1a19c;
+    --wordmark-1: #ffffff;
+    --wordmark-2: var(--brand-accent-on-dark);
   }
 }
 
@@ -46,4 +71,12 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* page titles in the serif; flyer/card artwork sets its own font inline, which wins */
+@layer base {
+  h1 {
+    font-family: var(--font-display), Georgia, serif;
+    font-optical-sizing: auto;
+  }
 }

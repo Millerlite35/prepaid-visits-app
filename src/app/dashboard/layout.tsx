@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { brand } from "@/config/brand";
+import { Wordmark } from "@/components/wordmark";
 import { Icon } from "@/components/icons";
 import { installableApp } from "@/lib/app-metadata";
 
@@ -14,11 +14,8 @@ export default function DashboardLayout({ children }: LayoutProps<"/dashboard">)
     <div className="flex min-h-full flex-1 flex-col bg-canvas text-ink">
       <header className="sticky top-0 z-30 border-b border-line bg-surface/85 backdrop-blur print:hidden">
         <nav className="flex h-14 w-full items-center justify-between px-4 text-sm sm:px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 font-semibold tracking-tight text-ink">
-            {/* the app icon, drawn from the brand colours (src/app/icon.tsx) */}
-            {/* eslint-disable-next-line @next/next/no-img-element -- tiny generated icon */}
-            <img src="/icon" alt="" width={24} height={24} className="rounded-md" />
-            {brand.name}
+          <Link href="/dashboard" className="text-xl">
+            <Wordmark />
           </Link>
           <span className="flex items-center gap-1">
             <Link href="/dashboard/security" className={link}>

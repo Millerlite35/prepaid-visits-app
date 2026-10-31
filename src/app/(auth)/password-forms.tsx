@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/password-input";
 import { requestPasswordReset, setNewPassword, type PasswordState } from "./password-actions";
 
 const inputClass =
@@ -43,12 +44,12 @@ export function NewPasswordForm({ needsCode }: { needsCode: boolean }) {
     <form action={formAction} className="mt-6 space-y-4">
       <label className="block">
         <span className="text-sm font-medium">New password</span>
-        <input name="password" type="password" required minLength={12} autoComplete="new-password" className={inputClass} />
+        <PasswordInput name="password" required minLength={12} autoComplete="new-password" className={inputClass} />
         <span className="mt-1 block text-xs text-ink-muted">At least 12 characters.</span>
       </label>
       <label className="block">
         <span className="text-sm font-medium">Type it again</span>
-        <input name="confirm" type="password" required minLength={12} autoComplete="new-password" className={inputClass} />
+        <PasswordInput name="confirm" required minLength={12} autoComplete="new-password" className={inputClass} />
       </label>
       {needsCode && (
         <label className="block">

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { brand } from "@/config/brand";
+import { Wordmark } from "@/components/wordmark";
 import { logoUrl } from "@/lib/branding";
 
 // The frame for client-facing pages (purchase, thank-you, pass): a soft background, a
@@ -14,7 +14,9 @@ export function ClientShell({ children, contact = [], width = "md" }: { children
           {contact.map((line) => (
             <p key={line}>{line}</p>
           ))}
-          <p className="pt-2 opacity-70">Powered by {brand.name}</p>
+          <p className="pt-2">
+            <span className="opacity-70">Powered by</span> <Wordmark className="text-sm" />
+          </p>
         </footer>
       </main>
     </div>

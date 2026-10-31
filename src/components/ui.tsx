@@ -42,8 +42,8 @@ export function PageHeader({
     <header className="mb-6 flex flex-wrap items-end justify-between gap-4 print:hidden">
       <div className="min-w-0">
         {eyebrow && <p className="mb-1 text-xs font-medium tracking-wide text-ink-muted uppercase">{eyebrow}</p>}
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
-        {description && <p className="mt-1 max-w-2xl text-sm text-ink-muted">{description}</p>}
+        <h1 className="font-display text-2xl font-medium tracking-tight text-ink">{title}</h1>
+        {description && <p className="mt-1.5 max-w-2xl text-sm text-ink-muted">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
@@ -69,8 +69,8 @@ export function Card({
     <section className={cx("rounded-xl border border-line bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04)]", className)}>
       {(title || actions) && (
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
-          <div>
-            {title && <h2 className="font-semibold text-ink">{title}</h2>}
+          <div className="min-w-0 flex-1">
+            {title && <h2 className="text-base font-semibold text-ink">{title}</h2>}
             {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
           </div>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
@@ -87,7 +87,7 @@ export function Stat({ label, value, trend, hint }: { label: ReactNode; value: R
   return (
     <div className="rounded-xl border border-line bg-surface px-5 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
       <p className="text-sm text-ink-muted">{label}</p>
-      <p className="mt-1.5 text-3xl font-semibold tracking-tight text-ink tabular-nums">{value}</p>
+      <p className="mt-1 font-display text-3xl font-medium tracking-tight text-ink tabular-nums">{value}</p>
       {trend && (
         <p className="mt-1.5 text-xs text-ink-muted">
           <span

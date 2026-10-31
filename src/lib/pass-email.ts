@@ -1,7 +1,7 @@
 import "server-only";
-import { brand } from "@/config/brand";
 import { logoUrl } from "@/lib/branding";
 import { emailConfigured, escapeHtml, fromAddress, sendEmail } from "@/lib/email";
+import { emailWordmark } from "@/lib/email-layout";
 import { formatDate, passUrl, qrPng } from "@/lib/passes";
 import { getAdminClient } from "@/lib/supabase/admin";
 
@@ -92,7 +92,7 @@ export async function sendPassEmail(
     </p>
     <p style="margin:0;font-size:12px;color:#71717a">Keep this email: it's your pass. Anyone with this code can use your ${e(prov.vocab_plural)}, so don't share it. Questions or refunds: contact ${e(prov.display_name)}.</p>
   </div>
-  <p style="text-align:center;font-size:11px;color:#a1a1aa">Sent by ${e(brand.name)} for ${e(prov.display_name)}</p>
+  <p style="text-align:center;font-size:11px;color:#a1a1aa">Sent for ${e(prov.display_name)} by ${emailWordmark(13)}</p>
 </body></html>`;
 
     const text = [

@@ -5,6 +5,7 @@ import { brand } from "@/config/brand";
 import { supportTopics } from "@/config/help-faq";
 import { requireUser } from "@/lib/auth";
 import { emailConfigured, escapeHtml, fromAddress, sendEmail } from "@/lib/email";
+import { brandedEmail } from "@/lib/email-layout";
 import { getAdminClient } from "@/lib/supabase/admin";
 
 export type SupportState = { error?: string; message?: string };
@@ -73,7 +74,7 @@ export async function sendSupportRequest(_prev: SupportState, formData: FormData
         from: fromAddress("Support"),
         replyTo: user.email,
         subject: `[${brand.name} support] ${topicLabel} · ${business?.display_name ?? user.email}`,
-        html: `<pre style="font-family:Arial,Helvetica,sans-serif;white-space:pre-wrap">${escapeHtml(text)}</pre>`,
+        html: brandedEmail(`<pre style="margin:0;font-family:Arial,Helvetica,sans-serif;white-space:pre-wrap">${escapeHtml(text)}</pre>`),
         text,
         idempotencyKey: `support-${saved.id}`,
       });

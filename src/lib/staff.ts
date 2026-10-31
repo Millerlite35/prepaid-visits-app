@@ -1,6 +1,7 @@
 import "server-only";
 import { brand } from "@/config/brand";
 import { emailConfigured, escapeHtml, fromAddress, sendEmail } from "@/lib/email";
+import { brandedEmail } from "@/lib/email-layout";
 import { requireEnv } from "@/lib/env";
 
 export const ROLE_LABELS: Record<string, string> = {
@@ -35,9 +36,7 @@ export function inviteText(businessName: string, email: string, role: string): s
 export async function sendInviteEmail(inviteId: string, businessName: string, email: string, role: string): Promise<boolean> {
   if (!emailConfigured()) return false;
   const text = inviteText(businessName, email, role);
-  const html = `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;color:#18181b;padding:24px">
-<div style="max-width:480px;margin:0 auto;white-space:pre-wrap;line-height:1.5">${escapeHtml(text)}</div>
-</body></html>`;
+  const html = brandedEmail(`<div style="white-space:pre-wrap">${escapeHtml(text)}</div>`);
   try {
     await sendEmail({
       to: email,

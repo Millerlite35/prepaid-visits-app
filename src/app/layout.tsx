@@ -1,16 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Figtree, Geist_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 import { brand } from "@/config/brand";
 import { designFontVariables } from "@/lib/design-fonts";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// App fonts: Figtree for everything, Newsreader (serif) for page titles and big numbers.
+// Self-hosted by Next.js. Flyer/card fonts are separate (src/lib/design-fonts.ts).
+const appSans = Figtree({
+  variable: "--font-app-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const appDisplay = Newsreader({
+  variable: "--font-app-display",
+  subsets: ["latin"],
+});
+
+// only for codes (pass codes, backup codes)
+const appMono = Geist_Mono({
+  variable: "--font-app-mono",
   subsets: ["latin"],
 });
 
@@ -26,12 +34,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${designFontVariables} h-full antialiased`}
+      className={`${appSans.variable} ${appDisplay.variable} ${appMono.variable} ${designFontVariables} h-full antialiased`}
       // brand colors as CSS variables, used through the bg-brand / text-brand classes
       style={
         {
           "--brand-primary": brand.colors.primary,
           "--brand-accent": brand.colors.accent,
+          "--brand-accent-on-dark": brand.colors.accentOnDark,
         } as React.CSSProperties
       }
     >
