@@ -55,3 +55,6 @@ next-env.d.ts
 
 # demo pack (fictional practice marketing material, not part of the app)
 /demo/
+
+# before/after screenshots from the design audit (fake demo data, not part of the app)
+/design-screenshots/
