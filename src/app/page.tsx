@@ -10,13 +10,13 @@ export default function Home() {
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">
       <h1 className="text-2xl font-semibold text-brand">{brand.name}</h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <p className="mt-1 text-sm text-ink-muted">
         Development build · test mode · fake data only
       </p>
 
       {/* development only: the live site shouldn't describe its own setup */}
       {process.env.NODE_ENV !== "production" && (
-        <section className="mt-8 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+        <section className="mt-8 rounded-lg border border-line p-4">
           <h2 className="font-medium">System check</h2>
           <Suspense fallback={<p className="mt-3 text-sm">Checking…</p>}>
             <SystemCheck />
@@ -43,13 +43,13 @@ async function SystemCheck() {
     <ul className="mt-3 space-y-3">
       {checks.map((c) => (
         <li key={c.label} className="flex gap-3 text-sm">
-          <span aria-hidden className={c.ok ? "text-green-600" : "text-red-600"}>
+          <span aria-hidden className={c.ok ? "text-success" : "text-danger"}>
             {c.ok ? "✓" : "✗"}
           </span>
           <span>
             <span className="font-medium">{c.label}</span>
             <br />
-            <span className="text-zinc-600 dark:text-zinc-400">{c.detail}</span>
+            <span className="text-ink-muted">{c.detail}</span>
           </span>
         </li>
       ))}

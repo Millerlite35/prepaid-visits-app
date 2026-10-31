@@ -37,7 +37,7 @@ async function MarketingContent({ params }: { params: Promise<{ providerId: stri
           page.
         </p>
         {data.sellingProblem && (
-          <p className="mt-4 rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+          <p className="mt-4 rounded-md bg-warning-soft p-3 text-sm text-warning">
             ⚠ {data.sellingProblem}
           </p>
         )}

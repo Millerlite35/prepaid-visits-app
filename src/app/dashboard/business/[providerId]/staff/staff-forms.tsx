@@ -46,13 +46,13 @@ export function InviteForm({
         </button>
       </form>
 
-      {!pending && state.error && <p role="alert" className="text-sm text-red-600">{state.error}</p>}
+      {!pending && state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       {!pending && state.message && (
         <div className="space-y-2">
-          <p role="status" className="text-sm text-green-700 dark:text-green-500">✓ {state.message}</p>
+          <p role="status" className="text-sm text-success">✓ {state.message}</p>
           {state.shareText && (
             <>
-              <pre className="whitespace-pre-wrap rounded-md bg-surface-muted p-3 text-xs dark:bg-zinc-900">{state.shareText}</pre>
+              <pre className="whitespace-pre-wrap rounded-md bg-surface-muted p-3 text-xs">{state.shareText}</pre>
               <button type="button" onClick={() => copy(state.shareText!)} className="text-sm underline">
                 {copied ? "Copied ✓" : "Copy message"}
               </button>

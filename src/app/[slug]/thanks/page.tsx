@@ -127,7 +127,7 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
     <>
       {heading}
       <div className="mt-6 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-2xl text-green-700 dark:bg-green-950 dark:text-green-400" aria-hidden>
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-soft text-2xl text-success" aria-hidden>
           ✓
         </span>
         <p className="mt-3 text-lg font-semibold text-ink">You&apos;re all set. Thank you!</p>

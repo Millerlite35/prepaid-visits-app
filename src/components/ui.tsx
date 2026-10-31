@@ -15,7 +15,7 @@ const BUTTON: Record<ButtonVariant, string> = {
   primary: "bg-brand text-white shadow-sm hover:opacity-90",
   secondary: "border border-line bg-surface text-ink shadow-sm hover:bg-surface-muted",
   ghost: "text-ink hover:bg-surface-muted",
-  danger: "bg-red-600 text-white shadow-sm hover:bg-red-700",
+  danger: "bg-danger-solid text-white shadow-sm hover:opacity-90",
 };
 
 // For <button>, <a> and <Link>: buttonClass("primary")
@@ -93,8 +93,8 @@ export function Stat({ label, value, trend, hint }: { label: ReactNode; value: R
           <span
             className={cx(
               "mr-1 inline-flex items-center rounded-full px-1.5 py-0.5 font-medium",
-              trend.direction === "up" && "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-400",
-              trend.direction === "down" && "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400",
+              trend.direction === "up" && "bg-success-soft text-success",
+              trend.direction === "down" && "bg-danger-soft text-danger",
               trend.direction === "flat" && "bg-surface-muted text-ink-muted",
             )}
           >
@@ -108,7 +108,7 @@ export function Stat({ label, value, trend, hint }: { label: ReactNode; value: R
   );
 }
 
-export type BadgeTone = "neutral" | "green" | "amber" | "red" | "brand";
+export type BadgeTone = "neutral" | "success" | "warning" | "danger" | "brand";
 
 export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; children: ReactNode }) {
   return (
@@ -116,9 +116,9 @@ export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; childr
       className={cx(
         "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
         tone === "neutral" && "bg-surface-muted text-ink-muted",
-        tone === "green" && "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-400",
-        tone === "amber" && "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-        tone === "red" && "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400",
+        tone === "success" && "bg-success-soft text-success",
+        tone === "warning" && "bg-warning-soft text-warning",
+        tone === "danger" && "bg-danger-soft text-danger",
         tone === "brand" && "bg-brand/10 text-brand",
       )}
     >
@@ -127,19 +127,31 @@ export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; childr
   );
 }
 
-export function Callout({ tone = "amber", title, children }: { tone?: "amber" | "red" | "green" | "neutral"; title?: ReactNode; children: ReactNode }) {
+// Body text stays ink for easy reading; the title carries the status colour.
+export function Callout({ tone = "warning", title, children }: { tone?: "warning" | "danger" | "success" | "neutral"; title?: ReactNode; children: ReactNode }) {
   return (
     <div
-      role={tone === "amber" || tone === "red" ? "alert" : undefined}
+      role={tone === "warning" || tone === "danger" ? "alert" : undefined}
       className={cx(
-        "rounded-xl border px-5 py-4 text-sm",
-        tone === "amber" && "border-amber-300 bg-amber-50 text-amber-950 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100",
-        tone === "red" && "border-red-300 bg-red-50 text-red-950 dark:border-red-800 dark:bg-red-950/40 dark:text-red-100",
-        tone === "green" && "border-green-300 bg-green-50 text-green-950 dark:border-green-800 dark:bg-green-950/40 dark:text-green-100",
-        tone === "neutral" && "border-line bg-surface-muted text-ink",
+        "rounded-xl border px-5 py-4 text-sm text-ink",
+        tone === "warning" && "border-warning-line bg-warning-soft",
+        tone === "danger" && "border-danger-line bg-danger-soft",
+        tone === "success" && "border-success-line bg-success-soft",
+        tone === "neutral" && "border-line bg-surface-muted",
       )}
     >
-      {title && <p className="mb-1 font-semibold">{title}</p>}
+      {title && (
+        <p
+          className={cx(
+            "mb-1 font-semibold",
+            tone === "warning" && "text-warning",
+            tone === "danger" && "text-danger",
+            tone === "success" && "text-success",
+          )}
+        >
+          {title}
+        </p>
+      )}
       {children}
     </div>
   );

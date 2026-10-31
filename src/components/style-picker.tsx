@@ -54,7 +54,7 @@ export function FontPicker({ value, onChange }: { value: DesignFontId; onChange:
           return (
             <label
               key={id}
-              className={`cursor-pointer rounded-md border px-3 py-1.5 text-sm ${value === id ? "border-brand ring-1 ring-brand" : "border-zinc-300 dark:border-zinc-700"}`}
+              className={`cursor-pointer rounded-md border px-3 py-1.5 text-sm ${value === id ? "border-brand ring-1 ring-brand" : "border-line"}`}
               style={f.family ? { fontFamily: f.family } : undefined}
             >
               <input type="radio" name="design-font" className="sr-only" checked={value === id} onChange={() => onChange(id)} />
@@ -77,20 +77,20 @@ export function StylePicker({ value, onChange, color }: { value: DesignStyleId; 
           return (
             <label
               key={id}
-              className={`cursor-pointer rounded-md border p-2 text-sm ${value === id ? "border-brand ring-1 ring-brand" : "border-zinc-300 dark:border-zinc-700"}`}
+              className={`cursor-pointer rounded-md border p-2 text-sm ${value === id ? "border-brand ring-1 ring-brand" : "border-line"}`}
             >
               <input type="radio" name="design-style" className="sr-only" checked={value === id} onChange={() => onChange(id)} />
               <span className="flex items-center gap-2">
                 <span
                   aria-hidden
-                  className="inline-block h-4 w-4 rounded-sm border border-zinc-300"
+                  className="inline-block h-4 w-4 rounded-sm border border-line"
                   style={{ background: s.pageBg, boxShadow: `inset 4px 0 0 ${s.stripe(color)}` }}
                 />
                 <span className="font-medium" style={{ fontFamily: s.headingFont }}>
                   {s.label}
                 </span>
               </span>
-              <span className="mt-0.5 block text-xs text-zinc-500">{s.note}</span>
+              <span className="mt-0.5 block text-xs text-ink-muted">{s.note}</span>
             </label>
           );
         })}

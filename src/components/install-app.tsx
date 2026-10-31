@@ -75,7 +75,7 @@ export function InstallApp({ appName }: { appName: string }) {
   return (
     <section className="mt-6 rounded-xl border border-line bg-surface px-5 py-4 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
       <h2 className="font-medium">Install the {appName} app</h2>
-      <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+      <p className="mt-1 text-ink-muted">
         Put it on your home screen: one tap to open, full screen, no browser bar. Handy for scanning at the front desk.
       </p>
       {view === "button" ? (
@@ -86,7 +86,7 @@ export function InstallApp({ appName }: { appName: string }) {
         <ol className="mt-3 list-decimal space-y-1 pl-5">
           <li>
             In Safari, tap the <strong>Share</strong> button{" "}
-            <span aria-hidden className="inline-block rounded border border-zinc-300 px-1 dark:border-zinc-700">
+            <span aria-hidden className="inline-block rounded border border-line px-1">
               ⬆
             </span>
             .
@@ -96,7 +96,7 @@ export function InstallApp({ appName }: { appName: string }) {
           </li>
         </ol>
       )}
-      <button onClick={dismiss} className="mt-3 block text-zinc-500 underline">
+      <button onClick={dismiss} className="mt-3 block text-ink-muted underline">
         Not now
       </button>
     </section>

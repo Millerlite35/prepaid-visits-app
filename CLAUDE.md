@@ -345,6 +345,12 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Tokens in `src/app/globals.css`: `canvas` (page background), `surface` / `surface-muted`
   (cards), `line` (borders), `ink` / `ink-muted` (text), with dark-mode values. Use them
   (`bg-surface`, `border-line`, `text-ink-muted`) instead of raw zinc greys in new work.
+- Colours (Oct 31, 2026, design audit step 2): neutrals are cool, tinted toward the navy (canvas #F4F6F8,
+  ink #16243A). Status tokens: `success` / `warning` / `danger` (text), `-soft` (background), `-line`
+  (border), `-solid` (filled, under white text; same in dark mode). **No raw Tailwind colours**
+  (`red-600`, `zinc-500`...): they don't follow dark mode. Badge/Callout tones are `success | warning |
+  danger | neutral` (+ `brand` for Badge); Callout body stays ink, the title takes the colour.
+  `.theme-light` keeps an area light in dark mode (the client-facing kiosk).
   `brand` = the product colour (staff app chrome); client pages use the PROVIDER's colour.
 - Type (Oct 31, 2026, design audit step 1): Figtree (body) + Newsreader (serif: every `h1`, `font-display`
   for big numbers), set in `layout.tsx`. Type scale in `globals.css` `@theme`: text-xs 13px, text-sm 15px

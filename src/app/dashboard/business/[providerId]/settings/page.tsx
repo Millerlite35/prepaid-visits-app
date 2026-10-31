@@ -51,7 +51,7 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
     )
     .eq("id", providerId)
     .single<ProviderSettings>();
-  if (error) return <p className="text-sm text-red-600">Couldn&apos;t load settings. Try refreshing.</p>;
+  if (error) return <p className="text-sm text-danger">Couldn&apos;t load settings. Try refreshing.</p>;
 
   const site = requireEnv("SITE_URL");
   const privateUrl = `${site}/${p.slug}?key=${p.private_access_key}`;

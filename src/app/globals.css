@@ -1,15 +1,27 @@
 @import "tailwindcss";
 
-:root {
+:root,
+.theme-light {
   --background: #ffffff;
-  --foreground: #171717;
-  /* staff app (dashboard) palette: a soft canvas with white surfaces */
-  --canvas: #f6f6f4;
+  --foreground: #16243a;
+  /* staff app (dashboard) palette: cool neutrals tinted toward the brand navy */
+  --canvas: #f4f6f8;
   --surface: #ffffff;
-  --surface-muted: #f4f4f2;
-  --line: #e6e5e1;
-  --ink: #1c1b19;
-  --ink-muted: #6b6a66;
+  --surface-muted: #eef1f4;
+  --line: #e1e6ec;
+  --ink: #16243a;
+  --ink-muted: #5b6676;
+  /* status colours: text / soft background / border.
+     Each text colour passes 4.5:1 on its soft background and on white. */
+  --success: #2b764e;
+  --success-soft: #e7f3ec;
+  --success-line: #a9d3ba;
+  --warning: #8a5a00;
+  --warning-soft: #fbf1dc;
+  --warning-line: #ebcb86;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --danger-line: #f1b7b0;
   /* the wordmark's two colours (src/components/wordmark.tsx) */
   --wordmark-1: var(--brand-primary);
   --wordmark-2: var(--brand-accent);
@@ -24,6 +36,20 @@
   --color-line: var(--line);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-line: var(--success-line);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-line: var(--warning-line);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-line: var(--danger-line);
+  /* filled status backgrounds under white text (scanner screens, danger buttons),
+     the same in light and dark mode */
+  --color-success-solid: #2b764e;
+  --color-warning-solid: #9a6400;
+  --color-danger-solid: #b42318;
   /* set from src/config/brand.ts in layout.tsx; do not hardcode brand colors here */
   --color-brand: var(--brand-primary);
   --color-brand-accent: var(--brand-accent);
@@ -51,16 +77,26 @@
   --text-3xl--line-height: 2.5rem;
 }
 
+/* .theme-light (above) keeps one area light in dark mode, e.g. the client-facing kiosk */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --canvas: #0d0e10;
-    --surface: #16171a;
-    --surface-muted: #1d1f23;
-    --line: #2a2c31;
-    --ink: #ececea;
-    --ink-muted: #a1a19c;
+    --background: #0e141c;
+    --foreground: #e8ecf1;
+    --canvas: #0e141c;
+    --surface: #151c26;
+    --surface-muted: #1c2430;
+    --line: #2a3442;
+    --ink: #e8ecf1;
+    --ink-muted: #9aa5b4;
+    --success: #6fcf97;
+    --success-soft: #12291d;
+    --success-line: #245a3c;
+    --warning: #f0b44c;
+    --warning-soft: #2e2210;
+    --warning-line: #6b4e1a;
+    --danger: #f2877d;
+    --danger-soft: #33130f;
+    --danger-line: #7a2a22;
     --wordmark-1: #ffffff;
     --wordmark-2: var(--brand-accent-on-dark);
   }

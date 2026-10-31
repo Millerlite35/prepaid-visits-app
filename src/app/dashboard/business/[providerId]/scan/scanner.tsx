@@ -148,7 +148,7 @@ export function Scanner({ checkIn, undo, singular, plural, cardLinking }: Props)
             <button onClick={startCamera} className="rounded-lg bg-white px-5 py-3 font-medium text-black">
               Start camera
             </button>
-            {cameraError && <p className="text-sm text-zinc-300">{cameraError}</p>}
+            {cameraError && <p className="text-sm text-white/70">{cameraError}</p>}
           </div>
         )}
         {cameraOn && !result && (
@@ -222,7 +222,7 @@ function ResultCard({
 }) {
   const s = result.scan;
   const tone =
-    s.result === "ok" ? "bg-green-600" : s.result === "duplicate_recent" || s.result === "unassigned" ? "bg-amber-500" : "bg-red-600";
+    s.result === "ok" ? "bg-success-solid" : s.result === "duplicate_recent" || s.result === "unassigned" ? "bg-warning-solid" : "bg-danger-solid";
 
   let title = "";
   let detail: ReactNode = null;

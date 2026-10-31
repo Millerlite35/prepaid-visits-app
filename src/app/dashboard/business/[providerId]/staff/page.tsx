@@ -87,7 +87,7 @@ async function StaffContent({ params }: { params: Promise<{ providerId: string }
                       label="Remove"
                       question={`Remove ${p.email}? They lose access straight away.`}
                       confirmLabel="Yes, remove"
-                      className="text-sm text-red-600 underline"
+                      className="text-sm text-danger underline"
                     />
                   </form>
                 </span>

@@ -22,8 +22,8 @@ const inputClass =
 
 function Result({ state, pending }: { state: SettingsState; pending: boolean }) {
   if (pending) return null;
-  if (state.error) return <p role="alert" className="text-sm text-red-600">{state.error}</p>;
-  if (state.saved) return <p role="status" className="text-sm text-green-700 dark:text-green-500">✓ Saved</p>;
+  if (state.error) return <p role="alert" className="text-sm text-danger">{state.error}</p>;
+  if (state.saved) return <p role="status" className="text-sm text-success">✓ Saved</p>;
   return null;
 }
 
@@ -107,7 +107,7 @@ export function PageDetailsForm({ action, initial }: { action: Action; initial: 
         <span className="text-sm font-medium">Label on the client&apos;s pass</span>
         <input name="passLabel" required maxLength={SETTINGS_LIMITS.passLabelMax} value={passLabel} onChange={(e) => setPassLabel(e.target.value)} className={inputClass} />
         {labelProblem ? (
-          <span className="mt-1 block text-xs text-red-600">{labelProblem}</span>
+          <span className="mt-1 block text-xs text-danger">{labelProblem}</span>
         ) : (
           <span className="mt-1 block text-xs text-ink-muted">Keep it neutral. Others may see it on a client&apos;s phone.</span>
         )}
@@ -122,7 +122,7 @@ export function PageDetailsForm({ action, initial }: { action: Action; initial: 
               type="button"
               aria-label={`Use colour ${c}`}
               onClick={() => setColor(c)}
-              className={`h-8 w-8 rounded-full border-2 ${color === c ? "border-zinc-900 dark:border-white" : "border-transparent"}`}
+              className={`h-8 w-8 rounded-full border-2 ${color === c ? "border-ink" : "border-transparent"}`}
               style={{ backgroundColor: c }}
             />
           ))}
@@ -139,7 +139,7 @@ export function PageDetailsForm({ action, initial }: { action: Action; initial: 
           </span>
         </div>
         {lowContrast && (
-          <p className="mt-1 text-xs text-amber-700 dark:text-amber-500">
+          <p className="mt-1 text-xs text-warning">
             This colour is light, so white text on it may be hard to read. A darker shade works better.
           </p>
         )}
@@ -193,9 +193,9 @@ export function AddressForm({
           className={inputClass}
         />
         <span className="mt-1 block break-all text-xs text-ink-muted">{siteHost}/{slug}</span>
-        {slugProblem && <span className="mt-1 block text-xs text-red-600">{slugProblem}</span>}
+        {slugProblem && <span className="mt-1 block text-xs text-danger">{slugProblem}</span>}
         {slug !== initialSlug && !slugProblem && (
-          <span className="mt-1 block text-xs text-amber-700 dark:text-amber-500">
+          <span className="mt-1 block text-xs text-warning">
             Changing this breaks old links, flyers and QR codes that use the current address.
           </span>
         )}
@@ -239,7 +239,7 @@ export function PrivateLink({ url, renewAction }: { url: string; renewAction: ()
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium">Private link</p>
-      <p className="break-all rounded-md bg-surface-muted p-2 font-mono text-xs dark:bg-zinc-900">{url}</p>
+      <p className="break-all rounded-md bg-surface-muted p-2 font-mono text-xs">{url}</p>
       <div className="flex flex-wrap items-center gap-4 text-sm">
         <button type="button" onClick={copy} className="underline">
           {copied ? "Copied ✓" : "Copy link"}
@@ -293,9 +293,9 @@ export function TermsForm({
           which version the client accepted.
         </p>
         {askReplace ? (
-          <span className="inline-flex flex-wrap items-center gap-3 rounded-md bg-amber-50 p-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+          <span className="inline-flex flex-wrap items-center gap-3 rounded-md bg-warning-soft p-2 text-sm text-warning">
             Replace your current terms?
-            <button type="button" onClick={applyTemplate} className="rounded-md bg-amber-600 px-3 py-1 font-medium text-white">
+            <button type="button" onClick={applyTemplate} className="rounded-md bg-warning-solid px-3 py-1 font-medium text-white">
               Yes, replace
             </button>
             <button type="button" onClick={() => setAskReplace(false)} className="underline">
@@ -322,7 +322,7 @@ export function TermsForm({
         template is a plain-language starting point, not legal advice. Have your attorney review your terms.
       </p>
       {!terms.trim() && (
-        <p className="text-xs text-amber-700 dark:text-amber-500">
+        <p className="text-xs text-warning">
           Clients won&apos;t be able to buy until you add terms.
         </p>
       )}

@@ -12,7 +12,7 @@ export function BackupCodesPanel({ unused, brandName }: { unused: number; brandN
     const text = `${brandName} backup codes (each works once)\n\n${state.codes.join("\n")}\n`;
     return (
       <div className="mt-4 space-y-4">
-        <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+        <p className="rounded-md bg-warning-soft p-3 text-sm text-warning">
           <strong>Save these now.</strong> This is the only time they&apos;re shown. Print them, or keep them in
           a password manager. Not on the same phone as your authenticator app.
         </p>
@@ -49,7 +49,7 @@ export function BackupCodesPanel({ unused, brandName }: { unused: number; brandN
   return (
     <form action={formAction} className="mt-4 space-y-3">
       {state.error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {state.error}
         </p>
       )}

@@ -65,7 +65,7 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
     .select("display_name, timezone, vocab_singular, vocab_plural")
     .eq("id", providerId)
     .single<{ display_name: string; timezone: string; vocab_singular: string; vocab_plural: string }>();
-  if (!provider) return <p className="text-sm text-red-600">Couldn&apos;t load this business.</p>;
+  if (!provider) return <p className="text-sm text-danger">Couldn&apos;t load this business.</p>;
 
   const tz = provider.timezone;
   const now = new Date();
@@ -284,7 +284,7 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
         <Card
           title="Expiring in the next 30 days"
           description={`A friendly reminder now can save a client from losing ${many}.`}
-          actions={expiring.length > 0 ? <Badge tone="amber">{expiring.length}</Badge> : undefined}
+          actions={expiring.length > 0 ? <Badge tone="warning">{expiring.length}</Badge> : undefined}
         >
           {expiring.length === 0 ? (
             <EmptyState>Nothing expiring soon.</EmptyState>
@@ -316,7 +316,7 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
                   key={a.id}
                   aside={
                     <>
-                      <span className={`mr-3 font-mono ${a.delta > 0 ? "text-green-700 dark:text-green-400" : ""}`}>
+                      <span className={`mr-3 font-mono ${a.delta > 0 ? "text-success" : ""}`}>
                         {a.delta > 0 ? `+${a.delta}` : a.delta}
                       </span>
                       {fmtDate(a.created_at, tz, true)}

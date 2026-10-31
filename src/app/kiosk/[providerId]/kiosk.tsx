@@ -182,11 +182,11 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
         <h1 className="text-2xl font-semibold" style={{ color }}>
           Self check-in
         </h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm text-ink-muted">
           For a computer or tablet at your front desk, with a USB QR scanner or its own camera. Clients show
           their pass and are checked in, with no one at the keyboard.
         </p>
-        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-zinc-600 dark:text-zinc-400">
+        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-ink-muted">
           <li>Sign this computer in with a scan-only staff account if you can.</li>
           <li>Test one scan before clients arrive. You should hear a beep.</li>
           <li>Testing without a scanner? Copy a pass link, start, click the screen and paste (Ctrl+V).</li>
@@ -203,11 +203,11 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
         >
           {starting ? "Starting camera…" : "Start with this device's camera"}
         </button>
-        <p className="mt-2 text-xs text-zinc-500">
+        <p className="mt-2 text-xs text-ink-muted">
           Camera: for a laptop webcam or a tablet on a stand facing clients. They hold their phone up to it.
         </p>
         {cameraError && (
-          <p role="alert" className="mt-3 text-sm text-red-600">
+          <p role="alert" className="mt-3 text-sm text-danger">
             {cameraError}
           </p>
         )}
@@ -219,7 +219,7 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
   }
 
   return (
-    <main className="relative flex flex-1 flex-col items-center justify-center bg-white px-6 py-10 text-center text-zinc-900 select-none">
+    <main className="relative flex flex-1 flex-col items-center justify-center theme-light bg-white px-6 py-10 text-center text-ink select-none">
       <div className="absolute top-8 flex flex-col items-center">
         {/* eslint-disable-next-line @next/next/no-img-element -- provider-uploaded logo from storage */}
         {logo && <img src={logo} alt="" className="mb-2 max-h-20 max-w-[260px] object-contain" />}
@@ -232,7 +232,7 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
         {result === null && (
           <>
             <p className="text-5xl font-semibold">Welcome!</p>
-            <p className="mt-6 text-2xl text-zinc-600">
+            <p className="mt-6 text-2xl text-ink-muted">
               {mode === "camera"
                 ? "Hold your pass QR code up to the camera to check in."
                 : "Hold your pass QR code under the scanner to check in."}
@@ -244,7 +244,7 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
             )}
           </>
         )}
-        {result === "checking" && <p className="text-4xl text-zinc-600">Checking…</p>}
+        {result === "checking" && <p className="text-4xl text-ink-muted">Checking…</p>}
         {result !== null && result !== "checking" && <Message r={result} unit={unit} plural={plural} />}
       </div>
 
@@ -259,9 +259,9 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
         />
       )}
 
-      <div className="absolute right-4 bottom-4 text-sm text-zinc-400">
+      <div className="absolute right-4 bottom-4 text-sm text-ink-muted">
         {askExit ? (
-          <span className="flex items-center gap-3 rounded-md bg-zinc-100 p-2 text-zinc-700">
+          <span className="flex items-center gap-3 rounded-md bg-surface-muted p-2 text-ink">
             Staff: leave self check-in?
             <Link href={exitHref} className="font-medium underline">
               Leave
@@ -303,7 +303,7 @@ function Message({ r, unit, plural }: { r: KioskResult; unit: (n: number) => str
 
 function Good({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl bg-green-50 px-6 py-10 text-green-900">
+    <div className="rounded-2xl bg-success-soft px-6 py-10 text-success">
       <p className="text-7xl" aria-hidden>
         ✓
       </p>
@@ -315,7 +315,7 @@ function Good({ title, children }: { title: string; children: React.ReactNode })
 
 function SeeDesk({ title, line = "Please see the front desk." }: { title: string; line?: string }) {
   return (
-    <div className="rounded-2xl bg-amber-50 px-6 py-10 text-amber-950">
+    <div className="rounded-2xl bg-warning-soft px-6 py-10 text-warning">
       <p className="text-7xl" aria-hidden>
         !
       </p>

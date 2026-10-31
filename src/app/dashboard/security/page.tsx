@@ -29,7 +29,7 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
       <p className="mt-1 text-sm text-ink-muted">Signed in as {user.email}</p>
 
       {justSetUp && unused === 0 && (
-        <p className="mt-6 rounded-md bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
+        <p className="mt-6 rounded-md bg-success-soft p-3 text-sm text-success">
           ✓ Two-step verification is on. One last step: make backup codes, in case you ever lose your phone.
         </p>
       )}
@@ -43,11 +43,11 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
         </p>
         <p className="mt-3 text-sm">
           {unused === 0 ? (
-            <span className="font-medium text-amber-700 dark:text-amber-400">⚠ You don&apos;t have any backup codes yet.</span>
+            <span className="font-medium text-warning">⚠ You don&apos;t have any backup codes yet.</span>
           ) : (
             <span>
               {unused} of {BACKUP_CODE_COUNT} codes unused.
-              {unused <= 3 && <span className="font-medium text-amber-700 dark:text-amber-400"> Running low: make new ones.</span>}
+              {unused <= 3 && <span className="font-medium text-warning"> Running low: make new ones.</span>}
             </span>
           )}
         </p>

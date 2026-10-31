@@ -50,13 +50,13 @@ export function NewBusinessForm({ siteHost }: { siteHost: string }) {
         <span className="mt-1 block break-all text-xs text-ink-muted">
           {siteHost}/{slug || "your-business"}
         </span>
-        {slug && slugProblem && <span className="mt-1 block text-xs text-red-600">{slugProblem}</span>}
+        {slug && slugProblem && <span className="mt-1 block text-xs text-danger">{slugProblem}</span>}
       </label>
 
       <input type="hidden" name="timezone" value={timezone} />
 
       {state.error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {state.error}
         </p>
       )}

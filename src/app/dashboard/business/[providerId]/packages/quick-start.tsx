@@ -58,7 +58,7 @@ export function QuickStart({ action, vocabSingular, vocabPlural, usualPriceCents
                   value={discounts[p.id] ?? ""}
                   onChange={(e) => setDiscounts((d) => ({ ...d, [p.id]: e.target.value }))}
                   aria-label={`${p.name} percent off`}
-                  className={`w-14 rounded-lg border bg-surface px-2 py-1.5 text-right ${pct === null ? "border-red-400" : "border-line"}`}
+                  className={`w-14 rounded-lg border bg-surface px-2 py-1.5 text-right ${pct === null ? "border-danger" : "border-line"}`}
                 />
                 % off
               </label>
@@ -69,7 +69,7 @@ export function QuickStart({ action, vocabSingular, vocabPlural, usualPriceCents
       </fieldset>
 
       {state.error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {state.error}
         </p>
       )}

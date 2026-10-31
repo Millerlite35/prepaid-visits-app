@@ -225,7 +225,7 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
                         {refunded > 0 ? ` · ${formatCents(refunded)} refunded` : ""}
                       </span>
                     </span>
-                    {p.status !== "paid" && <span className="text-xs font-medium uppercase text-amber-700">{p.status.replace("_", " ")}</span>}
+                    {p.status !== "paid" && <span className="text-xs font-medium uppercase text-warning">{p.status.replace("_", " ")}</span>}
                   </div>
                   {canRefund && (
                     <RefundForm
@@ -266,7 +266,7 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
                       <span className="block text-xs text-ink-muted">{l.note}</span>
                     )}
                   </td>
-                  <td className={`py-2 text-right font-mono ${l.delta > 0 ? "text-green-700 dark:text-green-500" : "text-red-700 dark:text-red-400"}`}>
+                  <td className={`py-2 text-right font-mono ${l.delta > 0 ? "text-success" : "text-danger"}`}>
                     {l.delta > 0 ? `+${l.delta}` : l.delta}
                   </td>
                 </tr>

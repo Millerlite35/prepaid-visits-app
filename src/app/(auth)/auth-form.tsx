@@ -16,7 +16,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
 
   if (state.message) {
     return (
-      <p role="status" className="mt-6 rounded-md bg-green-50 p-3 text-sm text-green-800">
+      <p role="status" className="mt-6 rounded-md bg-success-soft p-3 text-sm text-success">
         {state.message}
       </p>
     );
@@ -41,7 +41,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
       </label>
 
       {state.error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {state.error}
         </p>
       )}

@@ -223,12 +223,12 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
             </button>
           )}
           {state.error && (
-            <p role="alert" className="text-red-600">
+            <p role="alert" className="text-danger">
               {state.error}
             </p>
           )}
           {cards.length > 0 && (
-            <div className="space-y-2 rounded-md bg-green-50 p-3 text-green-900 dark:bg-green-950 dark:text-green-100">
+            <div className="space-y-2 rounded-md bg-success-soft p-3 text-success">
               <p>
                 {state.fresh ? "Made" : "Loaded"} {cards.length} card{cards.length === 1 ? "" : "s"}
                 {mode === "avery" ? ` on ${sheets.length} sheet${sheets.length === 1 ? "" : "s"}` : ""}. Each has its own code.
@@ -254,7 +254,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="w-fit overflow-hidden rounded-md shadow-md ring-1 ring-zinc-200">
+            <div className="w-fit overflow-hidden rounded-md shadow-md ring-1 ring-line">
               <QrCard b={brand} qr={cards[0]?.qrDataUrl ?? sampleQr} s={s} />
             </div>
             <p className="max-w-[3.5in] text-xs text-ink-muted">

@@ -9,7 +9,7 @@ const inputClass =
 
 function Result({ state, pending }: { state: PasswordState; pending: boolean }) {
   if (pending) return null;
-  if (state.error) return <p role="alert" className="text-sm text-red-600">{state.error}</p>;
+  if (state.error) return <p role="alert" className="text-sm text-danger">{state.error}</p>;
   return null;
 }
 
@@ -18,7 +18,7 @@ export function ForgotPasswordForm() {
 
   if (state.message) {
     return (
-      <p role="status" className="mt-6 rounded-md bg-green-50 p-3 text-sm text-green-800">
+      <p role="status" className="mt-6 rounded-md bg-success-soft p-3 text-sm text-success">
         {state.message}
       </p>
     );

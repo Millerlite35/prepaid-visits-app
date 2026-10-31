@@ -45,14 +45,14 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
           accept={LOGO_TYPES.join(",")}
           required
           onChange={(e) => choose(e.target.files?.[0])}
-          className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-2 dark:file:bg-zinc-800"
+          className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-2"
         />
         <p className="text-xs text-ink-muted">
           PNG, JPG or WebP, up to 1 MB. A wide logo on a transparent or white background works best.
         </p>
-        {problem && <p className="text-sm text-red-600">{problem}</p>}
-        {!pending && state.error && <p role="alert" className="text-sm text-red-600">{state.error}</p>}
-        {!pending && state.saved && <p role="status" className="text-sm text-green-700 dark:text-green-500">✓ Logo saved</p>}
+        {problem && <p className="text-sm text-danger">{problem}</p>}
+        {!pending && state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
+        {!pending && state.saved && <p role="status" className="text-sm text-success">✓ Logo saved</p>}
         <button
           disabled={pending || !preview}
           className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
@@ -63,7 +63,7 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
 
       {currentUrl && (
         <form action={removeAction}>
-          <ConfirmSubmit label="Remove logo" question="Remove your logo?" confirmLabel="Yes, remove" className="text-sm text-red-600 underline" />
+          <ConfirmSubmit label="Remove logo" question="Remove your logo?" confirmLabel="Yes, remove" className="text-sm text-danger underline" />
         </form>
       )}
     </div>

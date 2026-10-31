@@ -94,7 +94,7 @@ async function DashboardContent() {
 
       {invites && invites.length > 0 && (
         <div className="mb-6">
-          <Callout tone="green" title="Invitations">
+          <Callout tone="success" title="Invitations">
             <ul className="space-y-3">
               {invites.map((i) => (
                 <li key={i.id} className="flex flex-wrap items-center justify-between gap-3">
@@ -113,7 +113,7 @@ async function DashboardContent() {
       )}
 
       {error ? (
-        <Callout tone="red">Couldn&apos;t load your businesses. Try refreshing.</Callout>
+        <Callout tone="danger">Couldn&apos;t load your businesses. Try refreshing.</Callout>
       ) : memberships.length === 0 ? (
         <Card>
           <EmptyState action={{ href: "/dashboard/new-business", label: "Create your business" }}>
@@ -191,9 +191,9 @@ async function DashboardContent() {
 
 function PaymentsBadge({ provider }: { provider: NonNullable<Membership["providers"]> }) {
   return provider.stripe_charges_enabled ? (
-    <Badge tone="green">✓ Taking payments</Badge>
+    <Badge tone="success">✓ Taking payments</Badge>
   ) : (
-    <Badge tone="amber">Payments not set up</Badge>
+    <Badge tone="warning">Payments not set up</Badge>
   );
 }
 

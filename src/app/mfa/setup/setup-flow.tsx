@@ -11,7 +11,7 @@ export function SetupFlow() {
     return (
       <form action={startAction} className="mt-6 space-y-3">
         {enroll.error && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-danger">
             {enroll.error}
           </p>
         )}

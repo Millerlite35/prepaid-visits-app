@@ -33,9 +33,9 @@ export function ConfirmSubmit({
     );
   }
   return (
-    <span className="inline-flex flex-wrap items-center gap-3 rounded-md bg-red-50 p-2 text-sm text-red-900 dark:bg-red-950 dark:text-red-100">
+    <span className="inline-flex flex-wrap items-center gap-3 rounded-md bg-danger-soft p-2 text-sm text-danger">
       <span>{question}</span>
-      <button type="submit" className="rounded-md bg-red-600 px-3 py-1 font-medium text-white">
+      <button type="submit" className="rounded-md bg-danger-solid px-3 py-1 font-medium text-white">
         {confirmLabel}
       </button>
       <button type="button" onClick={() => setAsking(false)} className="underline">

@@ -22,7 +22,7 @@ function CancelCard({ cancel, linkedAt }: { cancel: Action; linkedAt: string }) 
           className="text-sm underline"
         />
       </form>
-      {state.error && <p role="alert" className="w-full text-sm text-red-600">{state.error}</p>}
+      {state.error && <p role="alert" className="w-full text-sm text-danger">{state.error}</p>}
     </li>
   );
 }

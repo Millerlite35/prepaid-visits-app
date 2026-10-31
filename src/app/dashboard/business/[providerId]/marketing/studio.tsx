@@ -227,7 +227,7 @@ export function Studio(props: Props) {
         </label>
 
         {props.logo && logoWidth !== null && logoWidth < MIN_LOGO_WIDTH_PX && (
-          <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+          <p className="rounded-md bg-warning-soft p-3 text-sm text-warning">
             ⚠ Your logo is only {logoWidth} pixels wide, so it may look blurry in print. Upload a larger one (at least{" "}
             {MIN_LOGO_WIDTH_PX} pixels wide) in Page settings.
           </p>
@@ -244,7 +244,7 @@ export function Studio(props: Props) {
               {downloading === "working" ? "Preparing image…" : "Download image"}
             </button>
             {downloading === "failed" ? (
-              <p role="alert" className="mt-2 text-xs text-red-600">
+              <p role="alert" className="mt-2 text-xs text-danger">
                 Couldn&apos;t download. Right-click the preview and choose &quot;Save image as…&quot; instead.
               </p>
             ) : (

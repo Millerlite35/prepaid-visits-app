@@ -55,7 +55,7 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
       .returns<{ package_template_id: string }[]>(),
   ]);
   if (providerRes.error || packagesRes.error || soldRes.error) {
-    return <p className="text-sm text-red-600">Couldn&apos;t load packages. Try refreshing.</p>;
+    return <p className="text-sm text-danger">Couldn&apos;t load packages. Try refreshing.</p>;
   }
 
   const provider = providerRes.data;
@@ -101,7 +101,7 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
                   </form>
                   {!hasSales.has(p.id) && (
                     <form action={deletePackage.bind(null, providerId, p.id)}>
-                      <button className="text-red-600 underline">Delete</button>
+                      <button className="text-danger underline">Delete</button>
                     </form>
                   )}
                 </div>

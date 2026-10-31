@@ -42,7 +42,7 @@ async function RecoveredNotice({ searchParams }: Pick<PageProps<"/login">, "sear
   }
   if (params.recovered !== "1") return null;
   return (
-    <p role="status" className="mt-4 rounded-md bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
+    <p role="status" className="mt-4 rounded-md bg-success-soft p-3 text-sm text-success">
       Backup code accepted and your old authenticator was removed. Sign in again, then set up your new phone.
     </p>
   );

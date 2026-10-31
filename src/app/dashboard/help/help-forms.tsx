@@ -42,7 +42,7 @@ export function FaqList({ topics }: { topics: FaqTopic[] }) {
                   </span>
                   {i.q}
                 </summary>
-                <p className="mt-2 pl-5 text-sm text-zinc-700 dark:text-zinc-300">{i.a}</p>
+                <p className="mt-2 pl-5 text-sm text-ink">{i.a}</p>
               </details>
             ))}
           </div>
@@ -80,7 +80,7 @@ export function SupportForm({
 
   if (state.message) {
     return (
-      <p role="status" className="rounded-md bg-green-50 p-3 text-sm text-green-800">
+      <p role="status" className="rounded-md bg-success-soft p-3 text-sm text-success">
         ✓ {state.message}
       </p>
     );
@@ -126,7 +126,7 @@ export function SupportForm({
         </span>
       </label>
       {!pending && state.error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {state.error}
         </p>
       )}

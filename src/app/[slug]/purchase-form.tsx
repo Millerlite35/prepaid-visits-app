@@ -87,7 +87,7 @@ export function PurchaseForm({ action, packages, singular, plural, brandColor, t
                     )}
                   </span>
                   {savingPercent(p) >= 1 && (
-                    <span className="mt-1 inline-flex rounded-full bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-950 dark:text-green-400">
+                    <span className="mt-1 inline-flex rounded-full bg-success-soft px-2 py-0.5 text-xs font-semibold text-success">
                       Save {savingPercent(p)}% vs {formatCents(usualPriceCents!)} each
                     </span>
                   )}
@@ -139,7 +139,7 @@ export function PurchaseForm({ action, packages, singular, plural, brandColor, t
       </Step>
 
       {state.error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+        <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
           {state.error}
         </p>
       )}

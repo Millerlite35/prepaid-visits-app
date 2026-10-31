@@ -56,7 +56,7 @@ async function ClientsContent({ params, searchParams }: PageProps<"/dashboard/bu
       .returns<{ visit_account_id: string; created_at: string }[]>(),
   ]);
   if (clientsRes.error || balancesRes.error || providerRes.error) {
-    return <p className="text-sm text-red-600">Couldn&apos;t load clients. Try refreshing.</p>;
+    return <p className="text-sm text-danger">Couldn&apos;t load clients. Try refreshing.</p>;
   }
 
   const balances = new Map(balancesRes.data.map((b) => [b.visit_account_id, b]));
@@ -86,7 +86,7 @@ async function ClientsContent({ params, searchParams }: PageProps<"/dashboard/bu
       ) : (
         <div className="mt-6 overflow-x-auto rounded-lg border border-line">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 text-xs uppercase text-ink-muted dark:bg-zinc-900">
+            <thead className="bg-surface-muted text-xs uppercase text-ink-muted">
               <tr>
                 <th className="px-3 py-2">Client</th>
                 <th className="px-3 py-2">{plural.charAt(0).toUpperCase() + plural.slice(1)} left</th>
