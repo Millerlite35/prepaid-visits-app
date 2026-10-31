@@ -15,12 +15,15 @@ function sessionIdOf(claims: Claims): string | null {
   return typeof claims.session_id === "string" ? claims.session_id : null;
 }
 
-// When this session last passed the two-step code (Unix seconds), from the signed login token.
+// the second step: authenticator code or passkey (Supabase's names for them in the token)
+const SECOND_STEP = new Set(["totp", "mfa/totp", "webauthn", "mfa/webauthn"]);
+
+// When this session last passed the second step (Unix seconds), from the signed login token.
 function codeTime(claims: Claims): number | null {
   if (!Array.isArray(claims.amr)) return null;
   const times = claims.amr
     .filter((e): e is { method: string; timestamp: number } =>
-      typeof e === "object" && e !== null && e.method === "totp" && typeof e.timestamp === "number",
+      typeof e === "object" && e !== null && SECOND_STEP.has(e.method) && typeof e.timestamp === "number",
     )
     .map((e) => e.timestamp);
   return times.length > 0 ? Math.max(...times) : null;

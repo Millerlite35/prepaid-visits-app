@@ -340,6 +340,17 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (one DB read, cached per request) and sends expired sessions to `/auth/expired` (route
   handler: signs out only if really expired) -> `/login?expired=1`. Signing out always means
   password + code again; migration 0004 (aal2) is untouched.
+- Passkeys (built Nov 2026, `src/lib/passkeys.ts` server, `src/lib/passkey-browser.ts` browser): the
+  SECOND step, in place of the 6-digit code (password is still required). Supabase "webauthn" MFA
+  factors, so a passkey sign-in is aal2 like a code. Requires Supabase dashboard > Authentication >
+  Multi-Factor > WebAuthn **enabled** (else enroll fails `mfa_webauthn_enroll_not_enabled`). Supabase's
+  own WebAuthn helpers are browser-side, so the server calls the Auth API (`/factors/{id}/challenge` and
+  `/verify`) with the user's token and saves the new session with `setSession`; the browser only runs
+  `navigator.credentials`. Relying party = `SITE_URL`'s host: passkeys don't carry over to a new domain.
+  Added on `/dashboard/security` (Passkeys panel, needs aal2); used on `/mfa/verify` ("Use passkey", one
+  button per passkey, code form below). The authenticator app stays required (set up first, used for
+  password reset); backup-code recovery removes ALL factors incl. passkeys. `requireUser` sends anyone
+  with any verified factor to `/mfa/verify`; remember-device counts `totp` and `webauthn` amr entries.
 
 ## Design system (Oct 2026)
 - Tokens in `src/app/globals.css`: `canvas` (page background), `surface` / `surface-muted`

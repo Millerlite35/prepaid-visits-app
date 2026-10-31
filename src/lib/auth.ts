@@ -27,7 +27,9 @@ export async function requireUser(): Promise<StaffUser> {
   const { supabase, claims } = await readSession();
   if (claims.aal !== "aal2") {
     const { data } = await supabase.auth.mfa.listFactors();
-    redirect((data?.totp.length ?? 0) > 0 ? "/mfa/verify" : "/mfa/setup");
+    // an authenticator app or a passkey: either one means "enter your code / use your passkey"
+    const hasFactor = (data?.all ?? []).some((f) => f.status === "verified");
+    redirect(hasFactor ? "/mfa/verify" : "/mfa/setup");
   }
   // 12 hours after the code, or 30 days on a remembered device (src/lib/session-trust.ts)
   if (await sessionExpired(claims)) redirect("/auth/expired");

@@ -4,7 +4,9 @@ import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { BACKUP_CODE_COUNT, unusedBackupCodeCount } from "@/lib/backup-codes";
+import { listPasskeys } from "@/lib/passkeys";
 import { BackupCodesPanel } from "./backup-codes-panel";
+import { PasskeysPanel } from "./passkeys-panel";
 import { Notice, PageSkeleton } from "@/components/ui";
 import { Icon } from "@/components/icons";
 
@@ -23,7 +25,7 @@ export default function SecurityPage({ searchParams }: PageProps<"/dashboard/sec
 
 async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/security">, "searchParams">) {
   const user = await requireUser();
-  const unused = await unusedBackupCodeCount(user.id);
+  const [unused, passkeys] = await Promise.all([unusedBackupCodeCount(user.id), listPasskeys()]);
   const justSetUp = (await searchParams).setup === "1";
 
   return (
@@ -35,6 +37,15 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
           Two-step verification is on. One last step: make backup codes, in case you ever lose your phone.
         </Notice>
       )}
+
+      <section className="mt-6 rounded-xl border border-line bg-surface p-5">
+        <h2 className="font-medium">Passkeys</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          Sign in with Face ID, a fingerprint or your device PIN instead of typing the 6-digit code. Add one on each
+          phone or computer you use. Your authenticator app still works as a backup.
+        </p>
+        <PasskeysPanel passkeys={passkeys} />
+      </section>
 
       <section className="mt-6 rounded-xl border border-line bg-surface p-5">
         <h2 className="font-medium">Backup codes</h2>
