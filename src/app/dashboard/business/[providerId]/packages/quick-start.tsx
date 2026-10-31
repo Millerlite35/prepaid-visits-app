@@ -58,7 +58,7 @@ export function QuickStart({ action, vocabSingular, vocabPlural, usualPriceCents
                   value={discounts[p.id] ?? ""}
                   onChange={(e) => setDiscounts((d) => ({ ...d, [p.id]: e.target.value }))}
                   aria-label={`${p.name} percent off`}
-                  className={`w-14 rounded-lg border bg-surface px-2 py-1.5 text-right ${pct === null ? "border-danger" : "border-line"}`}
+                  className={`w-14 rounded-md border bg-surface px-2 py-1.5 text-right ${pct === null ? "border-danger" : "border-line"}`}
                 />
                 % off
               </label>
@@ -73,7 +73,7 @@ export function QuickStart({ action, vocabSingular, vocabPlural, usualPriceCents
           {state.error}
         </p>
       )}
-      <button disabled={pending} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
+      <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Adding…" : "Add selected packages"}
       </button>
       <p className="text-xs text-ink-muted">You can rename or change any of these after adding them.</p>

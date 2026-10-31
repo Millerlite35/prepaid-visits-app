@@ -75,9 +75,10 @@ should re-check these findings with it (see "Next session" at the bottom).
 
 ## Suggested order (each step small and checkable)
 1. Type scale + font pairing (biggest visible change, touches only `layout.tsx`,
-   `globals.css` and `ui.tsx`).
-2. Status colour tokens + replace raw colours.
-3. Radii + fewer cards (start with the dashboard overview and client page).
+   `globals.css` and `ui.tsx`). **Done Oct 31.**
+2. Status colour tokens + replace raw colours. **Done Oct 31** (also cool, navy-tinted neutrals).
+3. Radii + fewer cards (start with the dashboard overview and client page). **Done Oct 31** for
+   radii everywhere, overview stats and the client page; other pages still use one card per section.
 4. Icons instead of typed symbols; skeletons instead of "Loading…"; retire the `/` page.
 5. Sign-in/two-step pages; copy trim.
 6. Brand switch to navy/green + wordmark (after the name is confirmed).

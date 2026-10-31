@@ -145,7 +145,7 @@ export function Scanner({ checkIn, undo, singular, plural, cardLinking }: Props)
         <video ref={videoRef} muted playsInline className={`h-full w-full object-cover ${cameraOn ? "" : "hidden"}`} />
         {!cameraOn && (
           <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center text-white">
-            <button onClick={startCamera} className="rounded-lg bg-white px-5 py-3 font-medium text-black">
+            <button onClick={startCamera} className="rounded-md bg-white px-5 py-3 font-medium text-black">
               Start camera
             </button>
             {cameraError && <p className="text-sm text-white/70">{cameraError}</p>}
@@ -195,7 +195,7 @@ export function Scanner({ checkIn, undo, singular, plural, cardLinking }: Props)
             className="mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2 font-mono text-sm"
           />
         </label>
-        <button className="rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm hover:bg-surface-muted">Check in</button>
+        <button className="rounded-md border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm hover:bg-surface-muted">Check in</button>
       </form>
     </div>
   );
@@ -300,11 +300,11 @@ function ResultCard({
       </div>
       <div className="flex flex-wrap gap-3">
         {s.result === "duplicate_recent" && (
-          <button onClick={onForce} className="rounded-lg border-2 border-white px-4 py-3 font-medium">
+          <button onClick={onForce} className="rounded-md border-2 border-white px-4 py-3 font-medium">
             Check in again anyway
           </button>
         )}
-        <button onClick={onNext} className="rounded-lg bg-white px-5 py-3 font-semibold text-black">
+        <button onClick={onNext} className="rounded-md bg-white px-5 py-3 font-semibold text-black">
           Scan next
         </button>
       </div>
@@ -336,7 +336,7 @@ function LinkCardPanel({
     return (
       <div className="space-y-3">
         <p className="text-xl font-semibold">✓ Card linked to {state.clientName}</p>
-        <button onClick={onCheckIn} className="rounded-lg bg-white px-4 py-2 font-semibold text-black">
+        <button onClick={onCheckIn} className="rounded-md bg-white px-4 py-2 font-semibold text-black">
           Check {state.clientName.split(" ")[0]} in now
         </button>
       </div>

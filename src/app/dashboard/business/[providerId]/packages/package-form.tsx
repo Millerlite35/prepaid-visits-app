@@ -132,7 +132,7 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
               inputMode="decimal"
               onChange={(e) => setUsual(e.target.value)}
               placeholder="150"
-              className="w-24 rounded-lg border border-line bg-surface px-2 py-1.5"
+              className="w-24 rounded-md border border-line bg-surface px-2 py-1.5"
             />
           </span>
         </label>
@@ -145,7 +145,7 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
               onChange={(e) => changePct(e.target.value)}
               disabled={!usualCents}
               placeholder="10"
-              className="w-16 rounded-lg border border-line bg-surface px-2 py-1.5 text-right disabled:opacity-50"
+              className="w-16 rounded-md border border-line bg-surface px-2 py-1.5 text-right disabled:opacity-50"
             />
             %
           </span>
@@ -190,7 +190,7 @@ export function PackageForm({ action, initial, vocabSingular, vocabPlural, submi
           {state.error}
         </p>
       )}
-      <button disabled={pending} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
+      <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Saving…" : submitLabel}
       </button>
     </form>

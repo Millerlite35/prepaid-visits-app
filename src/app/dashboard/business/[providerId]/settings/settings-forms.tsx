@@ -29,7 +29,7 @@ function Result({ state, pending }: { state: SettingsState; pending: boolean }) 
 
 function SaveButton({ pending, label = "Save" }: { pending: boolean; label?: string }) {
   return (
-    <button disabled={pending} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
+    <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
       {pending ? "Saving…" : label}
     </button>
   );
@@ -132,7 +132,7 @@ export function PageDetailsForm({ action, initial }: { action: Action; initial: 
             value={isHexColor(color) ? color.toLowerCase() : "#1b4d3e"}
             onChange={(e) => setColor(e.target.value.toUpperCase())}
             aria-label="Custom colour"
-            className="h-8 w-12 cursor-pointer rounded border border-line"
+            className="h-8 w-12 cursor-pointer rounded-md border border-line"
           />
           <span className="rounded-md px-3 py-1 text-sm font-medium text-white" style={{ backgroundColor: color }}>
             Buy now

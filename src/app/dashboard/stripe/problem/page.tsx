@@ -8,7 +8,7 @@ export default function StripeProblemPage() {
         Something went wrong starting your Stripe setup. Nothing was charged. Please try
         again in a minute. If it keeps happening, contact support.
       </p>
-      <Link href="/dashboard" className="mt-6 inline-block rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
+      <Link href="/dashboard" className="mt-6 inline-block rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
         Back to dashboard
       </Link>
     </main>

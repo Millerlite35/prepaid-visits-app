@@ -75,7 +75,7 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
             No packages yet. Use Quick start below, or create your own.
           </p>
         ) : (
-          <ul className="mt-3 divide-y divide-line rounded-lg border border-line">
+          <ul className="mt-3 divide-y divide-line rounded-xl border border-line">
             {packages.map((p) => (
               <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 p-4 text-sm">
                 <div className={p.active ? "" : "opacity-60"}>
@@ -111,7 +111,7 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
         )}
       </section>
 
-      <section className="mt-10 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <section className="mt-10 rounded-xl border border-line bg-surface p-5">
         <h2 className="font-medium">Quick start</h2>
         <p className="mb-4 mt-1 text-sm text-ink-muted">
           Add ready-made packages priced from your usual rate, with a discount for buying more.
@@ -124,7 +124,7 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
         />
       </section>
 
-      <section className="mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <section className="mt-6 rounded-xl border border-line bg-surface p-5">
         <h2 className="mb-4 font-medium">Create your own package</h2>
         <PackageForm
           usualPriceCents={providerRes.data?.usual_price_cents ?? null}

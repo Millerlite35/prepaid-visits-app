@@ -32,7 +32,7 @@ function HowItWorks({ singular }: { singular: string }) {
   return (
     <ol className="mt-6 grid grid-cols-3 gap-2 text-center text-xs text-ink-muted">
       {steps.map((step, i) => (
-        <li key={step} className="rounded-lg bg-surface-muted px-2 py-3">
+        <li key={step} className="rounded-md bg-surface-muted px-2 py-3">
           <span className="mx-auto mb-1 flex h-6 w-6 items-center justify-center rounded-full bg-surface text-xs font-semibold text-ink shadow-sm">
             {i + 1}
           </span>
@@ -69,7 +69,7 @@ async function PurchaseContent({ params, searchParams }: PageProps<"/[slug]">) {
       <ClientShell contact={contact}>
         <ClientCard color={provider.brand_color}>
           {header}
-          <p className="mt-6 rounded-lg bg-surface-muted p-4 text-center text-sm text-ink-muted">
+          <p className="mt-6 rounded-md bg-surface-muted p-4 text-center text-sm text-ink-muted">
             {provider.display_name} isn&apos;t selling packages online yet. Please check back soon.
           </p>
         </ClientCard>

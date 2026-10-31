@@ -55,7 +55,7 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
 
   const site = requireEnv("SITE_URL");
   const privateUrl = `${site}/${p.slug}?key=${p.private_access_key}`;
-  const card = "mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
+  const card = "mt-6 rounded-xl border border-line bg-surface p-5";
 
   return (
     <>

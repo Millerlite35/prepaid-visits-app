@@ -173,20 +173,20 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
                   Left/right: {nudge.x > 0 ? "+" : ""}
                   {nudge.x}
                 </span>
-                <button type="button" onClick={() => changeNudge("x", -1)} className="rounded border px-2" aria-label="Move left">
+                <button type="button" onClick={() => changeNudge("x", -1)} className="rounded-md border px-2" aria-label="Move left">
                   ←
                 </button>
-                <button type="button" onClick={() => changeNudge("x", 1)} className="rounded border px-2" aria-label="Move right">
+                <button type="button" onClick={() => changeNudge("x", 1)} className="rounded-md border px-2" aria-label="Move right">
                   →
                 </button>
                 <span className="ml-3">
                   Up/down: {nudge.y > 0 ? "+" : ""}
                   {nudge.y}
                 </span>
-                <button type="button" onClick={() => changeNudge("y", -1)} className="rounded border px-2" aria-label="Move up">
+                <button type="button" onClick={() => changeNudge("y", -1)} className="rounded-md border px-2" aria-label="Move up">
                   ↑
                 </button>
-                <button type="button" onClick={() => changeNudge("y", 1)} className="rounded border px-2" aria-label="Move down">
+                <button type="button" onClick={() => changeNudge("y", 1)} className="rounded-md border px-2" aria-label="Move down">
                   ↓
                 </button>
               </div>
@@ -212,7 +212,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
               type="button"
               disabled={pending}
               onClick={() => run(() => makeCards(count))}
-              className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+              className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
             >
               {pending ? "Working…" : "Make new cards"}
             </button>
@@ -233,7 +233,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
                 {state.fresh ? "Made" : "Loaded"} {cards.length} card{cards.length === 1 ? "" : "s"}
                 {mode === "avery" ? ` on ${sheets.length} sheet${sheets.length === 1 ? "" : "s"}` : ""}. Each has its own code.
               </p>
-              <button type="button" onClick={() => window.print()} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
+              <button type="button" onClick={() => window.print()} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
                 Print or save as PDF
               </button>
               <p className="text-xs">

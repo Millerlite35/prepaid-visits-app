@@ -361,8 +361,12 @@ default), plus a privilege check in `provider_setup_test.sql`.
   Shown in the top bar, sign-in/two-step pages, client "Powered by" footer. Emails: `brandedEmail()` /
   `emailWordmark()` in `src/lib/email-layout.ts` (header on staff invite, backup-code alert, support;
   the client pass email keeps the PRACTICE's branding on top and has the wordmark in its footer).
-- Staff building blocks in `src/components/ui.tsx`: `PageHeader`, `Card`, `Stat` (+ `Trend`),
+- Staff building blocks in `src/components/ui.tsx`: `PageHeader`, `Card`, `StatStrip` + `Stat` (+ `Trend`),
   `Badge`, `Callout`, `EmptyState`, `Row`, `buttonClass(variant, size)`. Icons: `src/components/icons.tsx`.
+- Shape (Oct 31, 2026, design audit step 3): TWO radii only: `rounded-md` (6px) for buttons, inputs, nav
+  items and boxes inside a panel; `rounded-xl` (12px) for panels on the canvas. `rounded-full` only for
+  pills and dots. No drop shadow under staff panels (border only). Group related content in one panel
+  with `divide-y` sections instead of a card each (see the client page: 3 panels, balance in the header).
 - Staff shell: `dashboard/layout.tsx` (sticky top bar on the canvas); business pages get a
   role-aware sidebar (`dashboard/business/[providerId]/layout.tsx` + `components/business-nav.tsx`,
   a tab strip on phones). The sidebar is a convenience: pages still check access themselves.

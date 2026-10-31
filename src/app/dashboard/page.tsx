@@ -200,7 +200,7 @@ function PaymentsBadge({ provider }: { provider: NonNullable<Membership["provide
 function PaymentsSetup({ provider, isOwner }: { provider: NonNullable<Membership["providers"]>; isOwner: boolean }) {
   const started = provider.stripe_account_id !== null;
   return (
-    <div className="mt-3 rounded-lg bg-surface-muted px-3 py-2.5 text-sm">
+    <div className="mt-3 rounded-md bg-surface-muted px-3 py-2.5 text-sm">
       <p className="text-ink-muted">{started ? "Stripe setup isn't finished yet." : "Connect Stripe to get paid for packages."}</p>
       {isOwner ? (
         <form action={connectStripe} className="mt-2">

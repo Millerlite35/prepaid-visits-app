@@ -83,7 +83,7 @@ export function StylePicker({ value, onChange, color }: { value: DesignStyleId; 
               <span className="flex items-center gap-2">
                 <span
                   aria-hidden
-                  className="inline-block h-4 w-4 rounded-sm border border-line"
+                  className="inline-block h-4 w-4 rounded-md border border-line"
                   style={{ background: s.pageBg, boxShadow: `inset 4px 0 0 ${s.stripe(color)}` }}
                 />
                 <span className="font-medium" style={{ fontFamily: s.headingFont }}>

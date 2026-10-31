@@ -34,7 +34,7 @@ async function PassContent({ params }: PageProps<"/pass/[token]">) {
     return (
       <ClientCard color={pass.brandColor}>
         {header}
-        <p className="mt-6 rounded-lg bg-surface-muted p-4 text-center text-sm text-ink-muted">
+        <p className="mt-6 rounded-md bg-surface-muted p-4 text-center text-sm text-ink-muted">
           This pass is no longer active. Please contact {pass.providerName} for a new one.
         </p>
       </ClientCard>
@@ -48,7 +48,7 @@ async function PassContent({ params }: PageProps<"/pass/[token]">) {
     <ClientCard color={pass.brandColor}>
       {header}
       <div
-        className="mx-auto mt-6 w-64 rounded-2xl border border-line bg-white p-3 shadow-sm"
+        className="mx-auto mt-6 w-64 rounded-xl border border-line bg-white p-3 shadow-sm"
         aria-label="Your check-in code"
         role="img"
         // our own QR library output for our own random token

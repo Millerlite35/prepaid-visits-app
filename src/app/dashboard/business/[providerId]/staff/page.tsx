@@ -54,7 +54,7 @@ async function StaffContent({ params }: { params: Promise<{ providerId: string }
     }),
   );
   const openInvites = (invites ?? []).filter((i) => new Date(i.expires_at) > new Date());
-  const card = "mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
+  const card = "mt-6 rounded-xl border border-line bg-surface p-5";
 
   return (
     <>

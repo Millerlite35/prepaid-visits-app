@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Card } from "@/components/ui";
 import { brand } from "@/config/brand";
 import { requireManager } from "@/lib/auth";
 import { formatCents } from "@/lib/packages";
@@ -16,7 +17,7 @@ export const metadata: Metadata = { title: `Client · ${brand.name}` };
 
 export default function ClientPage(props: PageProps<"/dashboard/business/[providerId]/clients/[clientId]">) {
   return (
-    <main className="w-full max-w-3xl flex-1 px-4 py-8 sm:px-8">
+    <main className="w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<p className="text-sm">Loading…</p>}>
         <ClientContent {...props} />
       </Suspense>
@@ -143,138 +144,149 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
   const purchases = purchasesRes.data ?? [];
   const ledger = ledgerRes.data ?? [];
   const pass = passRes.data;
-  const card = "mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
+  const Many = many.charAt(0).toUpperCase() + many.slice(1);
+  const subhead = "mb-2 text-sm font-semibold text-ink";
 
   return (
     <>
       <Link href={`/dashboard/business/${providerId}/clients`} className="text-sm underline">
         ← Clients
       </Link>
-      <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">{client.full_name}</h1>
-      <p className="mt-1 text-sm text-ink-muted">
-        {client.email} · client since {fmt(client.created_at)}
-      </p>
-
-      <section className={`${card} flex flex-wrap items-center gap-6`}>
-        <div>
-          <p className="text-sm text-ink-muted">{many.charAt(0).toUpperCase() + many.slice(1)} left</p>
-          <p className="text-4xl font-semibold text-brand">{balance?.usable_visits ?? 0}</p>
+      <header className="mt-4 flex flex-wrap items-end justify-between gap-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-medium tracking-tight text-ink">{client.full_name}</h1>
+          <p className="mt-1 text-sm text-ink-muted">
+            {client.email} · client since {fmt(client.created_at)}
+          </p>
         </div>
-        {balance?.next_expiry && (
+        <dl className="flex gap-8">
           <div>
-            <p className="text-sm text-ink-muted">Next expiry</p>
-            <p className="font-medium">{fmt(balance.next_expiry)}</p>
+            <dt className="text-sm text-ink-muted">{Many} left</dt>
+            <dd className="text-3xl font-semibold tracking-[-0.03em] text-ink tabular-nums">{balance?.usable_visits ?? 0}</dd>
           </div>
-        )}
-      </section>
-
-      <section className={card}>
-        <h2 className="mb-1 font-medium">Pass</h2>
-        <p className="mb-4 text-sm text-ink-muted">
-          {pass ? (
-            <>
-              Active since {fmt(pass.issued_at)}.{" "}
-              <a href={`/pass/${pass.token}`} target="_blank" rel="noopener noreferrer" className="underline">
-                View pass ↗
-              </a>
-            </>
-          ) : (
-            "No active pass."
+          {balance?.next_expiry && (
+            <div>
+              <dt className="text-sm text-ink-muted">Next expiry</dt>
+              <dd className="mt-2 font-medium">{fmt(balance.next_expiry)}</dd>
+            </div>
           )}
-        </p>
-        <PassButtons
-          resend={resendPass.bind(null, providerId, clientId)}
-          reissue={reissuePass.bind(null, providerId, clientId)}
-          hasPass={!!pass}
-        />
-      </section>
+        </dl>
+      </header>
 
-      <section className={card}>
-        <h2 className="mb-3 font-medium">QR cards</h2>
-        <CardList
-          cards={(cardRows ?? []).map((c) => ({
-            id: c.id,
-            linkedAt: c.linked_at ? fmt(c.linked_at) : "",
-            cancel: cancelCard.bind(null, providerId, clientId, c.id),
-          }))}
-        />
-      </section>
+      {/* pass panel comes first in the page order (phones), and sits on the right on wide screens */}
+      <div className="mt-8 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <Card title="Pass and QR cards" padded={false} className="lg:col-start-2 lg:row-start-1">
+          <div className="divide-y divide-line">
+            <div className="px-5 py-4">
+              <h3 className={subhead}>Pass</h3>
+              <p className="mb-4 text-sm text-ink-muted">
+                {pass ? (
+                  <>
+                    Active since {fmt(pass.issued_at)}.{" "}
+                    <a href={`/pass/${pass.token}`} target="_blank" rel="noopener noreferrer" className="underline">
+                      View pass ↗
+                    </a>
+                  </>
+                ) : (
+                  "No active pass."
+                )}
+              </p>
+              <PassButtons
+                resend={resendPass.bind(null, providerId, clientId)}
+                reissue={reissuePass.bind(null, providerId, clientId)}
+                hasPass={!!pass}
+              />
+            </div>
+            <div className="px-5 py-4">
+              <h3 className={subhead}>QR cards</h3>
+              <CardList
+                cards={(cardRows ?? []).map((c) => ({
+                  id: c.id,
+                  linkedAt: c.linked_at ? fmt(c.linked_at) : "",
+                  cancel: cancelCard.bind(null, providerId, clientId, c.id),
+                }))}
+              />
+            </div>
+          </div>
+        </Card>
 
-      <section className={card}>
-        <h2 className="mb-3 font-medium">Purchases</h2>
-        {purchases.length === 0 ? (
-          <p className="text-sm text-ink-muted">No purchases.</p>
-        ) : (
-          <ul className="divide-y divide-line text-sm">
-            {purchases.map((p) => {
-              const remaining = remainingByPurchase.get(p.id) ?? 0;
-              const refunded = refundedByPurchase.get(p.id) ?? 0;
-              const refundable = p.price_cents - refunded;
-              const canRefund =
-                isOwner && !!p.stripe_payment_intent_id && (p.status === "paid" || p.status === "partially_refunded") && refundable > 0;
-              return (
-                <li key={p.id} className="py-3">
-                  <div className="flex flex-wrap justify-between gap-2">
-                    <span>
-                      <span className="font-medium">{p.package_name}</span>: {p.visits_purchased}{" "}
-                      {p.visits_purchased === 1 ? one : many} · {formatCents(p.price_cents)}
-                      <span className="block text-xs text-ink-muted">
-                        {p.package_name === "Complimentary" ? "Added" : "Bought"} {fmt(p.paid_at)}
-                        {p.expires_at ? ` · expires ${fmt(p.expires_at)}` : " · never expires"}
-                        {p.stripe_payment_intent_id ? ` · accepted terms v${p.terms_version}` : ""} · {remaining} unused
-                        {refunded > 0 ? ` · ${formatCents(refunded)} refunded` : ""}
-                      </span>
-                    </span>
-                    {p.status !== "paid" && <span className="text-xs font-medium uppercase text-warning">{p.status.replace("_", " ")}</span>}
-                  </div>
-                  {canRefund && (
-                    <RefundForm
-                      action={refundAction.bind(null, providerId, clientId, p.id)}
-                      remaining={remaining}
-                      refundableCents={refundable}
-                      perVisitCents={Math.round(p.price_cents / p.visits_purchased)}
-                      plural={many}
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+        <div className="min-w-0 space-y-6 lg:col-start-1 lg:row-start-1">
+          <Card title="Purchases" padded={false}>
+            <div className="px-5 py-1">
+              {purchases.length === 0 ? (
+                <p className="py-3 text-sm text-ink-muted">No purchases.</p>
+              ) : (
+                <ul className="divide-y divide-line text-sm">
+                  {purchases.map((p) => {
+                    const remaining = remainingByPurchase.get(p.id) ?? 0;
+                    const refunded = refundedByPurchase.get(p.id) ?? 0;
+                    const refundable = p.price_cents - refunded;
+                    const canRefund =
+                      isOwner && !!p.stripe_payment_intent_id && (p.status === "paid" || p.status === "partially_refunded") && refundable > 0;
+                    return (
+                      <li key={p.id} className="py-3">
+                        <div className="flex flex-wrap justify-between gap-2">
+                          <span>
+                            <span className="font-medium">{p.package_name}</span>: {p.visits_purchased}{" "}
+                            {p.visits_purchased === 1 ? one : many} · {formatCents(p.price_cents)}
+                            <span className="block text-xs text-ink-muted">
+                              {p.package_name === "Complimentary" ? "Added" : "Bought"} {fmt(p.paid_at)}
+                              {p.expires_at ? ` · expires ${fmt(p.expires_at)}` : " · never expires"}
+                              {p.stripe_payment_intent_id ? ` · accepted terms v${p.terms_version}` : ""} · {remaining} unused
+                              {refunded > 0 ? ` · ${formatCents(refunded)} refunded` : ""}
+                            </span>
+                          </span>
+                          {p.status !== "paid" && <span className="text-xs font-medium uppercase text-warning">{p.status.replace("_", " ")}</span>}
+                        </div>
+                        {canRefund && (
+                          <RefundForm
+                            action={refundAction.bind(null, providerId, clientId, p.id)}
+                            remaining={remaining}
+                            refundableCents={refundable}
+                            perVisitCents={Math.round(p.price_cents / p.visits_purchased)}
+                            plural={many}
+                          />
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+            {isOwner && accountId && (
+              <div className="border-t border-line px-5 py-4">
+                <h3 className={subhead}>Add or remove {many}</h3>
+                <AdjustForm action={adjustAction.bind(null, providerId, clientId)} plural={many} />
+              </div>
+            )}
+          </Card>
 
-      {isOwner && accountId && (
-        <section className={card}>
-          <h2 className="mb-3 font-medium">Add or remove {many}</h2>
-          <AdjustForm action={adjustAction.bind(null, providerId, clientId)} plural={many} />
-        </section>
-      )}
-
-      <section className={card}>
-        <h2 className="mb-3 font-medium">History</h2>
-        {ledger.length === 0 ? (
-          <p className="text-sm text-ink-muted">Nothing yet.</p>
-        ) : (
-          <table className="w-full text-left text-sm">
-            <tbody className="divide-y divide-line">
-              {ledger.map((l) => (
-                <tr key={l.id}>
-                  <td className="py-2 pr-3 text-ink-muted">{fmt(l.created_at, true)}</td>
-                  <td className="py-2 pr-3">
-                    {KIND_LABEL[l.kind] ?? l.kind}
-                    {l.note && (l.kind === "adjust" || l.kind === "refund") && l.note !== "Refund" && (
-                      <span className="block text-xs text-ink-muted">{l.note}</span>
-                    )}
-                  </td>
-                  <td className={`py-2 text-right font-mono ${l.delta > 0 ? "text-success" : "text-danger"}`}>
-                    {l.delta > 0 ? `+${l.delta}` : l.delta}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+          <Card title="History">
+            {ledger.length === 0 ? (
+              <p className="text-sm text-ink-muted">Nothing yet.</p>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <tbody className="divide-y divide-line">
+                  {ledger.map((l) => (
+                    <tr key={l.id}>
+                      <td className="py-2 pr-3 text-ink-muted">{fmt(l.created_at, true)}</td>
+                      <td className="py-2 pr-3">
+                        {KIND_LABEL[l.kind] ?? l.kind}
+                        {l.note && (l.kind === "adjust" || l.kind === "refund") && l.note !== "Refund" && (
+                          <span className="block text-xs text-ink-muted">{l.note}</span>
+                        )}
+                      </td>
+                      <td className={`py-2 text-right font-mono ${l.delta > 0 ? "text-success" : "text-danger"}`}>
+                        {l.delta > 0 ? `+${l.delta}` : l.delta}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Card>
+        </div>
+      </div>
     </>
   );
 }

@@ -76,7 +76,7 @@ async function ClientsContent({ params, searchParams }: PageProps<"/dashboard/bu
           placeholder="Search by name or email"
           className="block w-full rounded-md border border-line bg-surface px-3 py-2"
         />
-        <button className="rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm hover:bg-surface-muted">Search</button>
+        <button className="rounded-md border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm hover:bg-surface-muted">Search</button>
       </form>
 
       {clientsRes.data.length === 0 ? (
@@ -84,7 +84,7 @@ async function ClientsContent({ params, searchParams }: PageProps<"/dashboard/bu
           {q ? "No clients match that search." : "No clients yet. They appear here after their first purchase."}
         </p>
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-lg border border-line">
+        <div className="mt-6 overflow-x-auto rounded-xl border border-line">
           <table className="w-full text-left text-sm">
             <thead className="bg-surface-muted text-xs uppercase text-ink-muted">
               <tr>

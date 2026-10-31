@@ -26,7 +26,7 @@ export function ClientShell({ children, contact = [], width = "md" }: { children
 export function ClientCard({ color, children }: { color: string; children: ReactNode }) {
   return (
     <div
-      className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_24px_-12px_rgba(0,0,0,0.12)]"
+      className="overflow-hidden rounded-xl border border-line bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_24px_-12px_rgba(0,0,0,0.12)]"
       style={{ borderTop: `4px solid ${color}` }}
     >
       <div className="px-5 py-6 sm:px-8 sm:py-8">{children}</div>

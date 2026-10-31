@@ -17,7 +17,7 @@ type Props = {
 };
 
 const inputClass =
-  "mt-1.5 block w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-ink shadow-sm outline-none transition placeholder:text-ink-muted/60 focus:border-transparent focus:ring-2";
+  "mt-1.5 block w-full rounded-md border border-line bg-surface px-3.5 py-2.5 text-ink shadow-sm outline-none transition placeholder:text-ink-muted/60 focus:border-transparent focus:ring-2";
 
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
@@ -139,7 +139,7 @@ export function PurchaseForm({ action, packages, singular, plural, brandColor, t
       </Step>
 
       {state.error && (
-        <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
+        <p role="alert" className="rounded-md bg-danger-soft px-3 py-2 text-sm text-danger">
           {state.error}
         </p>
       )}

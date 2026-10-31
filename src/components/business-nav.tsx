@@ -32,7 +32,7 @@ export function BusinessNav({ groups, overviewHref, businessName, logo }: { grou
                 target={item.external ? "_blank" : undefined}
                 aria-current={active(item.href) ? "page" : undefined}
                 className={cx(
-                  "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm",
+                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm",
                   active(item.href) ? "bg-brand/10 font-medium text-brand" : "text-ink-muted hover:bg-surface-muted hover:text-ink",
                 )}
               >
@@ -67,7 +67,7 @@ export function BusinessNav({ groups, overviewHref, businessName, logo }: { grou
                       target={item.external ? "_blank" : undefined}
                       aria-current={active(item.href) ? "page" : undefined}
                       className={cx(
-                        "flex items-center gap-2.5 rounded-lg px-2 py-[5px] text-sm transition",
+                        "flex items-center gap-2.5 rounded-md px-2 py-[5px] text-sm transition",
                         active(item.href) ? "bg-brand/10 font-medium text-brand" : "text-ink-muted hover:bg-surface-muted hover:text-ink",
                       )}
                     >

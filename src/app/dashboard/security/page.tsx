@@ -34,7 +34,7 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
         </p>
       )}
 
-      <section className="mt-6 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <section className="mt-6 rounded-xl border border-line bg-surface p-5">
         <h2 className="font-medium">Backup codes</h2>
         <p className="mt-1 text-sm text-ink-muted">
           If you lose the phone with your authenticator app, a backup code gets you back in. Each code works
@@ -54,7 +54,7 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
         <BackupCodesPanel unused={unused} brandName={brand.name} />
       </section>
 
-      <section className="mt-6 rounded-lg border border-line p-4 text-sm">
+      <section className="mt-6 rounded-xl border border-line p-4 text-sm">
         <h2 className="font-medium">Password</h2>
         <p className="mt-1 text-ink-muted">
           To change it, sign out and use{" "}

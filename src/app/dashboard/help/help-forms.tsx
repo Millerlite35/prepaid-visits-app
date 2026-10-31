@@ -33,7 +33,7 @@ export function FaqList({ topics }: { topics: FaqTopic[] }) {
       {shown.map((t) => (
         <section key={t.id} className="mt-6">
           <h2 className="mb-2 font-medium">{t.title}</h2>
-          <div className="divide-y divide-line rounded-lg border border-line">
+          <div className="divide-y divide-line rounded-xl border border-line">
             {t.items.map((i) => (
               <details key={i.q} className="group p-3" open={words.length > 0}>
                 <summary className="cursor-pointer list-none text-sm font-medium">

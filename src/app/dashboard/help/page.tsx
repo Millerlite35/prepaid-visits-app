@@ -19,7 +19,7 @@ export default function HelpPage() {
         <FaqList topics={helpFaq} />
       </div>
 
-      <section id="contact" className="mt-10 rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <section id="contact" className="mt-10 rounded-xl border border-line bg-surface p-5">
         <h2 className="font-medium">Contact support</h2>
         <p className="mb-4 mt-1 text-sm text-ink-muted">
           Didn&apos;t find your answer? Send us a message and we&apos;ll reply by email.

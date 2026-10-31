@@ -17,7 +17,7 @@ export function SetupFlow() {
         )}
         <button
           disabled={starting}
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {starting ? "Preparing…" : "Set up authenticator app"}
         </button>
@@ -41,7 +41,7 @@ export function SetupFlow() {
         alt="QR code for your authenticator app"
         width={180}
         height={180}
-        className="rounded bg-white p-2"
+        className="rounded-md bg-white p-2"
       />
       <p className="text-xs text-ink-muted">
         Can&apos;t scan? Enter this setup key instead:{" "}

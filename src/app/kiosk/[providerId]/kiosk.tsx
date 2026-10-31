@@ -255,7 +255,7 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
           muted
           playsInline
           aria-label="Camera"
-          className="mt-8 aspect-[4/3] w-full max-w-sm -scale-x-100 rounded-2xl bg-black object-cover"
+          className="mt-8 aspect-[4/3] w-full max-w-sm -scale-x-100 rounded-xl bg-black object-cover"
         />
       )}
 
@@ -303,7 +303,7 @@ function Message({ r, unit, plural }: { r: KioskResult; unit: (n: number) => str
 
 function Good({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl bg-success-soft px-6 py-10 text-success">
+    <div className="rounded-xl bg-success-soft px-6 py-10 text-success">
       <p className="text-7xl" aria-hidden>
         ✓
       </p>
@@ -315,7 +315,7 @@ function Good({ title, children }: { title: string; children: React.ReactNode })
 
 function SeeDesk({ title, line = "Please see the front desk." }: { title: string; line?: string }) {
   return (
-    <div className="rounded-2xl bg-warning-soft px-6 py-10 text-warning">
+    <div className="rounded-xl bg-warning-soft px-6 py-10 text-warning">
       <p className="text-7xl" aria-hidden>
         !
       </p>

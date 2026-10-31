@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/config/brand";
 import { Icon } from "@/components/icons";
-import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader, Row, Stat, type Trend } from "@/components/ui";
+import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader, Row, Stat, StatStrip, type Trend } from "@/components/ui";
 import { requireManager } from "@/lib/auth";
 import { monthName, monthStart } from "@/lib/dates";
 import { formatCents } from "@/lib/packages";
@@ -258,7 +258,8 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
         </div>
       )}
 
-      <section className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${isOwner ? "xl:grid-cols-4" : "xl:grid-cols-3"}`}>
+      {/* column counts divide the number of stats evenly, so no empty cell shows the line colour */}
+      <StatStrip className={`grid-cols-1 ${isOwner ? "sm:grid-cols-2 xl:grid-cols-4" : "sm:grid-cols-3"}`}>
         {isOwner && (
           <Stat
             label="Sales this month, after refunds"
@@ -278,9 +279,9 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
           value={outstandingVisits.toLocaleString("en-US")}
           hint={isOwner ? `About ${formatCents(outstandingValue)} paid in advance` : undefined}
         />
-      </section>
+      </StatStrip>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         <Card
           title="Expiring in the next 30 days"
           description={`A friendly reminder now can save a client from losing ${many}.`}

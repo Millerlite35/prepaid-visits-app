@@ -16,7 +16,7 @@ export default function Home() {
 
       {/* development only: the live site shouldn't describe its own setup */}
       {process.env.NODE_ENV !== "production" && (
-        <section className="mt-8 rounded-lg border border-line p-4">
+        <section className="mt-8 rounded-xl border border-line p-4">
           <h2 className="font-medium">System check</h2>
           <Suspense fallback={<p className="mt-3 text-sm">Checking…</p>}>
             <SystemCheck />

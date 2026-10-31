@@ -30,7 +30,7 @@ export function ForgotPasswordForm() {
         <input name="email" type="email" required autoComplete="email" className={inputClass} />
       </label>
       <Result state={state} pending={pending} />
-      <button disabled={pending} className="w-full rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
+      <button disabled={pending} className="w-full rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Sending…" : "Email me a reset link"}
       </button>
     </form>
@@ -70,7 +70,7 @@ export function NewPasswordForm({ needsCode }: { needsCode: boolean }) {
         </label>
       )}
       <Result state={state} pending={pending} />
-      <button disabled={pending} className="w-full rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
+      <button disabled={pending} className="w-full rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
         {pending ? "Saving…" : "Save new password"}
       </button>
     </form>

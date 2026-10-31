@@ -9,7 +9,7 @@ export const metadata = installableApp;
 // over the soft "canvas" background the dashboard cards sit on.
 // Static on purpose: no login reads here, so it never slows the page down.
 export default function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
-  const link = "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-ink-muted transition hover:bg-surface-muted hover:text-ink";
+  const link = "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-ink-muted transition hover:bg-surface-muted hover:text-ink";
   return (
     <div className="flex min-h-full flex-1 flex-col bg-canvas text-ink">
       <header className="sticky top-0 z-30 border-b border-line bg-surface/85 backdrop-blur print:hidden">
