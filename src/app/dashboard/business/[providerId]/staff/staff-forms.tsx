@@ -42,7 +42,7 @@ export function InviteForm({
           </select>
           <span className="mt-1 block text-xs text-ink-muted">{roleHelp[role]}</span>
         </label>
-        <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
+        <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand disabled:opacity-60">
           {pending ? "Inviting…" : "Send invitation"}
         </button>
       </form>

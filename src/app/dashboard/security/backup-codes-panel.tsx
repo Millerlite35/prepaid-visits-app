@@ -63,7 +63,7 @@ export function BackupCodesPanel({ unused, brandName }: { unused: number; brandN
           className="rounded-md border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm hover:bg-surface-muted"
         />
       ) : (
-        <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
+        <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand disabled:opacity-60">
           {pending ? "Making codes…" : "Make backup codes"}
         </button>
       )}

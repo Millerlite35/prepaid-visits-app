@@ -56,7 +56,7 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
         {!pending && state.saved && <Notice tone="success">Logo saved</Notice>}
         <button
           disabled={pending || !preview}
-          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {pending ? "Uploading…" : "Upload logo"}
         </button>

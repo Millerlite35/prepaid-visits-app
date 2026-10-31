@@ -27,6 +27,10 @@
   --wordmark-2: var(--brand-accent);
   /* keyboard focus outline (base layer below) */
   --focus-ring: var(--brand-primary);
+  /* filled brand buttons: navy with white text; in dark mode light green with dark text,
+     because navy disappears on a dark background */
+  --brand: var(--brand-primary);
+  --on-brand: #ffffff;
 }
 
 @theme inline {
@@ -53,7 +57,8 @@
   --color-warning-solid: #9a6400;
   --color-danger-solid: #b42318;
   /* set from src/config/brand.ts in layout.tsx; do not hardcode brand colors here */
-  --color-brand: var(--brand-primary);
+  --color-brand: var(--brand);
+  --color-on-brand: var(--on-brand);
   --color-brand-accent: var(--brand-accent);
   --font-sans: var(--font-app-sans);
   --font-display: var(--font-app-display);
@@ -102,6 +107,8 @@
     --wordmark-1: #ffffff;
     --wordmark-2: var(--brand-accent-on-dark);
     --focus-ring: var(--brand-accent-on-dark);
+    --brand: var(--brand-accent-on-dark);
+    --on-brand: #0e141c;
   }
 }
 

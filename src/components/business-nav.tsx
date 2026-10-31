@@ -125,7 +125,7 @@ function BottomBar({ items, active, businessName }: { items: NavItem[]; active: 
                   active(scan.href) ? "font-semibold text-ink" : "text-ink-muted",
                 )}
               >
-                <span className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white ring-4 ring-surface">
+                <span className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-on-brand ring-4 ring-surface">
                   <Icon name="scan" className="h-6 w-6" />
                 </span>
                 {scan.label}

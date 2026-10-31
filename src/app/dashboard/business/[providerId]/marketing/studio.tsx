@@ -240,7 +240,7 @@ export function Studio(props: Props) {
               type="button"
               onClick={downloadSocial}
               disabled={downloading === "working"}
-              className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+              className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand shadow-sm hover:opacity-90 disabled:opacity-60"
             >
               {downloading === "working" ? "Preparing image…" : "Download image"}
             </button>
@@ -252,7 +252,7 @@ export function Studio(props: Props) {
           </div>
         ) : (
           <div>
-            <button onClick={() => window.print()} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90">
+            <button onClick={() => window.print()} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand shadow-sm hover:opacity-90">
               Print or save as PDF
             </button>
             <p className="mt-2 text-xs text-ink-muted">

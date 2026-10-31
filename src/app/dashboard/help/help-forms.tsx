@@ -130,7 +130,7 @@ export function SupportForm({
           {state.error}
         </p>
       )}
-      <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
+      <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand disabled:opacity-60">
         {pending ? "Sending…" : "Send message"}
       </button>
     </form>

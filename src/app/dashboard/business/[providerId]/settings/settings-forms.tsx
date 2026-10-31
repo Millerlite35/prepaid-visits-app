@@ -30,7 +30,7 @@ function Result({ state, pending }: { state: SettingsState; pending: boolean }) 
 
 function SaveButton({ pending, label = "Save" }: { pending: boolean; label?: string }) {
   return (
-    <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60">
+    <button disabled={pending} className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand shadow-sm hover:opacity-90 disabled:opacity-60">
       {pending ? "Saving…" : label}
     </button>
   );

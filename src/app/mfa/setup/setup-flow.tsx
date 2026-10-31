@@ -17,7 +17,7 @@ export function SetupFlow() {
         )}
         <button
           disabled={starting}
-          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {starting ? "Preparing…" : "Set up authenticator app"}
         </button>

@@ -8,7 +8,7 @@ import { Wordmark } from "@/components/wordmark";
 export function AuthFrame({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-1 bg-surface text-ink">
-      <aside className="hidden w-[42%] max-w-xl shrink-0 flex-col justify-between bg-brand px-12 py-10 text-white [--wordmark-1:#fff] [--wordmark-2:var(--brand-accent-on-dark)] lg:flex">
+      <aside className="hidden w-[42%] max-w-xl shrink-0 flex-col justify-between bg-[var(--brand-primary)] px-12 py-10 text-white [--wordmark-1:#fff] [--wordmark-2:var(--brand-accent-on-dark)] lg:flex">
         <p className="text-2xl">
           <Wordmark />
         </p>

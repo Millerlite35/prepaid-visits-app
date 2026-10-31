@@ -9,7 +9,7 @@ export default function AuthErrorPage() {
         the one you signed up in. If you just confirmed your email, your account is probably
         ready: try signing in.
       </p>
-      <Link href="/login" className="mt-6 inline-block rounded-md bg-brand px-4 py-2 font-medium text-white">
+      <Link href="/login" className="mt-6 inline-block rounded-md bg-brand px-4 py-2 font-medium text-on-brand">
         Go to sign in
       </Link>
     </main>

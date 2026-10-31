@@ -80,7 +80,7 @@ export function InstallApp({ appName }: { appName: string }) {
         Put it on your home screen: one tap to open, full screen, no browser bar. Handy for scanning at the front desk.
       </p>
       {view === "button" ? (
-        <button onClick={install} className="mt-3 rounded-md bg-brand px-4 py-2 font-medium text-white">
+        <button onClick={install} className="mt-3 rounded-md bg-brand px-4 py-2 font-medium text-on-brand">
           Install app
         </button>
       ) : (

@@ -352,6 +352,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   danger | neutral` (+ `brand` for Badge); Callout body stays ink, the title takes the colour.
   `.theme-light` keeps an area light in dark mode (the client-facing kiosk).
   `brand` = the product colour (staff app chrome); client pages use the PROVIDER's colour.
+  `brand` switches in dark mode (navy -> light green), so filled brand buttons use `bg-brand
+  text-on-brand`, never `text-white`. For something that must stay navy in dark mode (the sign-in
+  panel), use `bg-[var(--brand-primary)]`.
 - Type (Oct 31, 2026, design audit step 1): Figtree (body) + Newsreader (serif: every `h1`, `font-display`
   for big numbers), set in `layout.tsx`. Type scale in `globals.css` `@theme`: text-xs 13px, text-sm 15px
   (body), text-2xl 30px (page titles), text-3xl 36px (figures). Geist Mono only for codes.
