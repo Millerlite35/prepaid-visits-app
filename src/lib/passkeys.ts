@@ -15,6 +15,13 @@ import { createSessionClient } from "@/lib/supabase/server";
 // prepaid-visits-app.vercel.app won't work on app.visitbundle.com. Staff add a new one after
 // a domain move; the authenticator app keeps working meanwhile.
 
+// OFF until Supabase supports passkeys as a two-step factor. Nov 2026: the Management API answers
+// "Enabling of MFA with WebAuthn not currently supported" (setting mfa_web_authn_enroll_enabled /
+// _verify_enabled; scripts/enable-passkey-mfa.ps1). Supabase's separate "Passkeys (Beta)" sign-in only
+// counts as aal1 (a first step, like a password), so it can't replace the code. When Supabase allows
+// it: run the script, set this to true, test adding a passkey and signing in with it.
+export const PASSKEYS_AVAILABLE = false;
+
 export type PasskeyCeremony = "create" | "request";
 export type PasskeyChallenge = { challengeId: string; type: PasskeyCeremony; publicKey: Record<string, unknown> };
 export type Passkey = { id: string; name: string; createdAt: string };

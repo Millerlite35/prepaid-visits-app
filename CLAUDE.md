@@ -340,6 +340,11 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (one DB read, cached per request) and sends expired sessions to `/auth/expired` (route
   handler: signs out only if really expired) -> `/login?expired=1`. Signing out always means
   password + code again; migration 0004 (aal2) is untouched.
+- **Passkeys are built but SWITCHED OFF** (`PASSKEYS_AVAILABLE = false` in `src/lib/passkeys.ts`): Supabase's
+  Management API refuses `mfa_web_authn_enroll_enabled` ("Enabling of MFA with WebAuthn not currently
+  supported", Nov 2026), and its separate "Passkeys (Beta)" sign-in only gives aal1 (a first step, so the
+  code would still be needed; github.com/orgs/supabase/discussions/51228). Recheck later; to switch on, run
+  `scripts/enable-passkey-mfa.ps1`, set the flag true, and test end to end (verify step never ran for real).
 - Passkeys (built Nov 2026, `src/lib/passkeys.ts` server, `src/lib/passkey-browser.ts` browser): the
   SECOND step, in place of the 6-digit code (password is still required). Supabase "webauthn" MFA
   factors, so a passkey sign-in is aal2 like a code. Requires Supabase dashboard > Authentication >
