@@ -23,9 +23,17 @@ function toUser(claims: { sub: string; email?: unknown }): StaffUser {
 // Otherwise redirects to /login, /mfa/setup or /mfa/verify.
 // Call this at the top of every protected page, server action and route handler.
 // Never rely on the browser (or on proxy.ts) to have checked.
+// Two-step = the authenticator code (aal2), or a passkey sign-in (Supabase records it as aal1
+// with amr method "passkey"; the server only accepts passkeys checked with Face ID / PIN).
+// Must match is_two_step_verified() in migration 0020.
+export function passedTwoStep(claims: { aal?: unknown; amr?: unknown }): boolean {
+  if (claims.aal === "aal2") return true;
+  return Array.isArray(claims.amr) && claims.amr.some((e) => (typeof e === "string" ? e : e?.method) === "passkey");
+}
+
 export async function requireUser(): Promise<StaffUser> {
   const { supabase, claims } = await readSession();
-  if (claims.aal !== "aal2") {
+  if (!passedTwoStep(claims)) {
     const { data } = await supabase.auth.mfa.listFactors();
     // an authenticator app or a passkey: either one means "enter your code / use your passkey"
     const hasFactor = (data?.all ?? []).some((f) => f.status === "verified");

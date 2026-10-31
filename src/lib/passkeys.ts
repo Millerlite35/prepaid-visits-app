@@ -8,10 +8,11 @@ import { createSessionClient } from "@/lib/supabase/server";
 // Passkeys (Face ID, fingerprint, device PIN) through Supabase's "Passkeys (Beta)" sign-in.
 // Plan and security reasoning: docs/passkey-signin-plan.md.
 //
-// STAGE 1 (now): a passkey replaces the password. Supabase labels that session aal1, so the
-// person still enters the 6-digit code afterwards: nothing is weaker than password + code.
-// After each passkey sign-in we log the token's aal/amr, to build stage 2 on facts.
-// STAGE 2 (not built): count a user-verified passkey as two-step (migration + requireUser).
+// A passkey sign-in counts as two-step (stage 2): Supabase labels it aal1 with amr method
+// "passkey" (measured Oct 31, 2026), and our database rule (migration 0020) and requireUser
+// accept that, because a passkey checked with Face ID / fingerprint / PIN is two factors on its own.
+// Supabase only "prefers" that check (userVerification: preferred), so THIS server refuses any
+// passkey answer whose "user verified" flag isn't set (userVerified below).
 //
 // Supabase's helpers for this run in the browser, and this app never creates a browser
 // Supabase client (cookies are httpOnly). So the server calls Supabase's passkey API and saves
@@ -85,8 +86,21 @@ export async function registrationOptions(): Promise<PasskeyOptions> {
   return { challengeId: res.challenge_id, publicKey: res.options };
 }
 
+// Did the device check the person (Face ID, fingerprint, PIN), not just that someone holds it?
+// WebAuthn authenticator data: 32-byte site hash, then a flags byte; bit 0 = user present,
+// bit 2 = user verified. Returns null when the answer doesn't include the data.
+export function userVerified(credential: unknown): boolean | null {
+  const data = (credential as { response?: { authenticatorData?: unknown } })?.response?.authenticatorData;
+  if (typeof data !== "string") return null;
+  const bytes = Buffer.from(data, "base64url");
+  if (bytes.length < 33) return false;
+  return (bytes[32] & 0x05) === 0x05;
+}
+
 // ... then the device's answer, and a name for the list
 export async function finishRegistration(challengeId: string, credential: unknown, name: string): Promise<void> {
+  // newer browsers include the data here too; refuse a passkey that skipped the Face ID / PIN check
+  if (userVerified(credential) === false) throw new PasskeyError("not_user_verified");
   const created = await authApi<{ id: string }>("POST", "/passkeys/registration/verify", { challenge_id: challengeId, credential });
   if (created?.id) {
     await authApi("PATCH", `/passkeys/${created.id}`, { friendly_name: name }).catch(() => {}); // name is a nicety
@@ -108,8 +122,10 @@ export async function authenticationOptions(): Promise<PasskeyOptions> {
   return { challengeId: res.challenge_id, publicKey: res.options };
 }
 
-// ... then the device's answer. Saves the session in the login cookie.
-export async function finishAuthentication(challengeId: string, credential: unknown): Promise<void> {
+// ... then the device's answer. Saves the session in the login cookie and returns its access token.
+export async function finishAuthentication(challengeId: string, credential: unknown): Promise<string> {
+  // the sign-in only counts as two-step if the device checked the person (see the top of this file)
+  if (userVerified(credential) !== true) throw new PasskeyError("not_user_verified");
   const res = await authApi<{ access_token?: string; refresh_token?: string; session?: { access_token: string; refresh_token: string } }>(
     "POST",
     "/passkeys/authentication/verify",
@@ -119,13 +135,9 @@ export async function finishAuthentication(challengeId: string, credential: unkn
   const tokens = res.session ?? res;
   if (!tokens.access_token || !tokens.refresh_token) throw new PasskeyError("no_session");
   const supabase = await createSessionClient();
-  const { data, error } = await supabase.auth.setSession({ access_token: tokens.access_token, refresh_token: tokens.refresh_token });
+  const { error } = await supabase.auth.setSession({ access_token: tokens.access_token, refresh_token: tokens.refresh_token });
   if (error) throw new PasskeyError(error.code ?? "session_failed");
-
-  // stage 1 measurement: what the database will see (method names only, no personal data)
-  const { data: claims } = await supabase.auth.getClaims(tokens.access_token);
-  const amr = Array.isArray(claims?.claims?.amr) ? claims.claims.amr.map((e: { method?: string }) => e?.method) : [];
-  console.info("passkey sign-in token:", JSON.stringify({ aal: claims?.claims?.aal, amr, user: data.user ? "ok" : "none" }));
+  return tokens.access_token;
 }
 
 // What the person sees when something goes wrong
@@ -134,6 +146,9 @@ export function passkeyErrorMessage(e: unknown): string {
   if (code.includes("disabled") || code.includes("not_enabled")) return "Passkeys aren't switched on for this app yet.";
   if (code.includes("expired")) return "That took too long. Please try again.";
   if (code === "not_signed_in") return "Your sign-in ran out. Please sign in again.";
+  if (code === "not_user_verified") {
+    return "This device didn't check your Face ID, fingerprint or PIN. Use a device that does, or sign in with your password.";
+  }
   return "That passkey didn't work. Please try again, or sign in with your password.";
 }
 

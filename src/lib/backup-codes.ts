@@ -66,8 +66,9 @@ export async function redeemBackupCode(userId: string, raw: string): Promise<Red
   return data === true ? "ok" : "wrong";
 }
 
-// Remove all of the person's authenticators (this signs them out everywhere), then tell
-// them by email, so they'd notice if it wasn't them.
+// Remove all of the person's authenticators and passkeys (this signs them out everywhere),
+// then tell them by email, so they'd notice if it wasn't them. A lost phone's passkey would
+// otherwise still sign in on its own.
 export async function removeAuthenticator(userId: string, email: string, remaining: number): Promise<void> {
   const admin = getAdminClient().auth.admin.mfa;
   const { data, error } = await admin.listFactors({ userId });
@@ -75,6 +76,16 @@ export async function removeAuthenticator(userId: string, email: string, remaini
   for (const f of data.factors) {
     const { error: delError } = await admin.deleteFactor({ id: f.id, userId });
     if (delError) throw new Error(`delete factor failed: ${delError.message}`);
+  }
+  const passkeyAdmin = getAdminClient().auth.admin.passkey;
+  const { data: passkeys, error: listError } = await passkeyAdmin.listPasskeys({ userId });
+  // passkeys switched off in Supabase: there are none that could sign in
+  if (listError && !String(listError.code ?? listError.message).includes("disabled")) {
+    throw new Error(`list passkeys failed: ${listError.message}`);
+  }
+  for (const p of passkeys ?? []) {
+    const { error: delError } = await passkeyAdmin.deletePasskey({ userId, passkeyId: p.id });
+    if (delError) throw new Error(`delete passkey failed: ${delError.message}`);
   }
   if (email && emailConfigured()) {
     try {

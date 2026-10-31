@@ -111,13 +111,17 @@ Files in `supabase/migrations/`, run in order:
 19. `0019_session_trust.sql`: `session_trust` (server-only; one row per Supabase session_id:
     did the person tick "Remember this device" when entering their code). Explicit grants.
 
+20. `0020_passkey_two_step.sql`: `is_two_step_verified()` (used by every table's restrictive policy from
+    0004) also accepts a passkey sign-in: `aal2` OR the signed token's `amr` has method `passkey`. Only the
+    function changes. **Apply it BEFORE deploying code that lets passkey sign-ins past `requireUser`.**
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
 `staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`,
-`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql`, `api_grants_test.sql`, `session_trust_test.sql`
+`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql`, `api_grants_test.sql`, `session_trust_test.sql`, `passkey_test.sql`
 in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.
@@ -348,12 +352,16 @@ default), plus a privilege check in `provider_setup_test.sql`.
   the browser only runs `navigator.credentials` (`src/lib/passkey-browser.ts`). Security page: add (needs
   aal2), list, remove, email alert on add/remove. Sign-in page: "Sign in with a passkey" (hidden while
   Supabase has passkeys off).
-  **Stage 1 (built):** a passkey sign-in is aal1, so the person still enters the 6-digit code. The server
-  logs the token's aal/amr after each passkey sign-in ("passkey sign-in token:") to confirm the method name.
-  **Stage 2 (not built, needs the founder's go-ahead):** require the user-verified flag, then let
-  `is_two_step_verified()` (new migration) and `requireUser` also accept a passkey sign-in, count it in
-  remember-device, and have backup-code recovery delete passkeys. `requireUser` already sends anyone
-  with any verified factor to `/mfa/verify`.
+  **A passkey sign-in counts as two-step (stage 2, Nov 2026):** Supabase labels it `aal1` with amr method
+  `passkey` (measured on the live site). Migration 0020 and `passedTwoStep()` in `src/lib/auth.ts` (used by
+  `requireUser` and `/auth/expired`) accept that; keep the two in sync. Supabase only "prefers" Face ID/PIN
+  (`userVerification: preferred`), so `userVerified()` in `src/lib/passkeys.ts` REFUSES any passkey answer
+  without the user-verified flag before Supabase sees it. Remember-device works on the passkey button too
+  (counts the `passkey` amr timestamp). Backup-code recovery deletes all passkeys (admin API). Residual
+  risk for the security review: someone calling Supabase's passkey API directly (skipping our server) with
+  a passkey that has no Face ID/PIN check would still get an `amr: passkey` token; only possible with a
+  passkey the account owner registered outside the app. The authenticator app stays required (first setup,
+  new devices, password reset). `requireUser` sends anyone with any verified factor to `/mfa/verify`.
 
 ## Design system (Oct 2026)
 - Tokens in `src/app/globals.css`: `canvas` (page background), `surface` / `surface-muted`

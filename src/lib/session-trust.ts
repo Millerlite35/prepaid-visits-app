@@ -15,8 +15,9 @@ function sessionIdOf(claims: Claims): string | null {
   return typeof claims.session_id === "string" ? claims.session_id : null;
 }
 
-// the second step: authenticator code or passkey (Supabase's names for them in the token)
-const SECOND_STEP = new Set(["totp", "mfa/totp", "webauthn", "mfa/webauthn"]);
+// what counts as the two-step moment: the authenticator code, or a passkey sign-in
+// (Supabase's method names in the token's amr list)
+const SECOND_STEP = new Set(["totp", "mfa/totp", "passkey"]);
 
 // When this session last passed the second step (Unix seconds), from the signed login token.
 function codeTime(claims: Claims): number | null {

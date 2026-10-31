@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { passedTwoStep } from "@/lib/auth";
 import { sessionExpired } from "@/lib/session-trust";
 import { createSessionClient } from "@/lib/supabase/server";
 
@@ -9,9 +10,9 @@ export async function GET(request: NextRequest) {
   const supabase = await createSessionClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
-  if (claims?.sub && claims.aal === "aal2" && !(await sessionExpired(claims))) {
+  if (claims?.sub && passedTwoStep(claims) && !(await sessionExpired(claims))) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
-  if (claims?.sub && claims.aal === "aal2") await supabase.auth.signOut({ scope: "local" });
+  if (claims?.sub && passedTwoStep(claims)) await supabase.auth.signOut({ scope: "local" });
   return NextResponse.redirect(new URL("/login?expired=1", request.url));
 }
