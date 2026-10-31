@@ -1,6 +1,6 @@
 # Plan: sign in with a passkey alone (no password, no 6-digit code)
 
-Status: **proposed, waiting for the founder's go-ahead** (Nov 1, 2026). Nothing below is built yet.
+Status: **stage 1 built (Nov 1, 2026); stage 2 waits for the founder's go-ahead.**
 For the independent security review: this changes the rule that protects all provider data.
 
 ## Why one passkey is enough

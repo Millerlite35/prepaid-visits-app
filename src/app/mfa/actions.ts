@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
 import { redeemBackupCode, removeAuthenticator, unusedBackupCodeCount } from "@/lib/backup-codes";
-import { challengePasskey, listPasskeys, passkeyErrorMessage, verifyPasskey } from "@/lib/passkeys";
 import { saveRemember, wantsRemember } from "@/lib/session-trust";
 import { createSessionClient } from "@/lib/supabase/server";
 
@@ -77,42 +76,6 @@ export async function verifySignIn(_prev: CodeState, formData: FormData): Promis
     return { error: BAD_CODE };
   }
   await rememberChoice(verified.access_token, wantsRemember(formData));
-  redirect("/dashboard");
-}
-
-// Sign-in with a passkey instead of the code: step 1 gets a challenge for one of the
-// person's passkeys, the browser runs Face ID / fingerprint, step 2 checks the answer.
-export type PasskeyStart = { challengeId: string; publicKey: Record<string, unknown> } | { error: string };
-
-async function ownPasskey(factorId: string): Promise<boolean> {
-  return (await listPasskeys()).some((p) => p.id === factorId);
-}
-
-export async function startPasskeySignIn(factorId: string): Promise<PasskeyStart> {
-  await requireSignedIn();
-  if (!(await ownPasskey(factorId))) return { error: "That passkey wasn't found." };
-  try {
-    const c = await challengePasskey(factorId);
-    return { challengeId: c.challengeId, publicKey: c.publicKey };
-  } catch (e) {
-    return { error: passkeyErrorMessage(e) };
-  }
-}
-
-export async function finishPasskeySignIn(
-  factorId: string,
-  challengeId: string,
-  credential: unknown,
-  remember: boolean,
-): Promise<CodeState> {
-  await requireSignedIn();
-  if (!(await ownPasskey(factorId))) return { error: "That passkey wasn't found." };
-  try {
-    const accessToken = await verifyPasskey(factorId, challengeId, "request", credential);
-    await rememberChoice(accessToken, remember);
-  } catch (e) {
-    return { error: passkeyErrorMessage(e) };
-  }
   redirect("/dashboard");
 }
 

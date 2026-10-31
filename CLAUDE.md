@@ -340,22 +340,20 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (one DB read, cached per request) and sends expired sessions to `/auth/expired` (route
   handler: signs out only if really expired) -> `/login?expired=1`. Signing out always means
   password + code again; migration 0004 (aal2) is untouched.
-- **Passkeys are built but SWITCHED OFF** (`PASSKEYS_AVAILABLE = false` in `src/lib/passkeys.ts`): Supabase's
-  Management API refuses `mfa_web_authn_enroll_enabled` ("Enabling of MFA with WebAuthn not currently
-  supported", Nov 2026), and its separate "Passkeys (Beta)" sign-in only gives aal1 (a first step, so the
-  code would still be needed; github.com/orgs/supabase/discussions/51228). Recheck later; to switch on, run
-  `scripts/enable-passkey-mfa.ps1`, set the flag true, and test end to end (verify step never ran for real).
-- Passkeys (built Nov 2026, `src/lib/passkeys.ts` server, `src/lib/passkey-browser.ts` browser): the
-  SECOND step, in place of the 6-digit code (password is still required). Supabase "webauthn" MFA
-  factors, so a passkey sign-in is aal2 like a code. Requires Supabase dashboard > Authentication >
-  Multi-Factor > WebAuthn **enabled** (else enroll fails `mfa_webauthn_enroll_not_enabled`). Supabase's
-  own WebAuthn helpers are browser-side, so the server calls the Auth API (`/factors/{id}/challenge` and
-  `/verify`) with the user's token and saves the new session with `setSession`; the browser only runs
-  `navigator.credentials`. Relying party = `SITE_URL`'s host: passkeys don't carry over to a new domain.
-  Added on `/dashboard/security` (Passkeys panel, needs aal2); used on `/mfa/verify` ("Use passkey", one
-  button per passkey, code form below). The authenticator app stays required (set up first, used for
-  password reset); backup-code recovery removes ALL factors incl. passkeys. `requireUser` sends anyone
-  with any verified factor to `/mfa/verify`; remember-device counts `totp` and `webauthn` amr entries.
+- **Passkeys (the founder's TOP priority; plan and security reasoning: `docs/passkey-signin-plan.md`).**
+  Supabase can't attach a passkey as the SECOND step (MFA WebAuthn: "not currently supported", Nov 2026),
+  so passkeys use Supabase's **Passkeys (Beta)** sign-in (dashboard > Passkeys must be ON; relying party =
+  the live site's host, so passkeys don't work on localhost and don't carry over to a new domain).
+  `src/lib/passkeys.ts` calls Supabase's `/passkeys/*` API from the server (no browser Supabase client);
+  the browser only runs `navigator.credentials` (`src/lib/passkey-browser.ts`). Security page: add (needs
+  aal2), list, remove, email alert on add/remove. Sign-in page: "Sign in with a passkey" (hidden while
+  Supabase has passkeys off).
+  **Stage 1 (built):** a passkey sign-in is aal1, so the person still enters the 6-digit code. The server
+  logs the token's aal/amr after each passkey sign-in ("passkey sign-in token:") to confirm the method name.
+  **Stage 2 (not built, needs the founder's go-ahead):** require the user-verified flag, then let
+  `is_two_step_verified()` (new migration) and `requireUser` also accept a passkey sign-in, count it in
+  remember-device, and have backup-code recovery delete passkeys. `requireUser` already sends anyone
+  with any verified factor to `/mfa/verify`.
 
 ## Design system (Oct 2026)
 - Tokens in `src/app/globals.css`: `canvas` (page background), `surface` / `surface-muted`

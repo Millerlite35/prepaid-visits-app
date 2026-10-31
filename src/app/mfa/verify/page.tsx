@@ -6,8 +6,6 @@ import { requireSignedIn } from "@/lib/auth";
 import { signOut } from "../../(auth)/actions";
 import { verifySignIn } from "../actions";
 import { CodeForm } from "../code-form";
-import { PasskeySignIn } from "../passkey-sign-in";
-import { listPasskeys, PASSKEYS_AVAILABLE } from "@/lib/passkeys";
 import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Enter your code · ${brand.name}` };
@@ -28,11 +26,9 @@ export default function MfaVerifyPage() {
 
 async function VerifyGate() {
   await requireSignedIn();
-  const passkeys = PASSKEYS_AVAILABLE ? await listPasskeys() : [];
   return (
     <>
-      <div className="mt-6 space-y-4">
-        <PasskeySignIn passkeys={passkeys.map((p) => ({ id: p.id, name: p.name }))} />
+      <div className="mt-6">
         <CodeForm action={verifySignIn} submitLabel="Continue" />
       </div>
       <p className="mt-6 text-sm">

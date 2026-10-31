@@ -1,8 +1,11 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { brand } from "@/config/brand";
+import { passkeysEnabled } from "@/lib/passkeys";
 import { AuthForm } from "../auth-form";
+import { PasskeyLogin } from "../passkey-login";
 
 export const metadata: Metadata = { title: `Sign in · ${brand.name}` };
 
@@ -13,6 +16,9 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       <p className="mt-1 text-sm text-ink-muted">For practices and their staff.</p>
       <Suspense>
         <RecoveredNotice searchParams={searchParams} />
+      </Suspense>
+      <Suspense>
+        <PasskeyGate />
       </Suspense>
       <AuthForm mode="signin" />
       <p className="mt-4 text-sm">
@@ -28,6 +34,12 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       </p>
     </main>
   );
+}
+
+// The passkey button only while passkeys are switched on in Supabase (checked per request)
+async function PasskeyGate() {
+  await connection();
+  return (await passkeysEnabled()) ? <PasskeyLogin /> : null;
 }
 
 // After a backup code was used (see /mfa/recover), or a sign-in ran out (/auth/expired)

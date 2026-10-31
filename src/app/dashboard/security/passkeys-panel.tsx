@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { buttonClass, Notice } from "@/components/ui";
 import { runPasskeyCeremony, useDeviceName, usePasskeySupport, wasCancelled } from "@/lib/passkey-browser";
 import type { Passkey } from "@/lib/passkeys";
-import { deletePasskey, finishPasskeySetup, startPasskeySetup } from "./passkey-actions";
+import { finishPasskeySetup, removePasskey, startPasskeySetup } from "./passkey-actions";
 
 const fmt = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
@@ -25,15 +25,15 @@ export function PasskeysPanel({ passkeys }: { passkeys: Passkey[] }) {
     setError(null);
     setAdded(false);
     try {
-      const start = await startPasskeySetup(name);
+      const start = await startPasskeySetup();
       if ("error" in start) return setError(start.error);
-      const credential = await runPasskeyCeremony(start.type, start.publicKey);
-      const done = await finishPasskeySetup(start.factorId, start.challengeId, credential);
+      const credential = await runPasskeyCeremony("create", start.publicKey);
+      const done = await finishPasskeySetup(start.challengeId, credential, name);
       if (done.error) return setError(done.error);
       setAdded(true);
       router.refresh();
     } catch (e) {
-      if (!wasCancelled(e)) setError("This device couldn't make a passkey. Try another device, or keep using your authenticator app.");
+      if (!wasCancelled(e)) setError("This device couldn't make a passkey. Try another device, or keep using your password and code.");
     } finally {
       setBusy(false);
     }
@@ -41,7 +41,7 @@ export function PasskeysPanel({ passkeys }: { passkeys: Passkey[] }) {
 
   function remove(id: string) {
     startRemoving(async () => {
-      const res = await deletePasskey(id);
+      const res = await removePasskey(id);
       if (res.error) setError(res.error);
       else router.refresh();
     });
@@ -84,7 +84,7 @@ export function PasskeysPanel({ passkeys }: { passkeys: Passkey[] }) {
         <p className="text-sm text-ink-muted">This browser can&apos;t make passkeys. Try a recent Chrome, Safari or Edge.</p>
       )}
 
-      {added && <Notice tone="success">Passkey added. Next time you sign in, use it instead of the code.</Notice>}
+      {added && <Notice tone="success">Passkey added. Next time, choose &quot;Sign in with a passkey&quot; on the sign-in page.</Notice>}
       {error && (
         <p role="alert" className="text-sm text-danger">
           {error}
