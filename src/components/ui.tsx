@@ -87,7 +87,7 @@ export function Stat({ label, value, trend, hint }: { label: ReactNode; value: R
   return (
     <div className="rounded-xl border border-line bg-surface px-5 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
       <p className="text-sm text-ink-muted">{label}</p>
-      <p className="mt-1 font-display text-3xl font-medium tracking-tight text-ink tabular-nums">{value}</p>
+      <p className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-ink tabular-nums">{value}</p>
       {trend && (
         <p className="mt-1.5 text-xs text-ink-muted">
           <span
