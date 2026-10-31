@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { ClientCard, ClientHeader, ClientShell } from "@/components/client-shell";
 import { formatDate, loadPass, qrSvg } from "@/lib/passes";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Your pass", robots: { index: false, follow: false } };
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = { title: "Your pass", robots: { index: false, 
 export default function PassPage(props: PageProps<"/pass/[token]">) {
   return (
     <ClientShell width="sm">
-      <Suspense fallback={<p className="text-center text-sm text-ink-muted">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="client" />}>
         <PassContent {...props} />
       </Suspense>
     </ClientShell>

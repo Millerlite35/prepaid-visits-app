@@ -6,6 +6,7 @@ import { requireSignedIn } from "@/lib/auth";
 import { signOut } from "../../(auth)/actions";
 import { verifySignIn } from "../actions";
 import { CodeForm } from "../code-form";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Enter your code · ${brand.name}` };
 
@@ -16,7 +17,7 @@ export default function MfaVerifyPage() {
       <p className="mt-2 text-sm text-ink-muted">
         Open your authenticator app and enter the 6-digit code for {brand.name}.
       </p>
-      <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="fields" className="mt-6" />}>
         <VerifyGate />
       </Suspense>
     </main>

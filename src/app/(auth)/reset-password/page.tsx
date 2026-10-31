@@ -4,6 +4,7 @@ import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { NewPasswordForm } from "../password-forms";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Choose a new password · ${brand.name}` };
 
@@ -12,7 +13,7 @@ export default function ResetPasswordPage() {
   return (
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Choose a new password</h1>
-      <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="fields" className="mt-6" />}>
         <ResetGate />
       </Suspense>
     </main>

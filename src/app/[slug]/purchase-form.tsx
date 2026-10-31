@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { describeExpiry, formatCents } from "@/lib/packages";
 import type { PublicPackage } from "@/lib/payments/checkout";
 import type { PurchaseState } from "./actions";
+import { Icon } from "@/components/icons";
 
 type Props = {
   action: (prev: PurchaseState, formData: FormData) => Promise<PurchaseState>;
@@ -121,9 +122,7 @@ export function PurchaseForm({ action, packages, singular, plural, brandColor, t
             className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-ink"
           >
             {showTerms ? "Hide the terms" : "Read the terms"}
-            <span aria-hidden className={`transition ${showTerms ? "rotate-180" : ""}`}>
-              ▾
-            </span>
+            <Icon name="chevronDown" className={`h-4 w-4 text-ink-muted transition ${showTerms ? "rotate-180" : ""}`} />
           </button>
           {showTerms && (
             <div className="max-h-60 overflow-y-auto border-t border-line px-4 py-3 text-xs leading-relaxed whitespace-pre-wrap text-ink-muted">

@@ -3,12 +3,13 @@
 import { useActionState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import type { PassActionState } from "../actions";
+import { Notice } from "@/components/ui";
 
 type Action = (prev: PassActionState) => Promise<PassActionState>;
 
 function Result({ state }: { state: PassActionState }) {
   if (state.error) return <p role="alert" className="mt-2 text-sm text-danger">{state.error}</p>;
-  if (state.message) return <p role="status" className="mt-2 text-sm text-success">✓ {state.message}</p>;
+  if (state.message) return <Notice tone="success" className="mt-2">{state.message}</Notice>;
   return null;
 }
 

@@ -5,6 +5,8 @@ import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { BACKUP_CODE_COUNT, unusedBackupCodeCount } from "@/lib/backup-codes";
 import { BackupCodesPanel } from "./backup-codes-panel";
+import { Notice, PageSkeleton } from "@/components/ui";
+import { Icon } from "@/components/icons";
 
 export const metadata: Metadata = { title: `Security · ${brand.name}` };
 
@@ -12,7 +14,7 @@ export default function SecurityPage({ searchParams }: PageProps<"/dashboard/sec
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Security</h1>
-      <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="fields" className="mt-6" />}>
         <SecurityContent searchParams={searchParams} />
       </Suspense>
     </main>
@@ -29,9 +31,9 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
       <p className="mt-1 text-sm text-ink-muted">Signed in as {user.email}</p>
 
       {justSetUp && unused === 0 && (
-        <p className="mt-6 rounded-md bg-success-soft p-3 text-sm text-success">
-          ✓ Two-step verification is on. One last step: make backup codes, in case you ever lose your phone.
-        </p>
+        <Notice tone="success" boxed className="mt-6">
+          Two-step verification is on. One last step: make backup codes, in case you ever lose your phone.
+        </Notice>
       )}
 
       <section className="mt-6 rounded-xl border border-line bg-surface p-5">
@@ -43,7 +45,10 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
         </p>
         <p className="mt-3 text-sm">
           {unused === 0 ? (
-            <span className="font-medium text-warning">⚠ You don&apos;t have any backup codes yet.</span>
+            <span className="inline-flex items-center gap-1.5 font-medium text-warning">
+              <Icon name="alert" className="h-4 w-4" />
+              You don&apos;t have any backup codes yet.
+            </span>
           ) : (
             <span>
               {unused} of {BACKUP_CODE_COUNT} codes unused.

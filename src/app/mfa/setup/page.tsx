@@ -4,6 +4,7 @@ import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
 import { signOut } from "../../(auth)/actions";
 import { SetupFlow } from "./setup-flow";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Set up two-step verification · ${brand.name}` };
 
@@ -15,7 +16,7 @@ export default function MfaSetupPage() {
         Each sign-in will also ask for a code from your phone, so a stolen password alone
         can&apos;t open your account.
       </p>
-      <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="fields" className="mt-6" />}>
         <SetupGate />
       </Suspense>
     </main>

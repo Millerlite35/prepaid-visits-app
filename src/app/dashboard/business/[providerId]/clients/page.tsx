@@ -4,13 +4,14 @@ import Link from "next/link";
 import { brand } from "@/config/brand";
 import { requireManager } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Clients · ${brand.name}` };
 
 export default function ClientsPage(props: PageProps<"/dashboard/business/[providerId]/clients">) {
   return (
     <main className="w-full max-w-3xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton />}>
         <ClientsContent {...props} />
       </Suspense>
     </main>

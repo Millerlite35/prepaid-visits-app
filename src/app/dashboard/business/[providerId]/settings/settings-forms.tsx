@@ -14,6 +14,7 @@ import {
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { checkSlug } from "@/lib/slug";
 import type { SettingsState } from "./actions";
+import { Notice } from "@/components/ui";
 
 type Action = (prev: SettingsState, formData: FormData) => Promise<SettingsState>;
 
@@ -23,7 +24,7 @@ const inputClass =
 function Result({ state, pending }: { state: SettingsState; pending: boolean }) {
   if (pending) return null;
   if (state.error) return <p role="alert" className="text-sm text-danger">{state.error}</p>;
-  if (state.saved) return <p role="status" className="text-sm text-success">✓ Saved</p>;
+  if (state.saved) return <Notice tone="success">Saved</Notice>;
   return null;
 }
 
@@ -242,7 +243,7 @@ export function PrivateLink({ url, renewAction }: { url: string; renewAction: ()
       <p className="break-all rounded-md bg-surface-muted p-2 font-mono text-xs">{url}</p>
       <div className="flex flex-wrap items-center gap-4 text-sm">
         <button type="button" onClick={copy} className="underline">
-          {copied ? "Copied ✓" : "Copy link"}
+          {copied ? "Copied" : "Copy link"}
         </button>
         <form action={renewAction}>
           <ConfirmSubmit

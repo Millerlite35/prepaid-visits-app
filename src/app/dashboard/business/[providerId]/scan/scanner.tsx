@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { cameraErrorMessage, makeDetector } from "@/lib/qr-detector";
 import type { LinkResult } from "@/lib/cards";
 import type { CardClient, ScanResult, UndoResult } from "./actions";
+import { Icon } from "@/components/icons";
 
 type Props = {
   checkIn: (code: string, force: boolean) => Promise<ScanResult>;
@@ -228,7 +229,7 @@ function ResultCard({
   let detail: ReactNode = null;
   switch (s.result) {
     case "ok":
-      title = "✓ Checked in";
+      title = "Checked in";
       detail = (
         <>
           <p className="text-2xl font-semibold">{s.clientName}</p>
@@ -248,15 +249,15 @@ function ResultCard({
       );
       break;
     case "no_visits":
-      title = `✗ No ${unit(2)} left`;
+      title = `No ${unit(2)} left`;
       detail = <p className="text-xl font-semibold">{s.clientName}</p>;
       break;
     case "expired":
-      title = "✗ Package expired";
+      title = "Package expired";
       detail = <p className="text-xl font-semibold">{s.clientName}</p>;
       break;
     case "revoked":
-      title = "✗ Pass cancelled";
+      title = "Pass cancelled";
       detail = <p>This pass was cancelled. The client needs a new one.</p>;
       break;
     case "unassigned":
@@ -268,7 +269,7 @@ function ResultCard({
       );
       break;
     case "unknown_code":
-      title = "✗ Code not recognised";
+      title = "Code not recognised";
       detail = <p>This isn&apos;t a pass for this business.</p>;
       break;
     default:
@@ -279,7 +280,8 @@ function ResultCard({
   return (
     <div className={`absolute inset-0 flex flex-col justify-between overflow-y-auto p-6 text-white ${tone}`} role="status" aria-live="assertive">
       <div>
-        <p className="text-3xl font-bold">{title}</p>
+        <Icon name={s.result === "ok" ? "check" : tone === "bg-warning-solid" ? "alert" : "close"} className="h-12 w-12" />
+        <p className="mt-2 text-3xl font-bold">{title}</p>
         <div className="mt-4">{detail}</div>
         {s.result === "ok" && (
           <div className="mt-4 text-sm">
@@ -335,7 +337,10 @@ function LinkCardPanel({
   if (state && state !== "working" && state.ok) {
     return (
       <div className="space-y-3">
-        <p className="text-xl font-semibold">✓ Card linked to {state.clientName}</p>
+        <p className="flex items-center gap-2 text-xl font-semibold">
+          <Icon name="check" className="h-6 w-6 shrink-0" />
+          Card linked to {state.clientName}
+        </p>
         <button onClick={onCheckIn} className="rounded-md bg-white px-4 py-2 font-semibold text-black">
           Check {state.clientName.split(" ")[0]} in now
         </button>

@@ -11,6 +11,7 @@ import {
 } from "@/lib/flyer-content";
 import { FontPicker, StylePicker, useRememberedFont, useRememberedStyle } from "@/components/style-picker";
 import { Artwork, TEMPLATES, type PrintTemplate } from "./artwork";
+import { Notice } from "@/components/ui";
 
 type Template = PrintTemplate | "social";
 
@@ -227,10 +228,10 @@ export function Studio(props: Props) {
         </label>
 
         {props.logo && logoWidth !== null && logoWidth < MIN_LOGO_WIDTH_PX && (
-          <p className="rounded-md bg-warning-soft p-3 text-sm text-warning">
-            ⚠ Your logo is only {logoWidth} pixels wide, so it may look blurry in print. Upload a larger one (at least{" "}
+          <Notice tone="warning" boxed>
+            Your logo is only {logoWidth} pixels wide, so it may look blurry in print. Upload a larger one (at least{" "}
             {MIN_LOGO_WIDTH_PX} pixels wide) in Page settings.
-          </p>
+          </Notice>
         )}
 
         {template === "social" ? (

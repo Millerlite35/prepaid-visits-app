@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatCents, parseMoneyToCents } from "@/lib/packages";
 import type { MoneyState } from "./money-actions";
+import { Notice } from "@/components/ui";
 
 type Action = (prev: MoneyState, formData: FormData) => Promise<MoneyState>;
 
@@ -12,7 +13,7 @@ const inputClass = "mt-1 block w-full rounded-md border border-line bg-surface p
 function Result({ state, pending }: { state: MoneyState; pending: boolean }) {
   if (pending) return null;
   if (state.error) return <p role="alert" className="text-sm text-danger">{state.error}</p>;
-  if (state.message) return <p role="status" className="text-sm text-success">✓ {state.message}</p>;
+  if (state.message) return <Notice tone="success">{state.message}</Notice>;
   return null;
 }
 

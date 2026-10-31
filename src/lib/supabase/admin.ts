@@ -16,13 +16,3 @@ export function getAdminClient(): SupabaseClient {
   );
   return adminClient;
 }
-
-// A client with only the publishable (browser) key, the same access a stranger's
-// browser would have. Used to prove row-level security is blocking reads.
-export function getPublicClient(): SupabaseClient {
-  return createClient(
-    requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    requireEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
-}

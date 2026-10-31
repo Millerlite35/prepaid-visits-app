@@ -8,13 +8,15 @@ import { logoUrl } from "@/lib/branding";
 import { newPrivateLink, removeLogo, saveAddressAndAccess, saveContact, saveLogo, savePageDetails, saveTerms, saveUsualPrice } from "./actions";
 import { LogoForm } from "./logo-form";
 import { AddressForm, ContactForm, PageDetailsForm, PrivateLink, TermsForm, UsualPriceForm, type PageDetails } from "./settings-forms";
+import { Icon } from "@/components/icons";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Page settings · ${brand.name}` };
 
 export default function SettingsPage({ params }: PageProps<"/dashboard/business/[providerId]/settings">) {
   return (
     <main className="w-full max-w-2xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="form" />}>
         <SettingsContent params={params} />
       </Suspense>
     </main>
@@ -62,8 +64,9 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
       <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Page settings</h1>
       <p className="mt-1 text-sm text-ink-muted">
         What clients see on {p.display_name}&apos;s purchase page, passes and emails.{" "}
-        <a href={privateUrlOrPublic(site, p)} target="_blank" rel="noopener noreferrer" className="underline">
-          View your purchase page ↗
+        <a href={privateUrlOrPublic(site, p)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline">
+          View your purchase page
+          <Icon name="external" className="h-3.5 w-3.5" />
         </a>
       </p>
 

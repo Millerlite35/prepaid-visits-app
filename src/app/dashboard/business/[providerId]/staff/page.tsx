@@ -7,13 +7,14 @@ import { ROLE_HELP, ROLE_LABELS } from "@/lib/staff";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { cancelInvite, changeRole, inviteStaff, removeMember } from "./actions";
 import { InviteForm } from "./staff-forms";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Staff · ${brand.name}` };
 
 export default function StaffPage({ params }: PageProps<"/dashboard/business/[providerId]/staff">) {
   return (
     <main className="w-full max-w-2xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton />}>
         <StaffContent params={params} />
       </Suspense>
     </main>

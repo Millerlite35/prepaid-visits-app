@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { sendSupportRequest } from "./actions";
 import { FaqList, SupportForm } from "./help-forms";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Help · ${brand.name}` };
 
@@ -24,7 +25,7 @@ export default function HelpPage() {
         <p className="mb-4 mt-1 text-sm text-ink-muted">
           Didn&apos;t find your answer? Send us a message and we&apos;ll reply by email.
         </p>
-        <Suspense fallback={<p className="text-sm">Loading…</p>}>
+        <Suspense fallback={<PageSkeleton variant="fields" />}>
           <SupportSection />
         </Suspense>
       </section>

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icons";
 import { InstallApp } from "@/components/install-app";
-import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader } from "@/components/ui";
+import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader, PageSkeleton } from "@/components/ui";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { unusedBackupCodeCount } from "@/lib/backup-codes";
@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: `Dashboard · ${brand.name}` };
 export default function DashboardPage() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="mt-4 text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton />}>
         <DashboardContent />
       </Suspense>
     </main>
@@ -191,7 +191,10 @@ async function DashboardContent() {
 
 function PaymentsBadge({ provider }: { provider: NonNullable<Membership["providers"]> }) {
   return provider.stripe_charges_enabled ? (
-    <Badge tone="success">✓ Taking payments</Badge>
+    <Badge tone="success">
+      <Icon name="check" className="h-3.5 w-3.5" />
+      Taking payments
+    </Badge>
   ) : (
     <Badge tone="warning">Payments not set up</Badge>
   );

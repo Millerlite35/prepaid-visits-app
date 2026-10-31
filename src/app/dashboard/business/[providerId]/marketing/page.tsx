@@ -6,6 +6,7 @@ import { brand } from "@/config/brand";
 import { requireManager } from "@/lib/auth";
 import { loadMarketingData } from "@/lib/marketing";
 import { Studio } from "./studio";
+import { Notice, PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Flyers and signs · ${brand.name}` };
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = { title: `Flyers and signs · ${brand.name}` }
 export default function MarketingPage({ params }: PageProps<"/dashboard/business/[providerId]/marketing">) {
   return (
     <main className="w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton />}>
         <MarketingContent params={params} />
       </Suspense>
     </main>
@@ -37,9 +38,9 @@ async function MarketingContent({ params }: { params: Promise<{ providerId: stri
           page.
         </p>
         {data.sellingProblem && (
-          <p className="mt-4 rounded-md bg-warning-soft p-3 text-sm text-warning">
-            ⚠ {data.sellingProblem}
-          </p>
+          <Notice tone="warning" boxed className="mt-4">
+            {data.sellingProblem}
+          </Notice>
         )}
         {data.isPrivate && (
           <p className="mt-4 rounded-md bg-surface-muted p-3 text-sm">

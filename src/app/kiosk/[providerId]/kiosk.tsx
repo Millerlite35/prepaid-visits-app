@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { cameraErrorMessage, makeDetector } from "@/lib/qr-detector";
 import type { KioskResult } from "./actions";
+import { Icon } from "@/components/icons";
 
 type Props = {
   checkIn: (code: string) => Promise<KioskResult>;
@@ -238,9 +239,7 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
                 : "Hold your pass QR code under the scanner to check in."}
             </p>
             {mode === "scanner" && (
-              <p className="mt-10 text-6xl" aria-hidden>
-                ⬇
-              </p>
+              <Icon name="arrowDown" className="mx-auto mt-10 h-16 w-16 text-ink-muted" />
             )}
           </>
         )}
@@ -304,9 +303,7 @@ function Message({ r, unit, plural }: { r: KioskResult; unit: (n: number) => str
 function Good({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl bg-success-soft px-6 py-10 text-success">
-      <p className="text-7xl" aria-hidden>
-        ✓
-      </p>
+      <Icon name="check" className="mx-auto h-20 w-20" />
       <p className="mt-4 text-4xl font-semibold">{title}</p>
       <p className="mt-4 text-2xl">{children}</p>
     </div>
@@ -316,9 +313,7 @@ function Good({ title, children }: { title: string; children: React.ReactNode })
 function SeeDesk({ title, line = "Please see the front desk." }: { title: string; line?: string }) {
   return (
     <div className="rounded-xl bg-warning-soft px-6 py-10 text-warning">
-      <p className="text-7xl" aria-hidden>
-        !
-      </p>
+      <Icon name="alert" className="mx-auto h-20 w-20" />
       <p className="mt-4 text-4xl font-semibold">{title}</p>
       <p className="mt-4 text-2xl">{line}</p>
     </div>

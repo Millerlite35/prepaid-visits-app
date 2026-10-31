@@ -11,6 +11,7 @@ import { contactLines } from "@/lib/page-settings";
 import { createSessionClient } from "@/lib/supabase/server";
 import { makeCards, reprintCards } from "./actions";
 import { CardStudio } from "./card-studio";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `QR cards · ${brand.name}` };
 
@@ -20,7 +21,7 @@ export const metadata: Metadata = { title: `QR cards · ${brand.name}` };
 export default function CardsPage({ params }: PageProps<"/dashboard/business/[providerId]/cards">) {
   return (
     <main className="w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton />}>
         <CardsContent params={params} />
       </Suspense>
     </main>

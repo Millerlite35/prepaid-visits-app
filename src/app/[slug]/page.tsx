@@ -8,6 +8,7 @@ import { contactLines } from "@/lib/page-settings";
 import { loadActivePackages, loadPublicProvider, notSellingReason } from "@/lib/payments/checkout";
 import { startCheckout } from "./actions";
 import { PurchaseForm } from "./purchase-form";
+import { PageSkeleton } from "@/components/ui";
 
 // The client-facing purchase page: example.com/{slug} (private pages need ?key=...).
 // Search engines are asked not to list it; private pages must never show up in search.
@@ -18,7 +19,7 @@ export default function PurchasePage(props: PageProps<"/[slug]">) {
     <Suspense
       fallback={
         <ClientShell>
-          <p className="text-center text-sm text-ink-muted">Loading…</p>
+          <PageSkeleton variant="client" />
         </ClientShell>
       }
     >

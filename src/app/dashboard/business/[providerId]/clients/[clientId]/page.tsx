@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Card } from "@/components/ui";
+import { Card, PageSkeleton } from "@/components/ui";
 import { brand } from "@/config/brand";
 import { requireManager } from "@/lib/auth";
 import { formatCents } from "@/lib/packages";
@@ -12,13 +12,14 @@ import { adjustAction, refundAction } from "./money-actions";
 import { AdjustForm, RefundForm } from "./money-forms";
 import { CardList } from "./card-list";
 import { PassButtons } from "./pass-buttons";
+import { Icon } from "@/components/icons";
 
 export const metadata: Metadata = { title: `Client · ${brand.name}` };
 
 export default function ClientPage(props: PageProps<"/dashboard/business/[providerId]/clients/[clientId]">) {
   return (
     <main className="w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton />}>
         <ClientContent {...props} />
       </Suspense>
     </main>
@@ -149,8 +150,9 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
 
   return (
     <>
-      <Link href={`/dashboard/business/${providerId}/clients`} className="text-sm underline">
-        ← Clients
+      <Link href={`/dashboard/business/${providerId}/clients`} className="inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink">
+        <Icon name="back" className="h-4 w-4" />
+        Clients
       </Link>
       <header className="mt-4 flex flex-wrap items-end justify-between gap-6">
         <div className="min-w-0">
@@ -183,8 +185,9 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
                 {pass ? (
                   <>
                     Active since {fmt(pass.issued_at)}.{" "}
-                    <a href={`/pass/${pass.token}`} target="_blank" rel="noopener noreferrer" className="underline">
-                      View pass ↗
+                    <a href={`/pass/${pass.token}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline">
+                      View pass
+                      <Icon name="external" className="h-3.5 w-3.5" />
                     </a>
                   </>
                 ) : (

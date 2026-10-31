@@ -6,13 +6,14 @@ import { requireStaff } from "@/lib/auth";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { checkIn, findClientsForCard, linkScannedCard, undoCheckIn } from "./actions";
 import { Scanner } from "./scanner";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Scan · ${brand.name}` };
 
 export default function ScanPage({ params }: PageProps<"/dashboard/business/[providerId]/scan">) {
   return (
     <main className="w-full max-w-md flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton />}>
         <ScanContent params={params} />
       </Suspense>
     </main>

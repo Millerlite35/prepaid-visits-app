@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { Icon } from "@/components/icons";
 
 // Shared building blocks for the staff dashboard, so every page has the same look.
 // Colours come from the tokens in globals.css (canvas, surface, line, ink) plus the
@@ -104,7 +105,14 @@ export function Stat({ label, value, trend, hint }: { label: ReactNode; value: R
               trend.direction === "flat" && "bg-surface-muted text-ink-muted",
             )}
           >
-            {trend.direction === "up" ? "▲ up" : trend.direction === "down" ? "▼ down" : "No change"}
+            {trend.direction === "flat" ? (
+              "No change"
+            ) : (
+              <>
+                <Icon name={trend.direction === "up" ? "arrowUp" : "arrowDown"} className="mr-0.5 h-3 w-3" />
+                {trend.direction}
+              </>
+            )}
           </span>
           {trend.text}
         </p>
@@ -120,7 +128,7 @@ export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; childr
   return (
     <span
       className={cx(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
         tone === "neutral" && "bg-surface-muted text-ink-muted",
         tone === "success" && "bg-success-soft text-success",
         tone === "warning" && "bg-warning-soft text-warning",
@@ -159,6 +167,101 @@ export function Callout({ tone = "warning", title, children }: { tone?: "warning
         </p>
       )}
       {children}
+    </div>
+  );
+}
+
+// A short status line with its icon ("Saved", "Card linked"); boxed adds the soft background
+export function Notice({ tone, boxed, className, children }: { tone: "success" | "warning" | "danger"; boxed?: boolean; className?: string; children: ReactNode }) {
+  return (
+    <p
+      role={tone === "success" ? "status" : undefined}
+      className={cx(
+        "flex items-start gap-2 text-sm",
+        tone === "success" && "text-success",
+        tone === "warning" && "text-warning",
+        tone === "danger" && "text-danger",
+        boxed && "rounded-md p-3",
+        boxed && tone === "success" && "bg-success-soft",
+        boxed && tone === "warning" && "bg-warning-soft",
+        boxed && tone === "danger" && "bg-danger-soft",
+        className,
+      )}
+    >
+      <Icon name={tone === "success" ? "check" : "alert"} className="mt-[3px] h-4 w-4 shrink-0" />
+      <span>{children}</span>
+    </p>
+  );
+}
+
+// A grey block standing in for content that is still loading
+export function Skeleton({ className }: { className?: string }) {
+  return <div className={cx("animate-pulse rounded-md bg-line/70 motion-reduce:animate-none", className)} />;
+}
+
+// Suspense fallback shaped like the page that's coming, instead of a "Loading…" line.
+// list: title + rows; overview: title + stat strip + two panels; form: title + fields;
+// fields: fields only (the page title is already showing); client: a client page card.
+export function PageSkeleton({ variant = "list", className }: { variant?: "list" | "overview" | "form" | "fields" | "client"; className?: string }) {
+  const title = (
+    <>
+      <Skeleton className="h-8 w-60 max-w-full" />
+      <Skeleton className="mt-3 h-4 w-80 max-w-full" />
+    </>
+  );
+  const rows = (n: number) => (
+    <div className="divide-y divide-line">
+      {Array.from({ length: n }, (_, i) => (
+        <div key={i} className="flex items-center justify-between gap-4 py-3">
+          <Skeleton className="h-4 w-2/5" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      ))}
+    </div>
+  );
+  const fields = (n: number) => (
+    <div className="space-y-5">
+      {Array.from({ length: n }, (_, i) => (
+        <div key={i}>
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="mt-2 h-10 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+  return (
+    <div role="status" aria-label="Loading" className={className}>
+      {variant === "list" && (
+        <>
+          {title}
+          <div className="mt-8 rounded-xl border border-line bg-surface px-5 py-2">{rows(5)}</div>
+        </>
+      )}
+      {variant === "overview" && (
+        <>
+          {title}
+          <Skeleton className="mt-8 h-32 w-full rounded-xl" />
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="rounded-xl border border-line bg-surface px-5 py-2">{rows(3)}</div>
+            <div className="rounded-xl border border-line bg-surface px-5 py-2">{rows(5)}</div>
+          </div>
+        </>
+      )}
+      {variant === "form" && (
+        <>
+          {title}
+          <div className="mt-8 rounded-xl border border-line bg-surface p-5">{fields(3)}</div>
+        </>
+      )}
+      {variant === "fields" && fields(2)}
+      {variant === "client" && (
+        <div className="flex flex-col items-center">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <Skeleton className="mt-4 h-6 w-48" />
+          <Skeleton className="mt-6 h-40 w-full" />
+          <Skeleton className="mt-4 h-10 w-full" />
+        </div>
+      )}
     </div>
   );
 }

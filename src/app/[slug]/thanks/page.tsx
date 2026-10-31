@@ -9,6 +9,8 @@ import { describeExpiry } from "@/lib/packages";
 import { getStripe } from "@/lib/stripe";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { AutoRefresh } from "./auto-refresh";
+import { Icon } from "@/components/icons";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Thank you", robots: { index: false, follow: false } };
 
@@ -19,7 +21,7 @@ export default function ThanksPage(props: PageProps<"/[slug]/thanks">) {
     <Suspense
       fallback={
         <ClientShell>
-          <p className="text-center text-sm text-ink-muted">Loading…</p>
+          <PageSkeleton variant="client" />
         </ClientShell>
       }
     >
@@ -127,8 +129,8 @@ async function ThanksContent({ params, searchParams }: PageProps<"/[slug]/thanks
     <>
       {heading}
       <div className="mt-6 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-soft text-2xl text-success" aria-hidden>
-          ✓
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-soft text-success">
+          <Icon name="check" className="h-6 w-6" />
         </span>
         <p className="mt-3 text-lg font-semibold text-ink">You&apos;re all set. Thank you!</p>
       </div>

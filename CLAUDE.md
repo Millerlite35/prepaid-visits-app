@@ -145,8 +145,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`.
 - Database access from the server: `getAdminClient()` in `src/lib/supabase/admin.ts`
   (secret key, bypasses RLS, marked `server-only`). Read settings with `requireEnv()`.
-- `src/app/page.tsx` is a temporary system check page (server connection + proof the
-  browser key cannot read providers). Replace it when the real home page exists.
+- `/` redirects to `/dashboard` (which sends signed-out visitors to `/login`). The old system check
+  page was retired Oct 31, 2026; RLS is proven by `supabase/tests/access_rules_test.sql`.
 - Check: `npm run lint` and `npm run build` must both pass.
 
 ## Provider login (build step 3: 3a login, 3b two-step, 3c onboarding)
@@ -362,7 +362,10 @@ default), plus a privilege check in `provider_setup_test.sql`.
   `emailWordmark()` in `src/lib/email-layout.ts` (header on staff invite, backup-code alert, support;
   the client pass email keeps the PRACTICE's branding on top and has the wordmark in its footer).
 - Staff building blocks in `src/components/ui.tsx`: `PageHeader`, `Card`, `StatStrip` + `Stat` (+ `Trend`),
-  `Badge`, `Callout`, `EmptyState`, `Row`, `buttonClass(variant, size)`. Icons: `src/components/icons.tsx`.
+  `Badge`, `Callout`, `Notice` (one-line status with icon), `EmptyState`, `Row`, `buttonClass(variant, size)`,
+  `PageSkeleton` (Suspense fallbacks: list | overview | form | fields | client; never a "Loading…" line).
+  Icons: `src/components/icons.tsx`. **No typed symbols as icons** (✓ ⚠ → ← ▲ ↗): use `<Icon>`. A "…" is
+  fine on in-progress button labels ("Saving…").
 - Shape (Oct 31, 2026, design audit step 3): TWO radii only: `rounded-md` (6px) for buttons, inputs, nav
   items and boxes inside a panel; `rounded-xl` (12px) for panels on the canvas. `rounded-full` only for
   pills and dots. No drop shadow under staff panels (border only). Group related content in one panel
@@ -436,7 +439,6 @@ default), plus a privilege check in `provider_setup_test.sql`.
   IP, scanner 120/min per user, support 5/hour per user. If the check errors it ALLOWS and
   logs (never locks everyone out). IP = first `x-forwarded-for`: confirm the host sets it
   honestly when choosing hosting.
-- `/` system check renders only outside production.
 - Admin-client review (Oct 2026): every use in `src/app` follows a `require*` check, a
   verified Stripe signature, or an unguessable token/session id. Keep it that way.
 

@@ -7,6 +7,7 @@ import { resolveStyle, type DesignStyle } from "@/lib/design-styles";
 import type { PrintableCard } from "@/lib/cards";
 import type { CardsState } from "./actions";
 import { CARD_H_IN, CARD_W_IN, QrCard, type CardBrand } from "./card-art";
+import { Icon } from "@/components/icons";
 
 type Mode = "avery" | "single";
 
@@ -174,20 +175,20 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
                   {nudge.x}
                 </span>
                 <button type="button" onClick={() => changeNudge("x", -1)} className="rounded-md border px-2" aria-label="Move left">
-                  ←
+                  <Icon name="back" className="h-4 w-4" />
                 </button>
                 <button type="button" onClick={() => changeNudge("x", 1)} className="rounded-md border px-2" aria-label="Move right">
-                  →
+                  <Icon name="chevronRight" className="h-4 w-4" />
                 </button>
                 <span className="ml-3">
                   Up/down: {nudge.y > 0 ? "+" : ""}
                   {nudge.y}
                 </span>
                 <button type="button" onClick={() => changeNudge("y", -1)} className="rounded-md border px-2" aria-label="Move up">
-                  ↑
+                  <Icon name="chevronUp" className="h-4 w-4" />
                 </button>
                 <button type="button" onClick={() => changeNudge("y", 1)} className="rounded-md border px-2" aria-label="Move down">
-                  ↓
+                  <Icon name="chevronDown" className="h-4 w-4" />
                 </button>
               </div>
             </div>

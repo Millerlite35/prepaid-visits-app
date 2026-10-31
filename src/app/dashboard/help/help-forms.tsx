@@ -3,6 +3,8 @@
 import { useActionState, useState, useSyncExternalStore } from "react";
 import type { FaqTopic } from "@/config/help-faq";
 import type { SupportState } from "./actions";
+import { Notice } from "@/components/ui";
+import { Icon } from "@/components/icons";
 
 // ---------------------------------------------------------------- searchable FAQ
 export function FaqList({ topics }: { topics: FaqTopic[] }) {
@@ -37,9 +39,7 @@ export function FaqList({ topics }: { topics: FaqTopic[] }) {
             {t.items.map((i) => (
               <details key={i.q} className="group p-3" open={words.length > 0}>
                 <summary className="cursor-pointer list-none text-sm font-medium">
-                  <span className="mr-2 inline-block transition-transform group-open:rotate-90" aria-hidden>
-                    ›
-                  </span>
+                  <Icon name="chevronRight" className="mr-1.5 inline-block h-4 w-4 align-[-3px] text-ink-muted transition-transform group-open:rotate-90" />
                   {i.q}
                 </summary>
                 <p className="mt-2 pl-5 text-sm text-ink">{i.a}</p>
@@ -80,9 +80,9 @@ export function SupportForm({
 
   if (state.message) {
     return (
-      <p role="status" className="rounded-md bg-success-soft p-3 text-sm text-success">
-        ✓ {state.message}
-      </p>
+      <Notice tone="success" boxed>
+        {state.message}
+      </Notice>
     );
   }
 

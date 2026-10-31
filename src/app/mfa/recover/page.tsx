@@ -5,6 +5,7 @@ import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
 import { signOut } from "../../(auth)/actions";
 import { BackupCodeForm } from "./backup-code-form";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Use a backup code · ${brand.name}` };
 
@@ -16,7 +17,7 @@ export default function MfaRecoverPage() {
         Enter one of the backup codes you saved when you set up two-step verification. Your old
         authenticator will be removed, and you&apos;ll sign in again to set up your new phone.
       </p>
-      <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="fields" className="mt-6" />}>
         <RecoverGate />
       </Suspense>
     </main>

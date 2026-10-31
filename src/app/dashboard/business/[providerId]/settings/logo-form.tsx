@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { LOGO_MAX_BYTES, LOGO_TYPES } from "@/lib/branding";
 import type { SettingsState } from "./actions";
+import { Notice } from "@/components/ui";
 
 type Props = {
   action: (prev: SettingsState, formData: FormData) => Promise<SettingsState>;
@@ -52,7 +53,7 @@ export function LogoForm({ action, removeAction, currentUrl }: Props) {
         </p>
         {problem && <p className="text-sm text-danger">{problem}</p>}
         {!pending && state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
-        {!pending && state.saved && <p role="status" className="text-sm text-success">✓ Logo saved</p>}
+        {!pending && state.saved && <Notice tone="success">Logo saved</Notice>}
         <button
           disabled={pending || !preview}
           className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"

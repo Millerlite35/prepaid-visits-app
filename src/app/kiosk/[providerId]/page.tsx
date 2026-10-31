@@ -6,6 +6,7 @@ import { logoUrl } from "@/lib/branding";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { kioskCheckIn } from "./actions";
 import { Kiosk } from "./kiosk";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Self check-in · ${brand.name}` };
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = { title: `Self check-in · ${brand.name}` };
 // a staff member (ideally a scan-only account), so leaving it only reaches the scanner.
 export default function KioskPage({ params }: PageProps<"/kiosk/[providerId]">) {
   return (
-    <Suspense fallback={<main className="flex flex-1 items-center justify-center text-sm">Loading…</main>}>
+    <Suspense fallback={<main className="flex flex-1 items-center justify-center px-6"><PageSkeleton variant="fields" className="w-full max-w-md" /></main>}>
       <KioskContent params={params} />
     </Suspense>
   );

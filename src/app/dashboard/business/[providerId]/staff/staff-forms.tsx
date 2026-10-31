@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import type { InviteState } from "./actions";
+import { Notice } from "@/components/ui";
 
 const inputClass = "mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2";
 
@@ -49,12 +50,12 @@ export function InviteForm({
       {!pending && state.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       {!pending && state.message && (
         <div className="space-y-2">
-          <p role="status" className="text-sm text-success">✓ {state.message}</p>
+          <Notice tone="success">{state.message}</Notice>
           {state.shareText && (
             <>
               <pre className="whitespace-pre-wrap rounded-md bg-surface-muted p-3 text-xs">{state.shareText}</pre>
               <button type="button" onClick={() => copy(state.shareText!)} className="text-sm underline">
-                {copied ? "Copied ✓" : "Copy message"}
+                {copied ? "Copied" : "Copy message"}
               </button>
             </>
           )}

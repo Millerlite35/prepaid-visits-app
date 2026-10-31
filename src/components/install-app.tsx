@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Icon } from "@/components/icons";
 
 // "Install the app" card. Android/Chrome/Edge offer a one-click install (the browser's
 // beforeinstallprompt event); iPhone/iPad don't, so we show the two taps instead.
@@ -86,9 +87,7 @@ export function InstallApp({ appName }: { appName: string }) {
         <ol className="mt-3 list-decimal space-y-1 pl-5">
           <li>
             In Safari, tap the <strong>Share</strong> button{" "}
-            <span aria-hidden className="inline-block rounded-md border border-line px-1">
-              ⬆
-            </span>
+            <Icon name="share" className="inline-block h-4 w-4 align-[-3px]" />
             .
           </li>
           <li>

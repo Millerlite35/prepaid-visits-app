@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/config/brand";
 import { Icon } from "@/components/icons";
-import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader, Row, Stat, StatStrip, type Trend } from "@/components/ui";
+import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader, PageSkeleton, Row, Stat, StatStrip, type Trend } from "@/components/ui";
 import { requireManager } from "@/lib/auth";
 import { monthName, monthStart } from "@/lib/dates";
 import { formatCents } from "@/lib/packages";
@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: `Overview · ${brand.name}` };
 export default function OverviewPage({ params }: PageProps<"/dashboard/business/[providerId]">) {
   return (
     <main className="w-full max-w-6xl flex-1 px-4 py-8 sm:px-8">
-      <Suspense fallback={<p className="text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="overview" />}>
         <OverviewContent params={params} />
       </Suspense>
     </main>
@@ -307,7 +307,7 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
           )}
         </Card>
 
-        <Card title="Recent activity" actions={<Link href={`${base}/clients`} className="text-sm text-ink-muted hover:text-ink">All clients →</Link>}>
+        <Card title="Recent activity" actions={<Link href={`${base}/clients`} className="text-sm text-ink-muted hover:text-ink">All clients</Link>}>
           {activity.length === 0 ? (
             <EmptyState>No activity yet.</EmptyState>
           ) : (

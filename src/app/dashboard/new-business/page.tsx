@@ -5,6 +5,7 @@ import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { requireEnv } from "@/lib/env";
 import { NewBusinessForm } from "./new-business-form";
+import { PageSkeleton } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Create your business · ${brand.name}` };
 
@@ -15,7 +16,7 @@ export default function NewBusinessPage() {
       <p className="mt-2 text-sm text-ink-muted">
         This is the name clients see on your purchase page and visit cards.
       </p>
-      <Suspense fallback={<p className="mt-6 text-sm">Loading…</p>}>
+      <Suspense fallback={<PageSkeleton variant="fields" className="mt-6" />}>
         <NewBusinessGate />
       </Suspense>
       <p className="mt-6 text-sm">
