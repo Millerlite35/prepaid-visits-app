@@ -82,6 +82,22 @@ export function Card({
   );
 }
 
+// Related things in ONE panel instead of a card each:
+// <Card title="…" padded={false}><Sections><Section title="…">…</Section>…</Sections></Card>
+export function Sections({ children }: { children: ReactNode }) {
+  return <div className="divide-y divide-line">{children}</div>;
+}
+
+export function Section({ title, description, children }: { title?: ReactNode; description?: ReactNode; children: ReactNode }) {
+  return (
+    <div className="px-5 py-4">
+      {title && <h3 className="text-sm font-semibold text-ink">{title}</h3>}
+      {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
+      <div className={title || description ? "mt-3" : undefined}>{children}</div>
+    </div>
+  );
+}
+
 export type Trend = { text: string; direction: "up" | "down" | "flat" };
 
 // One panel holding several Stats, split by hairlines (the gap shows the line colour through)

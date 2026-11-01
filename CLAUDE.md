@@ -403,6 +403,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   items and boxes inside a panel; `rounded-xl` (12px) for panels on the canvas. `rounded-full` only for
   pills and dots. No drop shadow under staff panels (border only). Group related content in one panel
   with `divide-y` sections instead of a card each (see the client page: 3 panels, balance in the header).
+  Building blocks: `<Card title padded={false}><Sections><Section title description>…` (`ui.tsx`). Page
+  settings (3 panels + danger zone), Packages (list + "Add packages"), Staff (Team + Invite) and Security
+  ("Signing in") use them.
 - Staff shell: `dashboard/layout.tsx` (sticky top bar on the canvas); business pages get a
   role-aware sidebar (`dashboard/business/[providerId]/layout.tsx` + `components/business-nav.tsx`).
   On phones (below `lg`) it's a fixed bottom bar instead: items with `bar: true` (managers: Overview,

@@ -11,7 +11,7 @@ import { removeBusiness } from "./remove-actions";
 import { RemoveBusinessForm } from "./remove-business-form";
 import { AddressForm, ContactForm, PageDetailsForm, PrivateLink, TermsForm, UsualPriceForm, type PageDetails } from "./settings-forms";
 import { Icon } from "@/components/icons";
-import { PageSkeleton } from "@/components/ui";
+import { Card, PageSkeleton, Section, Sections } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Page settings · ${brand.name}` };
 
@@ -66,7 +66,6 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
 
   const site = requireEnv("SITE_URL");
   const privateUrl = `${site}/${p.slug}?key=${p.private_access_key}`;
-  const card = "mt-6 rounded-xl border border-line bg-surface p-5";
 
   return (
     <>
@@ -79,72 +78,74 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
         </a>
       </p>
 
-      <section className={card}>
-        <h2 className="mb-4 font-medium">Logo</h2>
-        <LogoForm
-          action={saveLogo.bind(null, providerId)}
-          removeAction={removeLogo.bind(null, providerId)}
-          currentUrl={logoUrl(p.logo_path)}
-        />
-      </section>
+      <Card title="How your business looks" description="On the purchase page, passes and emails." padded={false} className="mt-6">
+        <Sections>
+          <Section title="Logo">
+            <LogoForm
+              action={saveLogo.bind(null, providerId)}
+              removeAction={removeLogo.bind(null, providerId)}
+              currentUrl={logoUrl(p.logo_path)}
+            />
+          </Section>
+          <Section title="Name, wording and colour">
+            <PageDetailsForm
+              action={savePageDetails.bind(null, providerId)}
+              initial={{
+                display_name: p.display_name,
+                brand_color: p.brand_color,
+                vocab_singular: p.vocab_singular,
+                vocab_plural: p.vocab_plural,
+                pass_label: p.pass_label,
+                profession_template: p.profession_template,
+                timezone: p.timezone,
+              }}
+            />
+          </Section>
+        </Sections>
+      </Card>
 
-      <section className={card}>
-        <h2 className="mb-4 font-medium">Page details</h2>
-        <PageDetailsForm
-          action={savePageDetails.bind(null, providerId)}
-          initial={{
-            display_name: p.display_name,
-            brand_color: p.brand_color,
-            vocab_singular: p.vocab_singular,
-            vocab_plural: p.vocab_plural,
-            pass_label: p.pass_label,
-            profession_template: p.profession_template,
-            timezone: p.timezone,
-          }}
-        />
-      </section>
+      <Card title="Price and contact" padded={false} className="mt-6">
+        <Sections>
+          <Section title="Regular price" description={`What one ${p.vocab_singular} costs without a package.`}>
+            <UsualPriceForm action={saveUsualPrice.bind(null, providerId)} initialCents={p.usual_price_cents} singular={p.vocab_singular} />
+          </Section>
+          <Section title="Office contact" description="Printed on your QR cards and flyers.">
+            <ContactForm
+              action={saveContact.bind(null, providerId)}
+              initial={{ address: p.office_address, phone: p.office_phone, website: p.office_website }}
+            />
+          </Section>
+        </Sections>
+      </Card>
 
-      <section className={card}>
-        <h2 className="mb-1 font-medium">Regular price</h2>
-        <p className="mb-4 text-sm text-ink-muted">What one {p.vocab_singular} costs without a package.</p>
-        <UsualPriceForm action={saveUsualPrice.bind(null, providerId)} initialCents={p.usual_price_cents} singular={p.vocab_singular} />
-      </section>
-
-      <section className={card}>
-        <h2 className="mb-1 font-medium">Office contact</h2>
-        <p className="mb-4 text-sm text-ink-muted">Printed on your QR cards and flyers.</p>
-        <ContactForm
-          action={saveContact.bind(null, providerId)}
-          initial={{ address: p.office_address, phone: p.office_phone, website: p.office_website }}
-        />
-      </section>
-
-      <section className={card}>
-        <h2 className="mb-4 font-medium">Web address and access</h2>
-        <AddressForm
-          action={saveAddressAndAccess.bind(null, providerId)}
-          initialSlug={p.slug}
-          initialAccess={p.page_access}
-          siteHost={new URL(site).host}
-        />
-        {p.page_access === "private" && (
-          <div className="mt-6 border-t border-line pt-4">
-            <PrivateLink url={privateUrl} renewAction={newPrivateLink.bind(null, providerId)} />
-          </div>
-        )}
-      </section>
-
-      <section className={card}>
-        <h2 className="mb-2 font-medium">Terms clients accept before buying</h2>
-        <TermsForm
-          action={saveTerms.bind(null, providerId)}
-          initialTerms={p.terms_text}
-          version={p.terms_version}
-          businessName={p.display_name}
-          singular={p.vocab_singular}
-          plural={p.vocab_plural}
-        />
-      </section>
+      <Card title="Selling" padded={false} className="mt-6">
+        <Sections>
+          <Section title="Web address and access">
+            <AddressForm
+              action={saveAddressAndAccess.bind(null, providerId)}
+              initialSlug={p.slug}
+              initialAccess={p.page_access}
+              siteHost={new URL(site).host}
+            />
+          </Section>
+          {p.page_access === "private" && (
+            <Section>
+              {/* PrivateLink shows its own "Private link" label */}
+              <PrivateLink url={privateUrl} renewAction={newPrivateLink.bind(null, providerId)} />
+            </Section>
+          )}
+          <Section title="Terms clients accept before buying">
+            <TermsForm
+              action={saveTerms.bind(null, providerId)}
+              initialTerms={p.terms_text}
+              version={p.terms_version}
+              businessName={p.display_name}
+              singular={p.vocab_singular}
+              plural={p.vocab_plural}
+            />
+          </Section>
+        </Sections>
+      </Card>
 
       {!p.closed_at && (
         <section className="mt-6 rounded-xl border border-danger-line bg-surface p-5">

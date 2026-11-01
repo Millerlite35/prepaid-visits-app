@@ -7,7 +7,7 @@ import { ROLE_HELP, ROLE_LABELS } from "@/lib/staff";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { cancelInvite, changeRole, inviteStaff, removeMember } from "./actions";
 import { InviteForm } from "./staff-forms";
-import { PageSkeleton } from "@/components/ui";
+import { Card, PageSkeleton, Section, Sections } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Staff · ${brand.name}` };
 
@@ -55,74 +55,74 @@ async function StaffContent({ params }: { params: Promise<{ providerId: string }
     }),
   );
   const openInvites = (invites ?? []).filter((i) => new Date(i.expires_at) > new Date());
-  const card = "mt-6 rounded-xl border border-line bg-surface p-5";
 
   return (
     <>
       <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Staff</h1>
       <p className="mt-1 text-sm text-ink-muted">{provider?.display_name}</p>
 
-      <section className={card}>
-        <h2 className="mb-3 font-medium">People with access</h2>
-        <ul className="divide-y divide-line text-sm">
-          {people.map((p) => (
-            <li key={p.user_id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-              <span>
-                <span className="font-medium">{p.email}</span>
-                {p.user_id === me.id && <span className="text-ink-muted"> (you)</span>}
-                <span className="block text-xs text-ink-muted">
-                  {ROLE_LABELS[p.role] ?? p.role} · since {fmt(p.created_at)}
-                </span>
-              </span>
-              {p.role !== "owner" && (
-                <span className="flex flex-wrap items-center gap-3">
-                  <form action={changeRole.bind(null, providerId, p.user_id)} className="flex items-center gap-2">
-                    <select name="role" defaultValue={p.role} className="rounded-md border border-line bg-surface px-2 py-1 text-sm">
-                      <option value="scan_only">Front desk (scan only)</option>
-                      <option value="manager">Manager</option>
-                    </select>
-                    <button className="text-sm underline">Change</button>
-                  </form>
-                  <form action={removeMember.bind(null, providerId, p.user_id)}>
-                    <ConfirmSubmit
-                      label="Remove"
-                      question={`Remove ${p.email}? They lose access straight away.`}
-                      confirmLabel="Yes, remove"
-                      className="text-sm text-danger underline"
-                    />
-                  </form>
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {openInvites.length > 0 && (
-        <section className={card}>
-          <h2 className="mb-3 font-medium">Waiting to join</h2>
-          <ul className="divide-y divide-line text-sm">
-            {openInvites.map((i) => (
-              <li key={i.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <span>
-                  <span className="font-medium">{i.email}</span>
-                  <span className="block text-xs text-ink-muted">
-                    {ROLE_LABELS[i.role] ?? i.role} · invited {fmt(i.created_at)} · expires {fmt(i.expires_at)}
+      <Card title="Team" padded={false} className="mt-6">
+        <Sections>
+          <Section title="People with access">
+            <ul className="-my-3 divide-y divide-line text-sm">
+              {people.map((p) => (
+                <li key={p.user_id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                  <span>
+                    <span className="font-medium">{p.email}</span>
+                    {p.user_id === me.id && <span className="text-ink-muted"> (you)</span>}
+                    <span className="block text-xs text-ink-muted">
+                      {ROLE_LABELS[p.role] ?? p.role} · since {fmt(p.created_at)}
+                    </span>
                   </span>
-                </span>
-                <form action={cancelInvite.bind(null, providerId, i.id)}>
-                  <button className="text-sm underline">Cancel invitation</button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                  {p.role !== "owner" && (
+                    <span className="flex flex-wrap items-center gap-3">
+                      <form action={changeRole.bind(null, providerId, p.user_id)} className="flex items-center gap-2">
+                        <select name="role" defaultValue={p.role} className="rounded-md border border-line bg-surface px-2 py-1 text-sm">
+                          <option value="scan_only">Front desk (scan only)</option>
+                          <option value="manager">Manager</option>
+                        </select>
+                        <button className="text-sm underline">Change</button>
+                      </form>
+                      <form action={removeMember.bind(null, providerId, p.user_id)}>
+                        <ConfirmSubmit
+                          label="Remove"
+                          question={`Remove ${p.email}? They lose access straight away.`}
+                          confirmLabel="Yes, remove"
+                          className="text-sm text-danger underline"
+                        />
+                      </form>
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </Section>
 
-      <section className={card}>
-        <h2 className="mb-3 font-medium">Invite someone</h2>
+          {openInvites.length > 0 && (
+            <Section title="Waiting to join">
+              <ul className="-my-3 divide-y divide-line text-sm">
+                {openInvites.map((i) => (
+                  <li key={i.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <span>
+                      <span className="font-medium">{i.email}</span>
+                      <span className="block text-xs text-ink-muted">
+                        {ROLE_LABELS[i.role] ?? i.role} · invited {fmt(i.created_at)} · expires {fmt(i.expires_at)}
+                      </span>
+                    </span>
+                    <form action={cancelInvite.bind(null, providerId, i.id)}>
+                      <button className="text-sm underline">Cancel invitation</button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+        </Sections>
+      </Card>
+
+      <Card title="Invite someone" className="mt-6">
         <InviteForm action={inviteStaff.bind(null, providerId)} roleHelp={ROLE_HELP} />
-      </section>
+      </Card>
     </>
   );
 }

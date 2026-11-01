@@ -8,7 +8,7 @@ import { createSessionClient } from "@/lib/supabase/server";
 import { addPresetPackages, createPackage, deletePackage, setPackageActive } from "./actions";
 import { PackageForm } from "./package-form";
 import { QuickStart } from "./quick-start";
-import { PageSkeleton } from "@/components/ui";
+import { Card, PageSkeleton, Section, Sections } from "@/components/ui";
 
 export const metadata: Metadata = { title: `Packages · ${brand.name}` };
 
@@ -69,16 +69,13 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
       <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Packages</h1>
       <p className="mt-1 text-sm text-ink-muted">{provider.display_name}</p>
 
-      <section className="mt-8">
-        <h2 className="font-medium">Your packages</h2>
+      <Card title="Your packages" padded={false} className="mt-8">
         {packages.length === 0 ? (
-          <p className="mt-2 text-sm text-ink-muted">
-            No packages yet. Use Quick start below, or create your own.
-          </p>
+          <p className="px-5 py-4 text-sm text-ink-muted">No packages yet. Use Quick start below, or create your own.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-line rounded-xl border border-line">
+          <ul className="divide-y divide-line">
             {packages.map((p) => (
-              <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 p-4 text-sm">
+              <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 px-5 py-4 text-sm">
                 <div className={p.active ? "" : "opacity-60"}>
                   <p className="font-medium">
                     {p.name}
@@ -110,31 +107,29 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
             ))}
           </ul>
         )}
-      </section>
+      </Card>
 
-      <section className="mt-10 rounded-xl border border-line bg-surface p-5">
-        <h2 className="font-medium">Quick start</h2>
-        <p className="mb-4 mt-1 text-sm text-ink-muted">
-          Add ready-made packages priced from your usual rate, with a discount for buying more.
-        </p>
-        <QuickStart
-          action={addPresetPackages.bind(null, providerId)}
-          vocabSingular={one}
-          vocabPlural={many}
-          usualPriceCents={providerRes.data?.usual_price_cents ?? null}
-        />
-      </section>
-
-      <section className="mt-6 rounded-xl border border-line bg-surface p-5">
-        <h2 className="mb-4 font-medium">Create your own package</h2>
-        <PackageForm
-          usualPriceCents={providerRes.data?.usual_price_cents ?? null}
-          action={createPackage.bind(null, providerId)}
-          vocabSingular={one}
-          vocabPlural={many}
-          submitLabel="Add package"
-        />
-      </section>
+      <Card title="Add packages" padded={false} className="mt-6">
+        <Sections>
+          <Section title="Quick start" description="Ready-made packages priced from your usual rate, with a discount for buying more.">
+            <QuickStart
+              action={addPresetPackages.bind(null, providerId)}
+              vocabSingular={one}
+              vocabPlural={many}
+              usualPriceCents={providerRes.data?.usual_price_cents ?? null}
+            />
+          </Section>
+          <Section title="Create your own">
+            <PackageForm
+              usualPriceCents={providerRes.data?.usual_price_cents ?? null}
+              action={createPackage.bind(null, providerId)}
+              vocabSingular={one}
+              vocabPlural={many}
+              submitLabel="Add package"
+            />
+          </Section>
+        </Sections>
+      </Card>
     </>
   );
 }
