@@ -500,7 +500,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   sessions not `paid` at completion (delayed methods like ACH would need `async_payment_*`).
 - Final product name: **VisitBundle** (visitbundle.com, bought on Cloudflare under the business
   account Oct 24, 2026) chosen after a council
-  review. **USPTO search came back fine (founder, Nov 1, 2026).** Still to confirm: 3 practitioner
+  review. **USPTO search (founder, Nov 1, 2026): no exact "VisitBundle" mark; similar names exist (e.g.
+  "Bundly", "Visit…" marks).** No exact match isn't clearance: the attorney judges whether any similar mark
+  in a related class is a confusion risk. Still to confirm: 3 practitioner
   reactions (by Nov 7, 2026) and the attorney's trademark/patent answers (questions 6-7 in
   `docs/hosting-options.md`).
   Risk: "bundle" also means fixed-price procedure bundles (MDSave) in cash-pay healthcare.
