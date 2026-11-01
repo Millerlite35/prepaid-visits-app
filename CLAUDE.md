@@ -115,13 +115,21 @@ Files in `supabase/migrations/`, run in order:
     0004) also accepts a passkey sign-in: `aal2` OR the signed token's `amr` has method `passkey`. Only the
     function changes. **Apply it BEFORE deploying code that lets passkey sign-ins past `requireUser`.**
 
+21. `0021_delete_or_close_provider.sql`: `providers.closed_at` (NOT in the owners' update grant) and
+    server-only `delete_provider(provider, actor)` (only with no purchases and no ledger rows; cascades; keeps
+    an audit row) and `close_provider(provider, actor)` (stamps closed_at, pauses packages, revokes all
+    passes/cards, new private key; keeps purchases/refunds/ledger; no automatic refunds). Both owner-checked
+    and audited. UI: Page settings > "Delete/Close this business" (type the name to confirm,
+    `remove-actions.ts`). Closed businesses: no purchase page (`loadPublicProvider` filters `closed_at`),
+    hidden from the dashboard list (a "Closed" list links to their records), banner on their pages.
+
 **Every new view** must be created `with (security_invoker = true)` (or altered so), and
 covered by an anon/stranger check in a test. Postgres views otherwise bypass RLS.
 Then `supabase/seed.sql` (fake demo provider). Tests (each ends with a PASSED result row):
 `visit_logic_test.sql`, `access_rules_test.sql`, `provider_setup_test.sql`,
 `page_settings_test.sql`, `checkout_test.sql`, `clients_test.sql`, `refunds_test.sql`,
 `staff_test.sql`, `external_refunds_test.sql`, `support_test.sql`, `rate_limits_test.sql`,
-`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql`, `api_grants_test.sql`, `session_trust_test.sql`, `passkey_test.sql`
+`backup_codes_test.sql`, `provider_contact_test.sql`, `usual_price_test.sql`, `api_grants_test.sql`, `session_trust_test.sql`, `passkey_test.sql`, `business_removal_test.sql`
 in `supabase/tests/`.
 Re-run all after any schema change.
 **New settings columns on providers** must be added to the `grant update (...)` list.

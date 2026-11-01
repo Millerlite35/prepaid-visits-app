@@ -18,8 +18,28 @@ export default function BusinessLayout({ children, params }: LayoutProps<"/dashb
         <Nav params={params} />
       </Suspense>
       {/* room for the phone bottom bar so it never covers the end of the page */}
-      <div className="min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">{children}</div>
+      <div className="min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+        <Suspense>
+          <ClosedBanner params={params} />
+        </Suspense>
+        {children}
+      </div>
     </div>
+  );
+}
+
+// A closed business (migration 0021) keeps its records for the owner; say so on every page
+async function ClosedBanner({ params }: { params: Promise<{ providerId: string }> }) {
+  const { providerId } = await params;
+  await requireUser();
+  // read as the user: row-level security only returns it to the business's own staff
+  const db = await createSessionClient();
+  const { data } = await db.from("providers").select("closed_at").eq("id", providerId).maybeSingle<{ closed_at: string | null }>();
+  if (!data?.closed_at) return null;
+  return (
+    <p className="border-b border-warning-line bg-warning-soft px-4 py-2.5 text-sm text-warning sm:px-8">
+      This business is closed: it no longer sells and its passes are cancelled. Purchases and history are kept here.
+    </p>
   );
 }
 

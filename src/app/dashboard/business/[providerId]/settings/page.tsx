@@ -7,6 +7,8 @@ import { createSessionClient } from "@/lib/supabase/server";
 import { logoUrl } from "@/lib/branding";
 import { newPrivateLink, removeLogo, saveAddressAndAccess, saveContact, saveLogo, savePageDetails, saveTerms, saveUsualPrice } from "./actions";
 import { LogoForm } from "./logo-form";
+import { removeBusiness } from "./remove-actions";
+import { RemoveBusinessForm } from "./remove-business-form";
 import { AddressForm, ContactForm, PageDetailsForm, PrivateLink, TermsForm, UsualPriceForm, type PageDetails } from "./settings-forms";
 import { Icon } from "@/components/icons";
 import { PageSkeleton } from "@/components/ui";
@@ -38,6 +40,7 @@ type ProviderSettings = PageDetails & {
   office_phone: string | null;
   office_website: string | null;
   usual_price_cents: number | null;
+  closed_at: string | null;
 };
 
 async function SettingsContent({ params }: { params: Promise<{ providerId: string }> }) {
@@ -49,11 +52,17 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
   const { data: p, error } = await db
     .from("providers")
     .select(
-      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version, logo_path, office_address, office_phone, office_website, usual_price_cents",
+      "display_name, brand_color, vocab_singular, vocab_plural, pass_label, profession_template, timezone, slug, page_access, private_access_key, terms_text, terms_version, logo_path, office_address, office_phone, office_website, usual_price_cents, closed_at",
     )
     .eq("id", providerId)
     .single<ProviderSettings>();
   if (error) return <p className="text-sm text-danger">Couldn&apos;t load settings. Try refreshing.</p>;
+  // any purchase at all (even a $0 complimentary one) means close, not delete (migration 0021)
+  const { count: purchaseCount } = await db
+    .from("purchases")
+    .select("id", { count: "exact", head: true })
+    .eq("provider_id", providerId);
+  const hasSales = (purchaseCount ?? 0) > 0;
 
   const site = requireEnv("SITE_URL");
   const privateUrl = `${site}/${p.slug}?key=${p.private_access_key}`;
@@ -136,6 +145,18 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
           plural={p.vocab_plural}
         />
       </section>
+
+      {!p.closed_at && (
+        <section className="mt-6 rounded-xl border border-danger-line bg-surface p-5">
+          <h2 className="mb-1 font-medium text-danger">{hasSales ? "Close this business" : "Delete this business"}</h2>
+          <RemoveBusinessForm
+            action={removeBusiness.bind(null, providerId)}
+            name={p.display_name}
+            hasSales={hasSales}
+            plural={p.vocab_plural}
+          />
+        </section>
+      )}
     </>
   );
 }

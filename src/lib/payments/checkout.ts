@@ -56,6 +56,7 @@ export async function loadPublicProvider(slug: string, key: string | undefined):
       "id, slug, display_name, brand_color, logo_path, vocab_singular, vocab_plural, pass_label, page_access, private_access_key, stripe_account_id, stripe_charges_enabled, terms_text, terms_version, office_address, office_phone, office_website, usual_price_cents",
     )
     .eq("slug", slug.toLowerCase())
+    .is("closed_at", null) // a closed business (migration 0021) no longer has a purchase page
     .maybeSingle<PublicProvider>();
   if (!data) return null;
   if (data.page_access === "private" && !(key && sameSecret(key, data.private_access_key))) return null;

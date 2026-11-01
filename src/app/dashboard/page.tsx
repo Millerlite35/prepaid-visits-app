@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icons";
 import { InstallApp } from "@/components/install-app";
-import { Badge, buttonClass, Callout, Card, EmptyState, PageHeader, PageSkeleton } from "@/components/ui";
+import { Badge, buttonClass, Callout, Card, EmptyState, Notice, PageHeader, PageSkeleton } from "@/components/ui";
 import { brand } from "@/config/brand";
 import { requireUser } from "@/lib/auth";
 import { unusedBackupCodeCount } from "@/lib/backup-codes";
@@ -16,11 +16,11 @@ import { connectStripe } from "./stripe/actions";
 
 export const metadata: Metadata = { title: `Dashboard · ${brand.name}` };
 
-export default function DashboardPage() {
+export default function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-8">
       <Suspense fallback={<PageSkeleton />}>
-        <DashboardContent />
+        <DashboardContent searchParams={searchParams} />
       </Suspense>
     </main>
   );
@@ -38,18 +38,20 @@ type Membership = {
     private_access_key: string;
     stripe_account_id: string | null;
     stripe_charges_enabled: boolean;
+    closed_at: string | null;
   } | null;
 };
 
-async function DashboardContent() {
+async function DashboardContent({ searchParams }: Pick<PageProps<"/dashboard">, "searchParams">) {
   const user = await requireUser();
+  const removed = (await searchParams).removed;
 
   // Read as the signed-in person: row-level security limits this to their own businesses.
   const supabase = await createSessionClient();
   const { data, error } = await supabase
     .from("provider_members")
     .select(
-      "provider_id, role, providers(id, display_name, slug, page_access, private_access_key, stripe_account_id, stripe_charges_enabled)",
+      "provider_id, role, providers(id, display_name, slug, page_access, private_access_key, stripe_account_id, stripe_charges_enabled, closed_at)",
     )
     .returns<Membership[]>();
 
@@ -67,18 +69,25 @@ async function DashboardContent() {
 
   const hidden = (data ?? []).filter((m) => !m.providers).map((m) => m.provider_id);
   const names = new Map<string, string>();
+  const closedHidden = new Set<string>();
   if (hidden.length) {
     const { data: rows } = await getAdminClient()
       .from("providers")
-      .select("id, display_name")
+      .select("id, display_name, closed_at")
       .in("id", hidden)
-      .returns<{ id: string; display_name: string }[]>();
-    rows?.forEach((r) => names.set(r.id, r.display_name));
+      .returns<{ id: string; display_name: string; closed_at: string | null }[]>();
+    rows?.forEach((r) => {
+      names.set(r.id, r.display_name);
+      if (r.closed_at) closedHidden.add(r.id);
+    });
   }
 
   const backupCodesLeft = await unusedBackupCodeCount(user.id);
 
-  const memberships = data ?? [];
+  // closed businesses (migration 0021) leave the main list; owners/managers can still open their records
+  const isClosed = (m: Membership) => !!m.providers?.closed_at || closedHidden.has(m.provider_id);
+  const memberships = (data ?? []).filter((m) => !isClosed(m));
+  const closed = (data ?? []).filter((m) => isClosed(m) && m.providers && (m.role === "owner" || m.role === "manager"));
 
   return (
     <>
@@ -91,6 +100,17 @@ async function DashboardContent() {
           </Link>
         }
       />
+
+      {removed === "deleted" && (
+        <Notice tone="success" boxed className="mb-6">
+          Business deleted.
+        </Notice>
+      )}
+      {removed === "closed" && (
+        <Notice tone="success" boxed className="mb-6">
+          Business closed. Its passes are cancelled and its purchase page is offline. Its records are under Closed below.
+        </Notice>
+      )}
 
       {invites && invites.length > 0 && (
         <div className="mb-6">
@@ -167,6 +187,22 @@ async function DashboardContent() {
             );
           })}
         </div>
+      )}
+
+      {closed.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-sm font-medium text-ink-muted">Closed</h2>
+          <ul className="mt-2 space-y-1 text-sm">
+            {closed.map((m) => (
+              <li key={m.provider_id}>
+                <Link href={`/dashboard/business/${m.provider_id}/clients`} className="underline">
+                  {m.providers?.display_name}
+                </Link>
+                <span className="text-ink-muted"> · records only</span>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <InstallApp appName={brand.name} />

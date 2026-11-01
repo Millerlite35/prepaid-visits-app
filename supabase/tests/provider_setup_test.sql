@@ -55,6 +55,10 @@ begin
          'the server must still be able to call record_visit';
   assert has_function_privilege('service_role', 'create_provider(uuid, text, text, text)', 'execute'),
          'the server must be able to call create_provider';
+  assert not has_function_privilege('authenticated', 'delete_provider(uuid, uuid)', 'execute'),
+         'signed-in users must not call delete_provider directly';
+  assert not has_function_privilege('authenticated', 'close_provider(uuid, uuid)', 'execute'),
+         'signed-in users must not call close_provider directly';
 end;
 $$;
 
