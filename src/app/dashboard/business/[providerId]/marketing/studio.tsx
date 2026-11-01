@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   defaultHeadline,
   defaultMessage,
@@ -29,7 +29,7 @@ type Props = {
   packages: FlyerPackage[];
 };
 
-const PREVIEW_WIDTH_PX = 520;
+const PREVIEW_WIDTH_PX = 520; // largest preview; smaller on phones (fits the column)
 
 // The preview is shrunk on screen and printed at real size; when printing, only the
 // artwork shows.
@@ -145,11 +145,24 @@ export function Studio(props: Props) {
     );
   }
 
+  // the preview shrinks to the space it has (phones), never wider than PREVIEW_WIDTH_PX;
+  // printing ignores this and uses real size
+  const previewBoxRef = useRef<HTMLDivElement>(null);
+  const [previewWidth, setPreviewWidth] = useState(PREVIEW_WIDTH_PX);
+  useEffect(() => {
+    const box = previewBoxRef.current;
+    if (!box) return;
+    const fit = () => setPreviewWidth(Math.min(PREVIEW_WIDTH_PX, Math.floor(box.clientWidth)));
+    const observer = new ResizeObserver(fit);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+
   const print = template !== "social" ? TEMPLATES[template] : null;
-  const scale = print ? PREVIEW_WIDTH_PX / (print.widthIn * 96) : 1;
+  const scale = print ? previewWidth / (print.widthIn * 96) : 1;
 
   return (
-    <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_auto]">
+    <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
       <div className="space-y-5 print:hidden">
         <fieldset>
           <legend className="text-sm font-medium">What to make</legend>
@@ -263,17 +276,17 @@ export function Studio(props: Props) {
         )}
       </div>
 
-      <div>
+      <div ref={previewBoxRef} className="min-w-0 lg:w-[520px]">
         <p className="mb-2 text-sm font-medium print:hidden">Preview</p>
         {template === "social" ? (
-          <div className="relative overflow-hidden rounded-md border border-line bg-surface" style={{ width: PREVIEW_WIDTH_PX, height: PREVIEW_WIDTH_PX }}>
+          <div className="relative overflow-hidden rounded-md border border-line bg-surface" style={{ width: previewWidth, height: previewWidth }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- generated image from our own route */}
             <img
               key={previewSrc}
               src={previewSrc}
               alt="Social post preview"
-              width={PREVIEW_WIDTH_PX}
-              height={PREVIEW_WIDTH_PX}
+              width={previewWidth}
+              height={previewWidth}
               onLoad={() => setPreview((v) => ({ ...v, state: "ready" }))}
               onError={previewFailed}
               className={preview.state === "ready" ? "" : "invisible"}
@@ -291,7 +304,7 @@ export function Studio(props: Props) {
 ${PRINT_CSS}`}</style>
             <div
               className="artwork-frame overflow-hidden rounded-md border border-line shadow-sm"
-              style={{ width: PREVIEW_WIDTH_PX, height: print!.heightIn * 96 * scale }}
+              style={{ width: previewWidth, height: print!.heightIn * 96 * scale }}
             >
               <div id="print-area" className="artwork-scale" style={{ ["--s" as string]: scale }}>
                 <Artwork template={template} styleId={styleId} fontId={fontId} c={content} />

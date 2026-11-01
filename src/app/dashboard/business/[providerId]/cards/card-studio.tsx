@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import { FontPicker, StylePicker, useRememberedFont, useRememberedStyle } from "@/components/style-picker";
 import { resolveStyle, type DesignStyle } from "@/lib/design-styles";
@@ -101,6 +101,19 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
   // eslint-disable-next-line react-hooks/set-state-in-effect -- the print area is added to <body> after the page loads
   useEffect(() => setMounted(true), []);
 
+  // the sheet preview shrinks to the space it has (phones); 0.55 of real size at most.
+  // Printing ignores it and uses real size.
+  const previewBoxRef = useRef<HTMLDivElement>(null);
+  const [sheetScale, setSheetScale] = useState(0.55);
+  useEffect(() => {
+    const box = previewBoxRef.current;
+    if (!box) return;
+    const fit = () => setSheetScale(Math.min(0.55, box.clientWidth / (8.5 * 96)));
+    const observer = new ResizeObserver(fit);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+
   const s = resolveStyle(styleId, fontId);
   const cards = state.cards ?? [];
   const sheets = mode === "avery" ? toSheets(cards, startSlot) : [];
@@ -119,7 +132,7 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
 }`;
 
   return (
-    <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_auto]">
+    <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
       <style>{printCss}</style>
       <div className="space-y-5">
         <StylePicker value={styleId} onChange={setStyleId} color={brand.color} />
@@ -245,11 +258,11 @@ export function CardStudio({ brand, sampleQr, batchSizes, inStock, makeCards, re
         </div>
       </div>
 
-      <div>
+      <div ref={previewBoxRef} className="min-w-0 lg:w-[449px]">
         <p className="mb-2 text-sm font-medium">{cards.length ? "First sheet" : "Preview"}</p>
         {cards.length && mode === "avery" ? (
-          <div className="overflow-hidden rounded-md border border-line shadow-sm" style={{ width: 8.5 * 96 * 0.55, height: 11 * 96 * 0.55 }}>
-            <div style={{ transform: "scale(0.55)", transformOrigin: "top left" }}>
+          <div className="overflow-hidden rounded-md border border-line shadow-sm" style={{ width: 8.5 * 96 * sheetScale, height: 11 * 96 * sheetScale }}>
+            <div style={{ transform: `scale(${sheetScale})`, transformOrigin: "top left" }}>
               <Sheet cards={sheets[0]} startSlot={startSlot} nudge={nudge} b={brand} s={s} />
             </div>
           </div>
