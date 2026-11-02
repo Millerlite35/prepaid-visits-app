@@ -68,7 +68,6 @@ async function ClientsContent({ params, searchParams }: PageProps<"/dashboard/bu
   return (
     <>
       <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Clients</h1>
-      <p className="mt-1 text-sm text-ink-muted">{providerRes.data.display_name}</p>
 
       <form className="mt-6 flex gap-2">
         <input

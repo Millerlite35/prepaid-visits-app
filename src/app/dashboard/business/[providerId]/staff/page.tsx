@@ -31,8 +31,7 @@ async function StaffContent({ params }: { params: Promise<{ providerId: string }
 
   // Members' emails live in Supabase Auth, so the server reads them after the owner check.
   const db = getAdminClient();
-  const [{ data: provider }, { data: members }, { data: invites }] = await Promise.all([
-    db.from("providers").select("display_name").eq("id", providerId).single<{ display_name: string }>(),
+  const [{ data: members }, { data: invites }] = await Promise.all([
     db
       .from("provider_members")
       .select("user_id, role, created_at")
@@ -59,7 +58,6 @@ async function StaffContent({ params }: { params: Promise<{ providerId: string }
   return (
     <>
       <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Staff</h1>
-      <p className="mt-1 text-sm text-ink-muted">{provider?.display_name}</p>
 
       <Card title="Team" padded={false} className="mt-6">
         <Sections>

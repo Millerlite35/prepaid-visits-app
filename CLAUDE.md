@@ -336,8 +336,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   credentialId, kind, actorId)` with kind `purchase | resend | reissue`.
 
 ## Help and support
-- `src/app/dashboard/layout.tsx`: slim top bar (brand -> /dashboard, Help) on every
-  dashboard page; static, no login reads.
+- `src/app/dashboard/layout.tsx`: slim top bar on every dashboard page: brand -> /dashboard, Help, and
+  the account menu (`src/components/account-menu.tsx`: email, Security, Sign out). Only the menu reads the
+  login (in Suspense); pages still do their own access checks. No "Signed in as" lines on pages.
 - `/dashboard/help`: searchable FAQ from `src/config/help-faq.ts` (edit answers there; the
   fee answer reads `platformFeePercent`) and Contact support (`help/actions.ts`): saved to
   `support_requests` via the admin client after `requireUser`, max 5/hour/user, emailed to
@@ -424,6 +425,10 @@ default), plus a privilege check in `provider_setup_test.sql`.
   mode). Don't remove outlines; only use `outline-none` where a custom focus style replaces it.
 - Copy (Oct 31, 2026, audit step 5): helper lines only where a mistake costs money or access (refunds,
   cancelling passes, roles, terms, prices, expiry rules); everything else is short or goes in the Help FAQ.
+  Nov 2, 2026 pass (founder's picks): no business name under page titles (the sidebar shows it), no
+  subtitle/description lines where the title says it, month in the figure ("Sales in October") instead of an
+  eyebrow, one-line Security explanations (full warnings where the action happens). Kept on purpose: sidebar
+  group headings, table headings, "Leave unticked on a shared computer".
 - Older pages were moved onto the tokens with a class-for-class pass;
   new or reworked pages should use the `ui.tsx` components directly.
 

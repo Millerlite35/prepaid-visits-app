@@ -31,8 +31,6 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
 
   return (
     <>
-      <p className="mt-1 text-sm text-ink-muted">Signed in as {user.email}</p>
-
       {justSetUp && unused === 0 && (
         <Notice tone="success" boxed className="mt-6">
           Two-step verification is on. One last step: make backup codes, in case you ever lose your phone.
@@ -44,7 +42,7 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
           {passkeys && (
             <Section
               title="Passkeys"
-              description="One tap with Face ID, a fingerprint or your device PIN signs you in: no password, no code. Add one on each phone or computer you use, but not on a shared front-desk device."
+              description="Sign in with Face ID or fingerprint. Not on shared computers."
             >
               <PasskeysPanel passkeys={passkeys} />
             </Section>
@@ -52,7 +50,7 @@ async function SecurityContent({ searchParams }: Pick<PageProps<"/dashboard/secu
 
           <Section
             title="Backup codes"
-            description="If you lose your phone, a backup code gets you back in. Each code works once. Using one removes your old authenticator and passkeys so you can set up the new phone, and we email you when it happens."
+            description="For when you lose your phone."
           >
             <p className="text-sm">
               {unused === 0 ? (

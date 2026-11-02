@@ -218,7 +218,6 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
   return (
     <>
       <PageHeader
-        eyebrow={`${monthName(tz, now)} so far`}
         title={provider.display_name}
         actions={
           <>
@@ -262,7 +261,7 @@ async function OverviewContent({ params }: { params: Promise<{ providerId: strin
       <StatStrip className={`grid-cols-1 ${isOwner ? "sm:grid-cols-2 xl:grid-cols-4" : "sm:grid-cols-3"}`}>
         {isOwner && (
           <Stat
-            label="Sales this month, after refunds"
+            label={`Sales in ${monthName(tz, now)}, after refunds`}
             value={formatCents(netThis)}
             trend={trend(netThis, netBefore, lastMonthLabel, true)}
             hint={refundedThis > 0 ? `${formatCents(grossThis)} in sales, ${formatCents(refundedThis)} refunded` : undefined}

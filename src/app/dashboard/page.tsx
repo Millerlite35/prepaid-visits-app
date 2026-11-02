@@ -9,7 +9,6 @@ import { requireUser } from "@/lib/auth";
 import { unusedBackupCodeCount } from "@/lib/backup-codes";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { createSessionClient } from "@/lib/supabase/server";
-import { signOut } from "../(auth)/actions";
 import { ROLE_LABELS } from "@/lib/staff";
 import { acceptInvite } from "./invite-actions";
 import { connectStripe } from "./stripe/actions";
@@ -93,7 +92,6 @@ async function DashboardContent({ searchParams }: Pick<PageProps<"/dashboard">, 
     <>
       <PageHeader
         title="Your businesses"
-        description={<>Signed in as {user.email}</>}
         actions={
           <Link href="/dashboard/new-business" className={buttonClass("secondary")}>
             Add a business
@@ -218,9 +216,6 @@ async function DashboardContent({ searchParams }: Pick<PageProps<"/dashboard">, 
         </div>
       )}
 
-      <form action={signOut} className="mt-8">
-        <button className="text-sm text-ink-muted hover:text-ink hover:underline">Sign out</button>
-      </form>
     </>
   );
 }

@@ -202,16 +202,8 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
         <h1 className="text-2xl font-semibold" style={{ color }}>
           Self check-in
         </h1>
-        <p className="mt-2 text-sm text-ink-muted">
-          For a computer or tablet at your front desk, with a USB QR scanner or its own camera. Clients show
-          their pass and are checked in, with no one at the keyboard.
-        </p>
-        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-ink-muted">
-          <li>Sign this computer in with a scan-only staff account if you can.</li>
-          <li>Test one scan before clients arrive. You should hear a beep.</li>
-          <li>Testing without a scanner? Copy a pass link, start, click the screen and paste (Ctrl+V).</li>
-          <li>Clients see their first name and {plural} left, nothing else.</li>
-        </ul>
+        {/* setup tips live in Help (src/config/help-faq.ts); only the one that protects data stays here */}
+        <p className="mt-2 text-sm text-ink-muted">Use a scan-only account on this computer.</p>
         <button onClick={() => start("scanner")} className="mt-6 rounded-md px-4 py-3 text-lg font-medium text-white" style={{ backgroundColor: color }}>
           Start with a desk scanner
         </button>
@@ -223,9 +215,6 @@ export function Kiosk({ checkIn, exitHref, name, color, logo, singular, plural }
         >
           {starting ? "Starting camera…" : "Start with this device's camera"}
         </button>
-        <p className="mt-2 text-xs text-ink-muted">
-          Camera: for a laptop webcam or a tablet on a stand facing clients. They hold their phone up to it.
-        </p>
         {cameraError && (
           <p role="alert" className="mt-3 text-sm text-danger">
             {cameraError}

@@ -78,7 +78,7 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
         </a>
       </p>
 
-      <Card title="How your business looks" description="On the purchase page, passes and emails." padded={false} className="mt-6">
+      <Card title="How your business looks" padded={false} className="mt-6">
         <Sections>
           <Section title="Logo">
             <LogoForm
@@ -106,10 +106,10 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
 
       <Card title="Price and contact" padded={false} className="mt-6">
         <Sections>
-          <Section title="Regular price" description={`What one ${p.vocab_singular} costs without a package.`}>
+          <Section title={`Price for a single ${p.vocab_singular}`}>
             <UsualPriceForm action={saveUsualPrice.bind(null, providerId)} initialCents={p.usual_price_cents} singular={p.vocab_singular} />
           </Section>
-          <Section title="Office contact" description="Printed on your QR cards and flyers.">
+          <Section title="Contact for cards and flyers">
             <ContactForm
               action={saveContact.bind(null, providerId)}
               initial={{ address: p.office_address, phone: p.office_phone, website: p.office_website }}

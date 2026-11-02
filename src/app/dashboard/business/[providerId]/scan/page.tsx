@@ -25,12 +25,12 @@ async function ScanContent({ params }: { params: Promise<{ providerId: string }>
   const { role } = await requireStaff(providerId);
 
   // scan-only staff can't read the providers table directly, so the server reads the
-  // name after the staff check above
+  // wording ("visit"/"class") after the staff check above
   const { data: provider } = await getAdminClient()
     .from("providers")
-    .select("display_name, vocab_singular, vocab_plural")
+    .select("vocab_singular, vocab_plural")
     .eq("id", providerId)
-    .single<{ display_name: string; vocab_singular: string; vocab_plural: string }>();
+    .single<{ vocab_singular: string; vocab_plural: string }>();
 
   return (
     <>
@@ -40,7 +40,6 @@ async function ScanContent({ params }: { params: Promise<{ providerId: string }>
           Dashboard
         </Link>
       </div>
-      <p className="mb-4 text-sm text-ink-muted">{provider?.display_name}</p>
       <Scanner
         checkIn={checkIn.bind(null, providerId)}
         undo={undoCheckIn.bind(null, providerId)}

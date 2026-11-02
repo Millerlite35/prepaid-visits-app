@@ -67,7 +67,6 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
   return (
     <>
       <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Packages</h1>
-      <p className="mt-1 text-sm text-ink-muted">{provider.display_name}</p>
 
       <Card title="Your packages" padded={false} className="mt-8">
         {packages.length === 0 ? (
@@ -111,7 +110,7 @@ async function PackagesContent({ params }: { params: Promise<{ providerId: strin
 
       <Card title="Add packages" padded={false} className="mt-6">
         <Sections>
-          <Section title="Quick start" description="Ready-made packages priced from your usual rate, with a discount for buying more.">
+          <Section title="Quick start">
             <QuickStart
               action={addPresetPackages.bind(null, providerId)}
               vocabSingular={one}

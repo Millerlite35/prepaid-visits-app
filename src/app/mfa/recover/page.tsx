@@ -14,8 +14,8 @@ export default function MfaRecoverPage() {
     <main className="mx-auto w-full max-w-sm flex-1 px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Lost your phone?</h1>
       <p className="mt-2 text-sm text-ink-muted">
-        Enter one of the backup codes you saved when you set up two-step verification. Your old
-        authenticator will be removed, and you&apos;ll sign in again to set up your new phone.
+        Enter one of the backup codes you saved. Your old authenticator and passkeys will be removed,
+        and you&apos;ll sign in again to set up your new phone. We&apos;ll email you that it happened.
       </p>
       <Suspense fallback={<PageSkeleton variant="fields" className="mt-6" />}>
         <RecoverGate />
