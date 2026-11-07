@@ -38,6 +38,10 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
     return { error: `Use at least ${MIN_PASSWORD_LENGTH} characters for your password.` };
   }
 
+  if (!(await allow("signup-ip", await clientIp(), LIMITS.signUpPerIp))) {
+    return { error: "Too many attempts. Please wait a while and try again." };
+  }
+
   const supabase = await createSessionClient();
   const { error } = await supabase.auth.signUp({
     email,

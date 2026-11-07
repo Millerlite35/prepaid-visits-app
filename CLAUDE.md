@@ -484,7 +484,8 @@ default), plus a privilege check in `provider_setup_test.sql`.
   Consequence: **never create a browser Supabase client**; all Supabase calls stay on the server.
 - Rate limits (`src/lib/rate-limit.ts`, `allow(kind, who, LIMITS.x)`; IPs/emails hashed):
   checkout 10/10 min per IP + 5/hour per email, sign-in 20/10 min per IP, reset 5/hour per
-  IP, scanner 120/min per user, support 5/hour per user. If the check errors it ALLOWS and
+  IP, scanner 120/min per user, support 5/hour per user, authenticator codes 10/15 min per user,
+  sign-up 10/hour per IP. Self-review results: `docs/security-review.md` (Nov 7, 2026). If the check errors it ALLOWS and
   logs (never locks everyone out). IP = first `x-forwarded-for`: confirm the host sets it
   honestly when choosing hosting.
 - Admin-client review (Oct 2026): every use in `src/app` follows a `require*` check, a

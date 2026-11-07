@@ -55,6 +55,9 @@ export async function setNewPassword(_prev: PasswordState, formData: FormData): 
   let usedBackupCode = false;
   if (factor) {
     if (/^\d{6}$/.test(code)) {
+      if (!(await allow("two-step-code", user.id, LIMITS.twoStepCodePerUser))) {
+        return { error: "Too many tries. Please wait 15 minutes and try again." };
+      }
       const { error: mfaError } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
       if (mfaError) {
         return { error: "That code didn't work. Codes change every 30 seconds, so try the newest one." };

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { brand } from "@/config/brand";
 import { requireSignedIn } from "@/lib/auth";
 import { redeemBackupCode, removeAuthenticator, unusedBackupCodeCount } from "@/lib/backup-codes";
+import { allow, LIMITS } from "@/lib/rate-limit";
 import { saveRemember, wantsRemember } from "@/lib/session-trust";
 import { createSessionClient } from "@/lib/supabase/server";
 
@@ -13,6 +14,8 @@ export type CodeState = { error?: string };
 const BAD_CODE =
   "That code didn't work. Codes change every 30 seconds, so try the newest one. " +
   `If your app has more than one ${brand.name} entry, use the one you added last.`;
+
+const TOO_MANY = "Too many tries. Please wait 15 minutes and try again.";
 
 // Step 1 of setup: create a new authenticator secret and its QR code.
 export async function startEnrollment(): Promise<EnrollState> {
@@ -61,9 +64,11 @@ export async function confirmEnrollment(_prev: CodeState, formData: FormData): P
 
 // Every sign-in after setup: password, then this code.
 export async function verifySignIn(_prev: CodeState, formData: FormData): Promise<CodeState> {
-  await requireSignedIn();
+  const user = await requireSignedIn();
   const code = readCode(formData);
   if (!code) return { error: "Enter the 6-digit code from your app." };
+  // someone who has the password must not be able to keep guessing 6-digit codes
+  if (!(await allow("two-step-code", user.id, LIMITS.twoStepCodePerUser))) return { error: TOO_MANY };
 
   const supabase = await createSessionClient();
   const { data, error: listError } = await supabase.auth.mfa.listFactors();
