@@ -418,7 +418,7 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (`ClientShell`, `ClientCard` with the provider-colour top bar, `ClientHeader`); office
   contact in the footer except on the pass page (kept discreet).
 - Sign-in, sign-up, password and two-step pages use `src/components/auth-frame.tsx` (from the
-  (auth) and mfa layouts): on wide screens a navy brand panel (wordmark, a decorative pass sketch with
+  (auth) and mfa layouts): on wide screens a navy brand panel (a decorative wallet-sized pass card with the wordmark printed on it and
   punch dots, `brand.tagline`, one privacy line) and the form on plain white; on phones the wordmark
   above the form. Pages keep their own `<main>`; the frame strips its padding.
 - Focus: one global `:focus-visible` outline in `globals.css` (`--focus-ring`: navy, light green in dark
