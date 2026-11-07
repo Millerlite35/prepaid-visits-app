@@ -490,6 +490,16 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Admin-client review (Oct 2026): every use in `src/app` follows a `require*` check, a
   verified Stripe signature, or an unguessable token/session id. Keep it that way.
 
+## Monitoring (Nov 2026; details and setup: `docs/monitoring.md`)
+- `alertFounder(title, details)` in `src/lib/alerts.ts` emails ALERT_EMAIL (else SUPPORT_EMAIL): throttled
+  (same title once per 15 min, max 20/hour), never throws, scrubs emails/pass codes/`?key=`. **Never put
+  client names or emails in alert details.** Called from `src/instrumentation.ts` (`onRequestError`: every
+  server error, reported by route FILE path, never the real URL), the Stripe webhook (failures), refunds
+  (paid-but-not-recorded, external refund failed) and disputes (opened/closed, one email per dispute).
+- `/api/health` (200 ok / 503 with the failed check names) for the uptime monitor (UptimeRobot, set up by the
+  founder). Friendly `error.tsx`, `global-error.tsx`, `not-found.tsx` in `src/app`.
+- Not covered: browser-only errors. Before real data, alerts move to the BAA email service.
+
 ## Open decisions
 - Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the
   hosting/BAA decision; a verified sending domain is needed either way.

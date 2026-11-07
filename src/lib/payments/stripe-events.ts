@@ -1,5 +1,6 @@
 import "server-only";
 import type Stripe from "stripe";
+import { alertFounder } from "@/lib/alerts";
 import { syncAccountStatus } from "@/lib/payments/connect";
 import { getAdminClient } from "@/lib/supabase/admin";
 
@@ -54,6 +55,11 @@ export async function handleRefundEvent(refund: Stripe.Refund, accountId: string
       metadata: { payment_intent: paymentIntent, amount_cents: refund.amount },
     });
     console.error(`REVIEW: refund ${refund.id} made in Stripe has ${refund.status}; visits may need restoring by hand`);
+    await alertFounder("A refund made in Stripe failed", {
+      stripe_refund: refund.id,
+      status: refund.status ?? undefined,
+      note: "Visits were removed when it was made; they may need restoring by hand.",
+    });
     return;
   }
   if (!done) return;
@@ -120,6 +126,14 @@ export async function handleDisputeEvent(dispute: Stripe.Dispute, accountId: str
         reason: dispute.reason,
         status: dispute.status,
       },
+    });
+    // a card dispute is money at risk for the practice: worth knowing straight away
+    // the dispute id is in the title, so each dispute gets its own email (throttling is per title)
+    await alertFounder(opened ? `Card dispute opened: ${dispute.id}` : `Card dispute closed (${dispute.status}): ${dispute.id}`, {
+      dispute: dispute.id,
+      provider: providerId,
+      amount_cents: dispute.amount,
+      reason: dispute.reason,
     });
   }
 

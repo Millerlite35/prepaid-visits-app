@@ -1,4 +1,5 @@
 import "server-only";
+import { alertFounder } from "@/lib/alerts";
 import { getStripe } from "@/lib/stripe";
 import { getAdminClient } from "@/lib/supabase/admin";
 
@@ -73,6 +74,12 @@ export async function refundPurchase(args: {
     if (finishError) {
       // money was refunded; the record will say pending until fixed. Shout in the logs.
       console.error(`REFUND ${refundId} PAID BY STRIPE (${stripeRefund.id}) BUT NOT MARKED FINISHED:`, finishError.message);
+      await alertFounder("Refund paid by Stripe but not recorded", {
+        what: finishError.message,
+        refund: String(refundId),
+        stripe_refund: stripeRefund.id,
+        note: "The client got their money back; the refund row is still pending. Finish it by hand.",
+      });
     }
     return { ok: true, amountCents: stripeRefund.amount };
   } catch (e) {

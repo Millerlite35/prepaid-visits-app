@@ -1,4 +1,5 @@
 import type Stripe from "stripe";
+import { alertFounder } from "@/lib/alerts";
 import { requireEnv } from "@/lib/env";
 import { sendPassEmail } from "@/lib/pass-email";
 import { recordPaidCheckout } from "@/lib/payments/checkout";
@@ -35,6 +36,13 @@ export async function POST(request: Request) {
     await handleEvent(event);
   } catch (e) {
     console.error(`stripe webhook ${event.type} ${event.id} failed:`, e instanceof Error ? e.message : e);
+    // Stripe retries on its own; some failures fix themselves (events arriving out of order)
+    await alertFounder(`Stripe webhook failed: ${event.type}`, {
+      what: e instanceof Error ? e.message : String(e),
+      event: event.id,
+      account: event.account ?? undefined,
+      note: "Stripe will retry. If this repeats, check Stripe > Workbench > Webhooks.",
+    });
     return new Response("processing failed", { status: 500 }); // Stripe will retry
   }
 
