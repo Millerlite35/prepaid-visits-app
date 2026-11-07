@@ -518,12 +518,11 @@ default), plus a privilege check in `provider_setup_test.sql`.
   account Oct 24, 2026) chosen after a council
   review. **USPTO search (founder, Nov 1, 2026): no exact "VisitBundle" mark; similar names exist (e.g.
   "Bundly", "Visit…" marks).** No exact match isn't clearance: the attorney judges whether any similar mark
-  in a related class is a confusion risk. Still to confirm: 3 practitioner
-  reactions (by Nov 7, 2026) and the attorney's trademark/patent answers (questions 6-7 in
-  `docs/hosting-options.md`).
+  in a related class is a confusion risk. **Founder decided Nov 7, 2026: the name is final** (skipped the
+  practitioner reactions). Only the attorney's trademark answer (questions 6-7 in `docs/hosting-options.md`)
+  could still change it; then edit `src/config/brand.ts` (one line; logo, icon, titles and emails follow).
   Risk: "bundle" also means fixed-price procedure bundles (MDSave) in cash-pay healthcare.
-  The founder switched `src/config/brand.ts` to VisitBundle on Oct 31, 2026, ahead of those
-  checks. If they turn it down, change it back there (one line; logo, icon, titles and emails follow).
+  Attorney and the $99 Apple Developer account wait on funding (founder asking family, Nov 2026).
 - Domain layout (decide BEFORE pilot: purchase-page URLs get printed into QR codes on flyers,
   signs and cards): likely marketing site on `visitbundle.com` (founder's Lovable, under the
   business account, never the practice's) and this app on `app.visitbundle.com`. No tracking
