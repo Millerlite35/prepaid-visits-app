@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import type { CodeState } from "./actions";
 
 type Props = {
@@ -11,6 +11,11 @@ type Props = {
 
 export function CodeForm({ action, factorId, submitLabel }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
+  // a fresh page load, so the next page reads the new two-step sign-in (see CodeState)
+  useEffect(() => {
+    if (state.next) window.location.assign(state.next);
+  }, [state.next]);
+  const busy = pending || !!state.next;
 
   return (
     <form action={formAction} className="space-y-3">
@@ -43,10 +48,10 @@ export function CodeForm({ action, factorId, submitLabel }: Props) {
         </p>
       )}
       <button
-        disabled={pending}
+        disabled={busy}
         className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-on-brand shadow-sm hover:opacity-90 disabled:opacity-60"
       >
-        {pending ? "Checking…" : submitLabel}
+        {busy ? "Checking…" : submitLabel}
       </button>
     </form>
   );

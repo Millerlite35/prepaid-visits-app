@@ -9,7 +9,10 @@ import { saveRemember, wantsRemember } from "@/lib/session-trust";
 import { createSessionClient } from "@/lib/supabase/server";
 
 export type EnrollState = { factorId?: string; qrCode?: string; secret?: string; error?: string };
-export type CodeState = { error?: string };
+// next = where the browser goes after a good code. A full page load (not a redirect inside the
+// action): the redirect rendered the next page with the request's OLD password-only cookies, so it
+// bounced straight back to the code screen and the code had to be typed twice.
+export type CodeState = { error?: string; next?: string };
 
 const BAD_CODE =
   "That code didn't work. Codes change every 30 seconds, so try the newest one. " +
@@ -59,7 +62,7 @@ export async function confirmEnrollment(_prev: CodeState, formData: FormData): P
   const { data, error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
   if (error) return { error: BAD_CODE };
   await rememberChoice(data.access_token, wantsRemember(formData));
-  redirect("/dashboard/security?setup=1"); // next: make backup codes
+  return { next: "/dashboard/security?setup=1" }; // next: make backup codes
 }
 
 // Every sign-in after setup: password, then this code.
@@ -81,7 +84,7 @@ export async function verifySignIn(_prev: CodeState, formData: FormData): Promis
     return { error: BAD_CODE };
   }
   await rememberChoice(verified.access_token, wantsRemember(formData));
-  redirect("/dashboard");
+  return { next: "/dashboard" };
 }
 
 // "Remember this device": saved against the new (two-step) session's id
