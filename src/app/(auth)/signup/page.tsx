@@ -13,6 +13,11 @@ export default function SignupPage() {
         For providers selling visit packages with {brand.name}.
       </p>
       <AuthForm mode="signup" />
+      <p className="mt-4 text-xs text-ink-muted">
+        By creating an account you agree to the{" "}
+        <Link href="/terms" className="underline">terms</Link> and{" "}
+        <Link href="/privacy" className="underline">privacy policy</Link>.
+      </p>
       <p className="mt-6 text-sm">
         Already have an account?{" "}
         <Link href="/login" className="underline">

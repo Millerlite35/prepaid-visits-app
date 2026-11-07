@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { Wordmark } from "@/components/wordmark";
 import { logoUrl } from "@/lib/branding";
@@ -16,6 +17,9 @@ export function ClientShell({ children, contact = [], width = "md" }: { children
           ))}
           <p className="pt-2">
             <span className="opacity-70">Powered by</span> <Wordmark className="text-sm" />
+          </p>
+          <p>
+            <Link href="/privacy" className="underline">Privacy</Link> · <Link href="/terms" className="underline">Terms</Link>
           </p>
         </footer>
       </main>

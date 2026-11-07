@@ -491,6 +491,13 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Admin-client review (Oct 2026): every use in `src/app` follows a `require*` check, a
   verified Stripe signature, or an unguessable token/session id. Keep it that way.
 
+## Privacy policy and terms (Nov 7, 2026, DRAFTS awaiting the attorney)
+- `/privacy` and `/terms` (`src/components/legal-page.tsx`); company facts in `src/config/legal.ts`
+  (operator legal name, contact inbox, governing state: founder to confirm). A "Draft" notice shows until
+  `attorneyReviewed: true`. Linked from the client page footer (`ClientShell`) and sign-up. The marketing site
+  links here too. **If the app starts collecting something new or adds a service provider, update `/privacy`
+  in the same commit.**
+
 ## Monitoring (Nov 2026; details and setup: `docs/monitoring.md`)
 - `alertFounder(title, details)` in `src/lib/alerts.ts` emails ALERT_EMAIL (else SUPPORT_EMAIL): throttled
   (same title once per 15 min, max 20/hour), never throws, scrubs emails/pass codes/`?key=`. **Never put

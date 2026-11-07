@@ -184,6 +184,6 @@ that nothing says "HIPAA compliant" or invents numbers or testimonials. Then sho
 - [ ] No "HIPAA compliant/certified", no invented numbers, no fake testimonials or logos.
 - [ ] Sign-up and sign-in links point at the real app address.
 - [ ] No analytics, pixels or chat widgets added by Lovable templates.
-- [ ] Privacy policy and terms pages exist before launch (attorney review).
+- [ ] Footer links "Privacy" and "Terms" to https://app.visitbundle.com/privacy and /terms (until that address works: https://prepaid-visits-app.vercel.app/privacy and /terms). Attorney review before launch.
 - [ ] Looks right on your phone, nothing to zoom.
 - [ ] Name is final (practitioner reactions + attorney trademark answer), or you're OK changing it later.
