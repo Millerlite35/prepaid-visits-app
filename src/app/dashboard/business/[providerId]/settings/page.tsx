@@ -151,7 +151,6 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
           <h2 className="mb-1 font-medium text-danger">{hasSales ? "Close this business" : "Delete this business"}</h2>
           <RemoveBusinessForm
             action={removeBusiness.bind(null, providerId)}
-            name={p.display_name}
             hasSales={hasSales}
             plural={p.vocab_plural}
           />

@@ -119,7 +119,7 @@ Files in `supabase/migrations/`, run in order:
     server-only `delete_provider(provider, actor)` (only with no purchases and no ledger rows; cascades; keeps
     an audit row) and `close_provider(provider, actor)` (stamps closed_at, pauses packages, revokes all
     passes/cards, new private key; keeps purchases/refunds/ledger; no automatic refunds). Both owner-checked
-    and audited. UI: Page settings > "Delete/Close this business" (type the name to confirm,
+    and audited. UI: Page settings > "Delete/Close this business" (owner re-enters their PASSWORD to confirm, `src/lib/confirm-password.ts`, 5 tries/15 min;
     `remove-actions.ts`). Closed businesses: no purchase page (`loadPublicProvider` filters `closed_at`),
     hidden from the dashboard list (a "Closed" list links to their records), banner on their pages.
 

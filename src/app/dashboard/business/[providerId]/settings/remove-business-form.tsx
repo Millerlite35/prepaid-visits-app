@@ -1,21 +1,20 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { PasswordInput } from "@/components/password-input";
 import { buttonClass } from "@/components/ui";
 import type { RemoveState } from "./remove-actions";
 
 type Props = {
   action: (prev: RemoveState, formData: FormData) => Promise<RemoveState>;
-  name: string;
   hasSales: boolean;
   plural: string;
 };
 
-// The "type the name to confirm" step for deleting or closing a business
-export function RemoveBusinessForm({ action, name, hasSales, plural }: Props) {
+// The owner's password confirms deleting or closing a business
+export function RemoveBusinessForm({ action, hasSales, plural }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
   const [typed, setTyped] = useState("");
-  const matches = typed.trim().toLowerCase() === name.trim().toLowerCase();
 
   return (
     <form action={formAction} className="space-y-3">
@@ -36,24 +35,16 @@ export function RemoveBusinessForm({ action, name, hasSales, plural }: Props) {
           This can&apos;t be undone.
         </p>
       )}
-      <label className="block text-sm">
-        <span className="font-medium">
-          Type <span className="font-semibold">{name}</span> to confirm
-        </span>
-        <input
-          name="confirm"
-          value={typed}
-          onChange={(e) => setTyped(e.target.value)}
-          autoComplete="off"
-          className="mt-1 block w-full max-w-sm rounded-md border border-line bg-surface px-3 py-2"
-        />
+      <label className="block max-w-sm text-sm">
+        <span className="font-medium">Your password</span>
+        <PasswordInput name="password" autoComplete="current-password" value={typed} onChange={(e) => setTyped(e.target.value)} className="block w-full rounded-md border border-line bg-surface px-3 py-2" />
       </label>
       {state.error && (
         <p role="alert" className="text-sm text-danger">
           {state.error}
         </p>
       )}
-      <button disabled={!matches || pending} className={buttonClass("danger")}>
+      <button disabled={!typed || pending} className={buttonClass("danger")}>
         {pending ? "Working…" : hasSales ? "Close this business" : "Delete this business"}
       </button>
     </form>
