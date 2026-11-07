@@ -3,7 +3,7 @@ import { brand } from "@/config/brand";
 import { Wordmark } from "@/components/wordmark";
 
 // Sign-in, sign-up, password and two-step pages. Wide screens: a navy brand panel on the
-// left (a client's pass card carrying the wordmark, one reassuring line) and the form on plain
+// left (a client's pass card carrying the wordmark) and the form on plain
 // white. Phones: the wordmark above the form, no panel.
 export function AuthFrame({ children }: { children: ReactNode }) {
   return (
@@ -11,9 +11,8 @@ export function AuthFrame({ children }: { children: ReactNode }) {
       <aside className="hidden w-[42%] max-w-xl shrink-0 flex-col bg-[var(--brand-primary)] px-12 py-10 text-white lg:flex">
         <div className="flex flex-1 flex-col justify-center">
           <PassCard />
-          <p className="mt-12 max-w-md font-display text-3xl leading-tight text-balance">{brand.tagline}, checked in with one scan.</p>
+          <p className="mt-12 max-w-md font-display text-3xl leading-tight text-balance">{brand.tagline}, checked in with a scan.</p>
         </div>
-        <p className="max-w-sm text-sm text-white/70">A client&apos;s pass holds only a random code, never their name.</p>
       </aside>
 
       <div className="flex flex-1 flex-col items-center px-4 py-10 lg:justify-center">
