@@ -367,12 +367,13 @@ export function UsualPriceForm({ action, initialCents, singular }: { action: Act
   const [state, formAction, pending] = useActionState(action, {});
   return (
     <form action={formAction} className="space-y-4">
+      {/* the section title ("Price for a single …") is the visible label */}
       <label className="block">
-        <span className="text-sm font-medium">Regular price for one {singular}</span>
-        <span className="mt-1 flex items-center gap-1">
+        <span className="flex items-center gap-1">
           $
           <input
             name="usualPrice"
+            aria-label={`Price for a single ${singular}`}
             defaultValue={initialCents ? (initialCents / 100).toFixed(initialCents % 100 ? 2 : 0) : ""}
             inputMode="decimal"
             placeholder="e.g. 150"
@@ -380,9 +381,7 @@ export function UsualPriceForm({ action, initialCents, singular }: { action: Act
           />
         </span>
         <span className="mt-1 block text-xs text-ink-muted">
-          Optional. Shows clients how much each package saves (for example &quot;Save 10%&quot;) on your purchase page and
-          flyers. Only enter a price you really charge for a single {singular}: advertising a made-up &quot;regular&quot;
-          price isn&apos;t allowed.
+          Only enter a price you really charge for a single {singular}.
         </span>
       </label>
       <Result state={state} pending={pending} />

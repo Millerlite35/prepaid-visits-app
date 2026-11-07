@@ -71,7 +71,6 @@ async function SettingsContent({ params }: { params: Promise<{ providerId: strin
     <>
       <h1 className="mt-4 text-2xl font-semibold tracking-tight text-ink">Page settings</h1>
       <p className="mt-1 text-sm text-ink-muted">
-        What clients see on {p.display_name}&apos;s purchase page, passes and emails.{" "}
         <a href={privateUrlOrPublic(site, p)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline">
           View your purchase page
           <Icon name="external" className="h-3.5 w-3.5" />
