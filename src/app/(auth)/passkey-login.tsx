@@ -32,7 +32,12 @@ export function PasskeyLogin() {
 
   return (
     <div className="mt-6">
-      <button type="button" onClick={signIn} disabled={busy} className={cx(buttonClass("primary"), "w-full")}>
+      <p className="mb-6 flex items-center gap-3 text-xs text-ink-muted">
+        <span className="h-px flex-1 bg-line" />
+        or
+        <span className="h-px flex-1 bg-line" />
+      </p>
+      <button type="button" onClick={signIn} disabled={busy} className={cx(buttonClass("secondary"), "w-full")}>
         {busy ? "Waiting for your device…" : "Sign in with a passkey"}
       </button>
       <label className="mt-3 flex items-start gap-2 text-sm">
@@ -47,11 +52,6 @@ export function PasskeyLogin() {
           {error}
         </p>
       )}
-      <p className="mt-6 flex items-center gap-3 text-xs text-ink-muted">
-        <span className="h-px flex-1 bg-line" />
-        or with your password
-        <span className="h-px flex-1 bg-line" />
-      </p>
     </div>
   );
 }

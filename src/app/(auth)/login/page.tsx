@@ -16,10 +16,10 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       <Suspense>
         <RecoveredNotice searchParams={searchParams} />
       </Suspense>
+      <AuthForm mode="signin" />
       <Suspense>
         <PasskeyGate />
       </Suspense>
-      <AuthForm mode="signin" />
       <p className="mt-4 text-sm">
         <Link href="/forgot-password" className="underline">
           Forgot password?
