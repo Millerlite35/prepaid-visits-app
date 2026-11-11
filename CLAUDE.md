@@ -544,6 +544,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   Amplify Hosting (NOT App Runner: not confirmed HIPAA-eligible), Cognito (logins + TOTP), SES,
   S3, KMS. Costs a one-time ~8-12 session rebuild (Supabase Auth/DB, Resend, Vercel go away);
   do it only after demand is proven. No NAT gateway.
+  **HIPAA risk assessment (DRAFT v0.1, Nov 11, 2026): `docs/hipaa-risk-assessment.md`** (data inventory,
+  risk register R1-R20, safeguards checklist, action plan). Known app gaps from it: no idle sign-out (R5), views
+  of client records aren't logged (R6), no field warnings on notes/package names (R7). Redo it before the pilot.
   Self-hosting the Supabase stack on AWS was considered and rejected (Oct 31, 2026: ongoing
   server upkeep for a solo founder). Break-even (~$3-10k sales/month at 1%), security-review
   scope and attorney questions 8-9 (referral payouts, state prepaid-services laws) are in the doc.
