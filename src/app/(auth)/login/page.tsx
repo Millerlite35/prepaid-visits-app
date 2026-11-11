@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { brand } from "@/config/brand";
+import { IDLE_MINUTES } from "@/lib/idle";
 import { passkeysEnabled } from "@/lib/passkeys";
 import { AuthForm } from "../auth-form";
 import { PasskeyLogin } from "../passkey-login";
@@ -44,6 +45,14 @@ async function PasskeyGate() {
 // After a backup code was used (see /mfa/recover), or a sign-in ran out (/auth/expired)
 async function RecoveredNotice({ searchParams }: Pick<PageProps<"/login">, "searchParams">) {
   const params = await searchParams;
+  if (params.idle === "1") {
+    return (
+      <p role="status" className="mt-4 rounded-md bg-surface-muted p-3 text-sm text-ink">
+        You were signed out after {IDLE_MINUTES} minutes without activity, to keep client details private. Sign in
+        again to continue.
+      </p>
+    );
+  }
   if (params.expired === "1") {
     return (
       <p role="status" className="mt-4 rounded-md bg-surface-muted p-3 text-sm text-ink">

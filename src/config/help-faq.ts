@@ -1,5 +1,6 @@
 import { brand } from "@/config/brand";
 import { platformFeePercent } from "@/config/payments";
+import { IDLE_MINUTES } from "@/lib/idle";
 
 // Help-centre questions for providers and their staff. Plain language, no jargon.
 // Edit freely: the Help page lists them in this order, grouped by topic.
@@ -111,6 +112,10 @@ export const helpFaq: FaqTopic[] = [
       {
         q: "I lost the phone with my authenticator app.",
         a: "Sign in with your password, then choose \"Lost your phone? Use a backup code\" and enter one of your backup codes. Your old authenticator is removed and you set up the new phone. Forgot your password too? Use Forgot password, and enter the backup code where it asks for the 6-digit code. No backup codes? Email support from your account's email address; for your security we'll confirm it's really you first.",
+      },
+      {
+        q: "Why was I signed out?",
+        a: `After ${IDLE_MINUTES} minutes without any activity, you're signed out automatically so nobody can read client details on an unattended screen. A warning shows a minute before. Scanning a pass counts as activity. The self check-in screen is never signed out this way. Separately, every sign-in ends after 12 hours, or 30 days if you ticked "Remember this device".`,
       },
       {
         q: "What are backup codes?",

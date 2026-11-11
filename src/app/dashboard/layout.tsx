@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import { AccountMenu } from "@/components/account-menu";
 import { Wordmark } from "@/components/wordmark";
 import { Icon } from "@/components/icons";
 import { installableApp } from "@/lib/app-metadata";
 import { createSessionClient } from "@/lib/supabase/server";
-import { signOut } from "../(auth)/actions";
+import { IdleSignOut } from "@/components/idle-sign-out";
+import { idleSignOut, signOut } from "../(auth)/actions";
 
 export const metadata = installableApp;
 
@@ -34,12 +36,14 @@ export default function DashboardLayout({ children }: LayoutProps<"/dashboard">)
         </nav>
       </header>
       {children}
+      <IdleSignOut signOut={idleSignOut} />
     </div>
   );
 }
 
 // Only reads who's signed in (for the menu); each page still does its own access check
 async function Account() {
+  await connection(); // the login check reads the clock, so it must run per request
   const supabase = await createSessionClient();
   const { data } = await supabase.auth.getClaims();
   const email = typeof data?.claims?.email === "string" ? data.claims.email : "";

@@ -353,6 +353,17 @@ default), plus a privilege check in `provider_setup_test.sql`.
   (one DB read, cached per request) and sends expired sessions to `/auth/expired` (route
   handler: signs out only if really expired) -> `/login?expired=1`. Signing out always means
   password + code again; migration 0004 (aal2) is untouched.
+- Idle sign-out (Nov 11, 2026, HIPAA automatic logoff): `<IdleSignOut>` (`src/components/idle-sign-out.tsx`) in
+  the dashboard layout signs staff out after `IDLE_MINUTES` (30, `src/lib/idle.ts`) without activity, with a
+  60-second "Still there?" warning; last activity is shared between tabs via localStorage and compared with the
+  clock (a laptop that slept past the limit signs out on wake). `idleSignOut` action (local scope only) ->
+  `/login?idle=1`. The kiosk is outside `/dashboard`, so never idle-signed-out. A camera scan dispatches
+  `ACTIVITY_EVENT`; anything else that works without clicks/keys should too.
+- Client-view logging (Nov 11, 2026, HIPAA audit controls): `logAccess()` (`src/lib/access-log.ts`) writes
+  `client.viewed`, `clients.listed`, `clients.searched` rows to `audit_log` after the response (`after()`),
+  ids only: **never a client's name/email or the search text**. Repeat views by the same person within 10 min
+  collapse to one row; searches always log the matched client ids. **Any new page or action that shows client
+  names must call `logAccess`.** (Scanner check-ins are already ledger rows.)
 - **Passkeys (the founder's TOP priority; plan and security reasoning: `docs/passkey-signin-plan.md`).**
   Supabase can't attach a passkey as the SECOND step (MFA WebAuthn: "not currently supported", Nov 2026),
   so passkeys use Supabase's **Passkeys (Beta)** sign-in (dashboard > Passkeys must be ON; relying party =
@@ -545,8 +556,9 @@ default), plus a privilege check in `provider_setup_test.sql`.
   S3, KMS. Costs a one-time ~8-12 session rebuild (Supabase Auth/DB, Resend, Vercel go away);
   do it only after demand is proven. No NAT gateway.
   **HIPAA risk assessment (DRAFT v0.1, Nov 11, 2026): `docs/hipaa-risk-assessment.md`** (data inventory,
-  risk register R1-R20, safeguards checklist, action plan). Known app gaps from it: no idle sign-out (R5), views
-  of client records aren't logged (R6), no field warnings on notes/package names (R7). Redo it before the pilot.
+  risk register R1-R20, safeguards checklist, action plan). Built from it (Nov 11): idle sign-out (R5) and
+  client-view logging (R6), see "Help and support". Still open in the app: field warnings on notes/package names
+  (R7), an "access history" screen for owners. Redo the assessment before the pilot.
   Self-hosting the Supabase stack on AWS was considered and rejected (Oct 31, 2026: ongoing
   server upkeep for a solo founder). Break-even (~$3-10k sales/month at 1%), security-review
   scope and attorney questions 8-9 (referral payouts, state prepaid-services laws) are in the doc.

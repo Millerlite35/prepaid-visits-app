@@ -1,4 +1,4 @@
-# HIPAA security risk assessment (DRAFT v0.1, Nov 11, 2026)
+# HIPAA security risk assessment (DRAFT v0.2, Nov 11, 2026)
 
 **Status:** first draft, written before any real client data exists (hard rule 7: test mode and fake
 data only). It assesses the app as built today **and** the planned AWS setup (setup D in
@@ -68,8 +68,8 @@ would be present; it isn't, which is why hard rule 7 exists.
 | R2 | Founder's admin account taken over (AWS root, Supabase, Vercel, Stripe, GitHub, Gmail, Cloudflare) | A14, all | Two-step on most accounts | Med | High | **High** | Passkeys or authenticator two-step on EVERY admin account; AWS root locked away (no keys, hardware/passkey MFA), daily work via a separate IAM user/role; password manager; check recovery emails/phones |
 | R3 | Bug that lets one provider, a signed-out visitor or a password-only session see another provider's clients | A1-A4 | RLS + restrictive two-step policies, server `require*` checks, 18 SQL test files, self-review (Nov 7) | Med | High | **Med-High** | Keep tests green; independent security review before real data; re-test RLS-equivalent checks after the AWS rebuild (RDS has no Supabase RLS helpers out of the box) |
 | R4 | Provider staff account stolen (phishing, reused password) | A1-A2, A12 | Two-step required for all staff, passkeys, 12-char passwords, rate limits on sign-in and codes, alert emails, sessions end after 12 h (30 days if "remember") | Med | Med | **Med** | Fine for pilot; consider shorter "remember" period for covered providers |
-| R5 | Unattended or shared device left signed in (front desk, kiosk) | A12 | Kiosk shows first name + visits only; `scan_only` role; 12-hour sessions | Med | Med | **Med** | **Gap: no idle sign-out.** Add auto sign-out after ~15-30 min idle on staff pages (not the kiosk screen); decide the shared-device approach (open decision in CLAUDE.md) |
-| R6 | Staff browse client records they have no reason to see, and we can't tell | A1-A2 | Roles; actions are audited | Med | Med | **Med** | **Gap: views aren't logged.** Log "viewed client page/list/search" to `audit_log` (ids only) so a provider can review access; HIPAA "audit controls" and "information system activity review" |
+| R5 | Unattended or shared device left signed in (front desk, kiosk) | A12 | Kiosk shows first name + visits only; `scan_only` role; 12-hour sessions | Med | Med | **Med** | **Built Nov 11:** sign-out after 30 min idle on staff pages, 1-min warning (not the kiosk). Still to decide: the shared-device approach (open decision in CLAUDE.md) |
+| R6 | Staff browse client records they have no reason to see, and we can't tell | A1-A2 | Roles; actions are audited | Med | Med | **Med** | **Built Nov 11:** client page views, list views and searches logged to `audit_log` (ids only). Still to do: an "access history" screen so owners can review it; routine monthly review |
 | R7 | Health details typed into free text: adjustment notes, package names/descriptions, business name, support messages | A2, A4, A6, A7 | Pass label keyword check (hard rule 8); support form warning | Med | Med | **Med** | Short warnings on note and package fields; provider terms say "no health details"; extend the keyword check to package names and notes |
 | R8 | Data lost: deletion, bad migration, ransomware on the host, provider deletes by mistake | A1-A5 | Ledger is append-only (undo = new row); delete/close business needs the owner's password | Low | High | **Med** | Contingency plan (section 6): RDS automated backups (e.g. 14 days) + a monthly snapshot copied to a second region; **test a restore** before pilot and yearly |
 | R9 | App down when clients arrive (check-in fails) | All | UptimeRobot, `/api/health`, alert emails | Med | Low-Med | **Med** | Written "if the scanner is down" step for providers: note names + times on paper, enter later with "Adjust visits" (note required) |
@@ -94,7 +94,7 @@ would be present; it isn't, which is why hard rule 7 exists.
 | Risk analysis | Partial | This draft; finish before pilot |
 | Risk management | Partial | Section 4 action list |
 | Sanction policy | Gap | One paragraph: what happens if a workforce member breaks policy |
-| Information system activity review | Partial | Audit log exists; no view logging (R6); no routine review yet: monthly check of audit log + AWS CloudTrail |
+| Information system activity review | Partial | Audit log records changes and client views (R6); no review screen or routine review yet: monthly check of audit log + AWS CloudTrail |
 | Assigned security responsibility | Done | Section 1 |
 | Workforce security / access management | Partial | Roles in the app; founder-only admin access; write down who gets console access and how it's removed |
 | Security awareness training | Gap | Founder completes a free HIPAA training (e.g. HHS materials) yearly; keep the certificate |
@@ -115,9 +115,9 @@ would be present; it isn't, which is why hard rule 7 exists.
 |---|---|---|
 | Unique user identification | Done | Every staff member has their own login; no shared logins (advise a `scan_only` account per front desk) |
 | Emergency access procedure | Gap | How the founder reaches data if a provider's owner is locked out (documented, audited) |
-| Automatic logoff | Gap | Idle sign-out (R5) |
+| Automatic logoff | Done | 30-minute idle sign-out on staff pages (R5) |
 | Encryption at rest | Partial | Supabase encrypts; AWS: RDS + S3 with KMS keys |
-| Audit controls | Partial | Actions logged; add view logging (R6); CloudTrail on AWS |
+| Audit controls | Partial | Changes and client views logged (R6); add an owner review screen; CloudTrail on AWS |
 | Integrity | Done | Append-only ledger; balances only from `visit_ledger`; database functions are atomic |
 | Person or entity authentication | Done | Password + required two-step, or passkey with Face ID/PIN check |
 | Transmission security | Done | HTTPS everywhere, HSTS; SES with "require TLS" on AWS |
@@ -143,7 +143,8 @@ change management. Templates for small businesses exist (HHS, NIST); each can be
 - [ ] Laptop: device encryption on, screen lock, antivirus (R15)
 - [ ] GitHub: Dependabot alerts and secret scanning on (R17, R19)
 - [ ] Write the incident response plan and the AI/device acceptable-use policy (R13, R14)
-- [ ] Build: idle sign-out on staff pages (R5) and client-view logging (R6)
+- [x] Build: idle sign-out on staff pages (R5) and client-view logging (R6) (Nov 11)
+- [ ] Build: "Access history" screen for owners (R6)
 - [ ] Field warnings + keyword check on notes and package names (R7)
 
 **Before the pilot with any covered provider**
@@ -162,3 +163,4 @@ change management. Templates for small businesses exist (HHS, NIST); each can be
 | Date | Version | What changed | By |
 |---|---|---|---|
 | 2026-11-11 | 0.1 | First draft (pre-pilot, fake data only) | Founder, with Claude |
+| 2026-11-11 | 0.2 | R5 and R6 built (idle sign-out, client-view logging) | Founder, with Claude |

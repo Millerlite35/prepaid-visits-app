@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/config/brand";
+import { logAccess } from "@/lib/access-log";
 import { requireManager } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { PageSkeleton } from "@/components/ui";
@@ -28,7 +29,7 @@ function fmt(iso: string | null) {
 async function ClientsContent({ params, searchParams }: PageProps<"/dashboard/business/[providerId]/clients">) {
   const { providerId } = await params;
   const query = await searchParams;
-  await requireManager(providerId);
+  const user = await requireManager(providerId);
 
   // only letters, numbers and a few email characters, so the search can't break the query
   const q = (typeof query.q === "string" ? query.q : "").replace(/[^\p{L}\p{N} @._+-]/gu, "").trim().slice(0, 60);
@@ -59,6 +60,19 @@ async function ClientsContent({ params, searchParams }: PageProps<"/dashboard/bu
   if (clientsRes.error || balancesRes.error || providerRes.error) {
     return <p className="text-sm text-danger">Couldn&apos;t load clients. Try refreshing.</p>;
   }
+
+  // record who saw this list: for a search, which clients it showed (ids only, never the search text)
+  logAccess(
+    q
+      ? {
+          providerId,
+          actorId: user.id,
+          action: "clients.searched",
+          metadata: { where: "client_list", results: clientsRes.data.length, client_ids: clientsRes.data.slice(0, 50).map((c) => c.id) },
+        }
+      : { providerId, actorId: user.id, action: "clients.listed", metadata: { results: clientsRes.data.length } },
+    { collapseRepeats: !q },
+  );
 
   const balances = new Map(balancesRes.data.map((b) => [b.visit_account_id, b]));
   const lastVisit = new Map<string, string>();

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, PageSkeleton } from "@/components/ui";
 import { brand } from "@/config/brand";
+import { logAccess } from "@/lib/access-log";
 import { requireManager } from "@/lib/auth";
 import { formatCents } from "@/lib/packages";
 import { createSessionClient } from "@/lib/supabase/server";
@@ -60,7 +61,7 @@ function fmt(iso: string | null, withTime = false) {
 
 async function ClientContent({ params }: PageProps<"/dashboard/business/[providerId]/clients/[clientId]">) {
   const { providerId, clientId } = await params;
-  const { role } = await requireManager(providerId);
+  const { role, id: userId } = await requireManager(providerId);
   const isOwner = role === "owner";
 
   // read as the signed-in user: row-level security limits everything to this business
@@ -72,6 +73,7 @@ async function ClientContent({ params }: PageProps<"/dashboard/business/[provide
     .eq("provider_id", providerId)
     .maybeSingle<{ id: string; full_name: string; email: string; created_at: string; visit_accounts: { id: string } | null }>();
   if (!client) notFound();
+  logAccess({ providerId, actorId: userId, action: "client.viewed", clientId: client.id });
   const accountId = client.visit_accounts?.id;
 
   const [providerRes, balanceRes, purchasesRes, ledgerRes, passRes, remainingRes, refundsRes] = await Promise.all([

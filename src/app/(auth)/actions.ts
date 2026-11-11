@@ -57,3 +57,11 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   redirect("/login");
 }
+
+// Automatic sign-out after inactivity (src/components/idle-sign-out.tsx). Only this
+// device: an idle front-desk tab shouldn't sign the person out on their phone too.
+export async function idleSignOut(): Promise<void> {
+  const supabase = await createSessionClient();
+  await supabase.auth.signOut({ scope: "local" });
+  redirect("/login?idle=1");
+}

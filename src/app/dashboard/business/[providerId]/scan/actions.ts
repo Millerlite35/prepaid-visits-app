@@ -1,5 +1,6 @@
 "use server";
 
+import { logAccess } from "@/lib/access-log";
 import { requireManager, requireStaff } from "@/lib/auth";
 import { cleanSearch, linkCard, type LinkResult } from "@/lib/cards";
 import { createSessionClient } from "@/lib/supabase/server";
@@ -96,7 +97,7 @@ export async function undoCheckIn(providerId: string, ledgerId: number): Promise
 export type CardClient = { id: string; name: string; email: string };
 
 export async function findClientsForCard(providerId: string, query: string): Promise<CardClient[]> {
-  await requireManager(providerId);
+  const user = await requireManager(providerId);
   const q = cleanSearch(query);
   if (q.length < 2) return [];
   // read as the signed-in user: row-level security limits this to their own business
@@ -109,6 +110,18 @@ export async function findClientsForCard(providerId: string, query: string): Pro
     .order("full_name")
     .limit(8)
     .returns<{ id: string; full_name: string; email: string }[]>();
+  // record which clients this search showed (ids only, never the search text)
+  if (data && data.length > 0) {
+    logAccess(
+      {
+        providerId,
+        actorId: user.id,
+        action: "clients.searched",
+        metadata: { where: "card_link", results: data.length, client_ids: data.map((c) => c.id) },
+      },
+      { collapseRepeats: false },
+    );
+  }
   return (data ?? []).map((c) => ({ id: c.id, name: c.full_name, email: c.email }));
 }
 

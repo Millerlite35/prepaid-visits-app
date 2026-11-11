@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { ACTIVITY_EVENT } from "@/lib/idle";
 import { cameraErrorMessage, makeDetector } from "@/lib/qr-detector";
 import type { LinkResult } from "@/lib/cards";
 import type { CardClient, ScanResult, UndoResult } from "./actions";
@@ -64,6 +65,8 @@ export function Scanner({ checkIn, undo, singular, plural, cardLinking }: Props)
       busyRef.current = true;
       pausedRef.current = true;
       lastRef.current = { code, at: now };
+      // a camera scan involves no click or key press: count it as activity (idle sign-out)
+      window.dispatchEvent(new Event(ACTIVITY_EVENT));
       try {
         const scan = await checkIn(code, force);
         setResult({ scan, code });
