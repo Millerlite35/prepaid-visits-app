@@ -58,3 +58,6 @@ next-env.d.ts
 
 # before/after screenshots from the design audit (fake demo data, not part of the app)
 /design-screenshots/
+
+# Third-party design skill (tasteskill), installed locally via `npx skills add`; 39 MB
+.claude/skills/design-taste-frontend/
