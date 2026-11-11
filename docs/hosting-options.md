@@ -139,6 +139,29 @@ subscription price in the business plan matters a lot here.
    (escheat) laws apply to unused prepaid visits? Whose obligation is it, ours or the
    provider's, given the money goes straight to the provider's Stripe account?
 
+Added Nov 11, 2026 (HIPAA scope, after the AWS plan):
+
+10. Covered entities as customers: a covered practice must sign a BAA with us before using the
+    app. Can you draft our standard BAA? What must we have in place before we sign one (written
+    risk assessment, policies, breach-notification plan, training), and what's the minimum
+    for a one-person company?
+11. Telling them apart at sign-up: is it enough for a provider to tick "I am / am not a HIPAA
+    covered entity", or do we need to check? What if a cash-only practice later starts billing
+    insurance?
+12. Marketing claims: once we're on AWS (setup D) with a signed AWS BAA, which wording is safe?
+    E.g. "HIPAA compliant", "built for HIPAA, we sign a BAA", "hosted on HIPAA-eligible AWS
+    infrastructure", "collects only name and email, no health information". Same question for
+    cold outreach emails to practitioners.
+13. Stripe and email: does HIPAA's payment-processing exemption cover Stripe for card payments
+    for visit packages? Must the transactional email service (pass emails) be under a BAA
+    (AWS SES on setup D), even though emails carry no health details?
+14. For providers who are NOT covered entities: does the FTC Health Breach Notification Rule
+    apply to us, and what would a breach require?
+
+**If the budget only covers a short consult, ask in this order:** 1 and 11 (who is covered), 5
+(can a studio-first pilot start without a BAA), 10 (our BAA template), 12 (marketing wording),
+then 9 and 8. The name (6) and patent (7) questions can wait for a later consult.
+
 ## Before any real client data (whichever setup)
 - Signed BAAs with every vendor that touches client data (database, app host, email).
 - Supabase HIPAA project settings on; region chosen (hard to move later).
