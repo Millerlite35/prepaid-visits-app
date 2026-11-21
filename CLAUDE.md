@@ -519,6 +519,20 @@ default), plus a privilege check in `provider_setup_test.sql`.
   founder). Friendly `error.tsx`, `global-error.tsx`, `not-found.tsx` in `src/app`.
 - Not covered: browser-only errors. Before real data, alerts move to the BAA email service.
 
+## Next build: virtual visits (planned Saturday Nov 28, 2026)
+Why: a therapist in the provider survey would only use the app "if it supported virtual practice".
+- **Option 1 (build this):** "Record virtual visit" button on the client page, owners + managers
+  (`requireManager`). Deducts one visit WITHOUT a scan, still through `record_visit()` (hard rule 5): add a
+  "how" value to the visit (scan | virtual) in a new migration, so the ledger/history shows it; same result
+  codes, soonest-expiring package first, Undo works as for scans. Confirm step before deducting (no double
+  clicks: request id). Audit row; activity feed shows "Checked in (online)". New migration needs grants +
+  test (see Database rules); re-run all tests.
+- Optional with it: package label "In person / Online / Either" (display only, shown on the purchase page).
+- Later, only if providers ask: Option 2, client self check-in for online sessions from the pass page
+  (provider opt-in per package, off by default, undoable).
+- Rejected: syncing with SimplePractice/Zoom (no open API, pulls appointment data: breaks minimal-data rule).
+  No video or appointment details ever stored here.
+
 ## Open decisions
 - Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the
   hosting/BAA decision; a verified sending domain is needed either way.
