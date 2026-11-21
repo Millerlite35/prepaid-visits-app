@@ -98,8 +98,8 @@ export function RefundForm({
         <input name="reason" maxLength={200} className={inputClass} />
       </label>
       <p className="text-xs text-ink-muted">
-        The money goes back to the client&apos;s card from your Stripe account, and our platform fee is refunded
-        to you in proportion. The cancelled {plural} come off their balance straight away.
+        The money goes back to the client&apos;s card from your Stripe account. If we took a platform fee on the
+        sale, that is refunded to you in proportion. The cancelled {plural} come off their balance straight away.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         {amountCents && !tooMuch ? (

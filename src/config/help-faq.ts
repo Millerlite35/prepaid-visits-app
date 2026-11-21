@@ -41,7 +41,10 @@ export const helpFaq: FaqTopic[] = [
       },
       {
         q: "What does it cost?",
-        a: `Stripe charges its standard card processing fee on each sale, plus a ${platformFeePercent}% ${brand.name} platform fee. Both are taken automatically from the payment before it reaches your bank.`,
+        a:
+          platformFeePercent > 0
+            ? `Stripe charges its standard card processing fee on each sale, plus a ${platformFeePercent}% ${brand.name} platform fee. Both are taken automatically from the payment before it reaches your bank.`
+            : `${brand.name} takes nothing from your sales. Stripe charges its standard card processing fee on each sale, taken automatically before the money reaches your bank.`,
       },
       {
         q: "How do I refund a client?",

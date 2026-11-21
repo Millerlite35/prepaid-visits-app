@@ -11,6 +11,8 @@
 // Changing this only affects providers who connect afterwards.
 export const connectAccountStyle: "full" | "express" = "full";
 
-// Our platform fee on each package sale, in percent (business plan: 0.5 to 1%).
-// Used by checkout in build step 6.
-export const platformFeePercent = 1;
+// Our cut of each package sale, in percent. 0 = we take nothing from sales (founder decision
+// Nov 21, 2026: monthly fee only, $19.99 founder price). Raising it later is a business decision:
+// give 30 days' notice (terms page) and keep founder accounts on their promised price.
+// Checkout skips the application fee entirely while this is 0; help and terms wording follow it.
+export const platformFeePercent = 0;

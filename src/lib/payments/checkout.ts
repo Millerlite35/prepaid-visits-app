@@ -117,8 +117,9 @@ export async function createCheckout(args: {
   };
   const unit = pkg.visits === 1 ? provider.vocab_singular : provider.vocab_plural;
 
-  // Direct charge on the provider's own Stripe account: the money lands with them,
-  // and our platform fee is taken automatically (hard rule 4).
+  // Direct charge on the provider's own Stripe account: the money lands with them
+  // (hard rule 4). Our platform fee, if any, is taken automatically; at 0% none is sent.
+  const applicationFee = Math.round((pkg.price_cents * platformFeePercent) / 100);
   const session = await getStripe().checkout.sessions.create(
     {
       mode: "payment",
@@ -133,9 +134,7 @@ export async function createCheckout(args: {
           },
         },
       ],
-      payment_intent_data: {
-        application_fee_amount: Math.round((pkg.price_cents * platformFeePercent) / 100),
-      },
+      ...(applicationFee > 0 ? { payment_intent_data: { application_fee_amount: applicationFee } } : {}),
       metadata,
       success_url: `${site}/${provider.slug}/thanks?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,

@@ -165,16 +165,10 @@ function createProviderSurvey() {
   // ------------------------------------------------------------ 4. Price
   form.addPageBreakItem().setTitle('Price');
 
-  form.addGridItem()
-    .setTitle('How would each monthly price feel for this tool?')
-    .setHelpText('Plus Stripe\'s normal card fee on each sale.')
-    .setRows(['$29 / month', '$49 / month', '$79 / month'])
-    .setColumns(['A bargain', 'Fair', 'Expensive, but I\'d consider it', 'Too much'])
-    .setRequired(true);
-
   form.addMultipleChoiceItem()
-    .setTitle('We would also take 1% of each package sale. Is that acceptable?')
-    .setChoiceValues(['Yes', 'Only with a lower monthly price', 'No'])
+    .setTitle('Founder pricing would be $19.99 a month, flat, for early practices. How does that feel?')
+    .setHelpText('We take nothing from your sales. Stripe\'s normal card fee still applies.')
+    .setChoiceValues(['A bargain', 'Fair', 'Expensive, but I\'d consider it', 'Too much'])
     .setRequired(true);
 
   form.addMultipleChoiceItem()

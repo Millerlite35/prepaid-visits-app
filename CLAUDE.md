@@ -523,6 +523,12 @@ default), plus a privilege check in `provider_setup_test.sql`.
 - Email provider for real clients: Resend (testing) has no advertised BAA. Decide with the
   hosting/BAA decision; a verified sending domain is needed either way.
 - Resending a pass email / rate limits on repeat purchases: not built yet (steps 9, 11).
+- **Pricing (founder decided Nov 21, 2026): monthly fee ONLY, $19.99/month founder price, we take nothing
+  from sales** ("nothing off the top" is the pitch). The 1% `platformFeePercent` in `src/config/payments.ts`
+  was a build-time placeholder (step 4a) and must go to 0 (also the help FAQ fee answer and the refund
+  `refund_application_fee` logic). A monthly subscription (Stripe Billing on the platform account) is NOT
+  built yet. The business plan doc (Draft v4) still says subscription + small platform fee: update it.
+  Survey and call sheet test the $19.99 price.
 - Stripe account style (who is liable for chargebacks/negative balances): testing with
   "full"; decide with the attorney before pilot. One setting in `src/config/payments.ts`.
 - Lost authenticator phone WITHOUT backup codes: manual (confirm identity, then delete the

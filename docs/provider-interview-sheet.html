@@ -1,0 +1,146 @@
+<title>Provider Call Sheet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+/* Layout: one US-letter page. Header strip with call details, then three
+   numbered blocks (they really are the call's order), a demo cue, and a
+   tally row at the bottom. Write-in lines sized for a pen. */
+:root {
+  --navy: #1E3A5F;
+  --green: #3E8F63;
+  --paper: #FFFFFF;
+  --canvas: #F4F6F8;
+  --ink: #16243A;
+  --muted: #5A6678;
+  --line: #CBD3DD;
+  --soft: #EAF5EE;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --navy: #9DB8DA; --green: #6FCF97; --paper: #17202D; --canvas: #0F151E;
+  --ink: #E6ECF3; --muted: #9AA6B5; --line: #34404F; --soft: #1C3328; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --navy: #9DB8DA; --green: #6FCF97; --paper: #17202D; --canvas: #0F151E;
+  --ink: #E6ECF3; --muted: #9AA6B5; --line: #34404F; --soft: #1C3328; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body {
+  background: var(--canvas); color: var(--ink);
+  font-family: var(--body); font-size: 13px; line-height: 1.4;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px;
+}
+.sheet {
+  max-width: 8.5in; margin: 0 auto; background: var(--paper);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 0.45in 0.5in; display: grid; gap: 14px;
+}
+header { display: grid; gap: 10px; border-bottom: 2px solid var(--navy); padding-bottom: 10px; }
+h1 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0; color: var(--navy); text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; }
+.field { display: flex; gap: 6px; align-items: flex-end; min-width: 0; }
+.field span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; }
+.field i { flex: 1; border-bottom: 1px solid var(--line); height: 16px; }
+
+section { display: grid; gap: 6px; }
+h2 { display: flex; align-items: baseline; gap: 8px; margin: 0; font-size: 14px; font-weight: 700; color: var(--navy); }
+h2 b { font-family: var(--display); font-size: 18px; color: var(--green); font-weight: 600; }
+h2 em { font-style: normal; font-weight: 500; font-size: 12px; color: var(--muted); }
+ol { margin: 0; padding: 0; list-style: none; counter-reset: q var(--start, 0); display: grid; gap: 5px; }
+li { counter-increment: q; display: grid; grid-template-columns: 22px 1fr; gap: 0 4px; }
+li::before { content: counter(q) "."; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+li .w { grid-column: 2; border-bottom: 1px solid var(--line); height: 16px; }
+li .w + .w { margin-top: 2px; }
+.opts { grid-column: 2; display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); font-size: 12px; }
+.opts span::before { content: ""; display: inline-block; width: 10px; height: 10px; border: 1px solid var(--muted); border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+.cue { background: var(--soft); border-radius: 6px; padding: 8px 12px; font-size: 12.5px; }
+.cue strong { color: var(--green); }
+
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 18px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+.rules strong { color: var(--ink); }
+
+.tally { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.tally div { border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; display: grid; gap: 2px; }
+.tally span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.tally p { margin: 0; font-weight: 600; }
+
+@media print {
+  @page { size: letter; margin: 0.4in; }
+  :root { --paper: #fff; --canvas: #fff; --ink: #16243A; --muted: #5A6678; --line: #B9C3CF; --navy: #1E3A5F; --green: #3E8F63; --soft: #EAF5EE; }
+  body { padding: 0; background: #fff; }
+  .sheet { border: 0; border-radius: 0; padding: 0; max-width: none; gap: 11px; }
+  .screen-only { display: none; }
+  .cue, .tally div { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
+<div class="sheet">
+  <header>
+    <h1>Provider call sheet</h1>
+    <p class="sub">About 15 minutes. Listen first, demo second, ask for the pilot every time.</p>
+    <div class="fields">
+      <label class="field"><span>Name</span><i></i></label>
+      <label class="field"><span>Practice type</span><i></i></label>
+      <label class="field"><span>Date</span><i></i></label>
+      <label class="field"><span>How we met</span><i></i></label>
+    </div>
+  </header>
+
+  <section>
+    <h2><b>1</b> How they work now <em>most of the call</em></h2>
+    <ol>
+      <li>Do you sell packages or prepaid visits now? If not, have you thought about it? What stopped you?
+        <div class="opts"><span>Yes</span><span>Thought about it</span><span>Used to</span><span>No</span></div></li>
+      <li>Walk me through the last package you sold. How did they pay, and how did you track it?<div class="w"></div></li>
+      <li>How do you know how many visits a client has left?<div class="w"></div></li>
+      <li>What's the most annoying part of that?<div class="w"></div></li>
+      <li>Has it ever gone wrong (a disputed count, a forgotten visit, a refund)? What happened?<div class="w"></div></li>
+      <li>About how many package clients? Typical package price?
+        <div class="opts"><span>Under 10</span><span>10–50</span><span>50+</span><span>Price: $______</span></div></li>
+      <li>What do you use now, and what do you pay for it?
+        <div class="opts"><span>Paper</span><span>Spreadsheet</span><span>Practice software</span><span>Other: ________</span></div></li>
+    </ol>
+  </section>
+
+  <div class="cue"><strong>Now demo it.</strong> Two minutes on your phone: purchase page, the pass, then a scan. Don't explain features they didn't ask about.</div>
+
+  <section>
+    <h2><b>2</b> Their reaction</h2>
+    <ol style="--start: 7">
+      <li>What, if anything, would this replace for you?<div class="w"></div></li>
+      <li>What's missing that would stop you from using it?<div class="w"></div></li>
+      <li>Would your clients be OK getting a pass by email and scanning it at the door?
+        <div class="opts"><span>Yes</span><span>Some would</span><span>No</span></div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2><b>3</b> Price and the ask <em>never skip</em></h2>
+    <ol style="--start: 10">
+      <li>"Founder price is $19.99 a month, flat. We take nothing from your sales. Fair, too high, or a bargain?"
+        <div class="opts"><span>Bargain</span><span>Fair</span><span>Too high</span><span>Would pay: $____</span></div></li>
+      <li>"I'm starting a small free pilot soon. Can I put you down for it?"
+        <div class="opts"><span>Yes</span><span>Maybe</span><span>No</span><span>Why: ____________</span></div></li>
+      <li>"Who else should I talk to?"<div class="w"></div></li>
+    </ol>
+  </section>
+
+  <div class="tally">
+    <div><span>Biggest pain, in their words</span><p>&nbsp;</p></div>
+    <div><span>Pilot</span><p>Yes / Maybe / No</p></div>
+    <div><span>Follow up by</span><p>&nbsp;</p></div>
+  </div>
+
+  <div class="rules">
+    <p><strong>Ask about the past.</strong> "Walk me through the last time" beats "would you use this?"</p>
+    <p><strong>Compliments don't count.</strong> Only a pilot yes or a referral is real.</p>
+    <p><strong>No patient details.</strong> Never write down a client's name or health story.</p>
+    <p><strong>The goal:</strong> 3–5 pilot yeses from 15–20 calls.</p>
+  </div>
+  <p class="sub screen-only">To print: open this file in your browser and press Ctrl+P (fits one letter page).</p>
+</div>

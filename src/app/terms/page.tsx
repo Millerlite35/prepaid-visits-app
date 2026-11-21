@@ -54,7 +54,9 @@ export default function TermsPage() {
         <LegalList
           items={[
             "Payments are processed by Stripe on your own Stripe account, under Stripe's terms. Money from each sale goes to you, not to us.",
-            `Our fee is ${platformFeePercent}% of each package sold, taken automatically at the time of sale. When you refund a sale, the matching part of our fee is refunded too.`,
+            platformFeePercent > 0
+              ? `Our fee is ${platformFeePercent}% of each package sold, taken automatically at the time of sale. When you refund a sale, the matching part of our fee is refunded too.`
+              : "We take no fee from your package sales.",
             "Stripe's own card fees are charged to you by Stripe.",
             "We'll give at least 30 days' notice by email before changing our fees.",
           ]}

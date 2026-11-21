@@ -61,7 +61,7 @@ export async function refundPurchase(args: {
       {
         payment_intent: purchase.stripe_payment_intent_id,
         amount: refund?.amount_cents ?? args.amountCents,
-        refund_application_fee: true, // our platform fee goes back too, in proportion
+        refund_application_fee: true, // our platform fee (if the sale had one) goes back too, in proportion
         reason: "requested_by_customer",
         metadata: { refund_id: String(refundId), provider_id: args.providerId, purchase_id: args.purchaseId },
       },
